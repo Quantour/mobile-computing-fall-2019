@@ -8,6 +8,8 @@
 .buildlog/
 .history
 .svn/
+*MAPS_API_KEY.txt
+MAPS_API_KEY.txt
 
 # IntelliJ related
 *.iml
