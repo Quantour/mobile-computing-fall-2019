@@ -69,5 +69,6 @@ nearest city (City, Country)| (String, String)
 my time, my (user-/difficulty-)rating, ID of route
 
 save for each user, so he can have a list of his activities
+
 Dont safe here: #not directly visible information by user
 
