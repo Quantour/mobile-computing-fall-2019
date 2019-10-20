@@ -28,7 +28,7 @@ field | type
 Route ID | String
 Creator/User ID | String
 route information | List of (longitude, latitude) [List of (double, double)]
-timestamp, when created|  int [UNIX Style time stamp]
+timestamp, when created |  int [UNIX Style time stamp]
 
 #optional, changeable, editable by everyone
 
@@ -38,7 +38,6 @@ description|	String
 tips & tricks|	String
 images|	List of Strings [List of URLs to Images]
 
-int [seconds (UNIX Style time unit)]
 #not directly visible information by user
 
 field | type
