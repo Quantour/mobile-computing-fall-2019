@@ -27,6 +27,7 @@ field | type
 ------------ | -------------
 Route ID | String
 Creator/User ID | String
+Title | String
 route information | List of (longitude, latitude) [List of (double, double)]
 timestamp, when created |  int [UNIX Style time stamp]
 
