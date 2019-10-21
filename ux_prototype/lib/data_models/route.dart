@@ -10,7 +10,8 @@ class HikingRoute {
   //required, final, only editable by Creator while creating data
   final String          routeID;
   final String          userID = "0";
-  final List<Location>  route = <Location>[for (int i=0;i<10;i++)Location(45.521500+00.000020*i, -122.677443+-000.000020*i)];
+  final String          title = "Title";
+  final List<Location>  route = <Location>[for (int i=0;i<10;i++)Location(45.521500+00.000921*i, -122.677443+-000.000095*i)];
   final int             timestamp = 1571561662;
 
   //optional, changeable, editable by everyone
@@ -42,6 +43,14 @@ class HikingRoute {
   String get nearestCity => "Berlin";
   String get country     => "Germany";
   
+
+  /*static Future<HikingRoute> fromID(String id) {
+    if (_localMirroredData.containsKey(id))
+      return Future.delayed(Duration(seconds: 3),()=>_localMirroredData[id]);
+    HikingRoute r = HikingRoute._(id);
+    _localMirroredData[id] = r;
+    return Future.delayed(Duration(seconds: 3),()=>r);
+  }*/
 
   static HikingRoute fromID(String id) {
     if (_localMirroredData.containsKey(id))

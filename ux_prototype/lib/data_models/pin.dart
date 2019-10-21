@@ -20,16 +20,17 @@ class Pin {
   List<String> get  images => [];
   Set<PinType> get  types => <PinType>[PinType.restingPlace, PinType.restroom].toSet();
 
-  static Pin fromID(String pinID) {
+  static Future<Pin> fromID(String pinID) {
     if (_localMirroredData.containsKey(pinID))
-      return _localMirroredData[pinID];
+      return Future.delayed(Duration(seconds: 3), ()=>_localMirroredData[pinID]);
     Pin p = Pin._(pinID);
     _localMirroredData[pinID] = p;
-    return p;
+    return Future.delayed(Duration(seconds: 3), ()=>p);
   }
 
+  /*
   static Set<Pin> fromArea(Location start, Location end) {
     return <Pin>[Pin.fromID("1"),Pin.fromID("2")].toSet();
-  }
+  }*/
 
 }

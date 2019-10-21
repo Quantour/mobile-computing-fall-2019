@@ -12,17 +12,15 @@ class User {
   User._(String id): userID = id;
 
   final String userID;
-  String get   profilePicture => "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png";
+  String get   profilePicture => "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
   String get   name => "John Doe";  
   int get      expertise => 2;
 
-  static User fromID(String userID) {
+  static Future<User> fromID(String userID) {
     if (_localMirroredData.containsKey(userID))
-      return _localMirroredData[userID];
+      return Future.delayed(Duration(seconds: 3),()=>_localMirroredData[userID]);
     User u = User._(userID);
     _localMirroredData[userID] = u;
-    return u;
+    return Future.delayed(Duration(seconds: 3),()=>u);
   }
-
-
 }

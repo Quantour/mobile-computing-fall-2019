@@ -6,6 +6,12 @@ double _degreesToRadians(double degree) {
   return degree * _pi / 180;
 }
 
+/**
+ * The Location class holds latitude and longitude information
+ * abaout an geographic position. it can also calculate the
+ * distance between two geographic positions and calculates the
+ * midpoint of a list of positions.
+ */
 class Location {
   final double latitude, longitude;
   Location(double latitude, double longitude): 
@@ -27,11 +33,11 @@ class Location {
     return meterDist;
   }
 
-  //TODO: Check/test if correct or use library
-  //source: http://www.geomidpoint.com/calculation.html
   /** Calculates distance of two coordinate points in meter */
   int distanceTo(Location b) => Location.distance(this, b);
 
+  //TODO: Check/test if correct or use library
+  //source: http://www.geomidpoint.com/calculation.html
   static Location average(List<Location> locations) {
     if (locations == null) throw NullThrownError();
     List<List<double>> radLatLong = locations.map(
