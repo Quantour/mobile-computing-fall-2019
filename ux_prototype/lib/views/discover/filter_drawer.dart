@@ -25,59 +25,76 @@ class _FilterDrawerState extends State<FilterDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
 
-          Container(
-            child: SafeArea(
-              child: Builder(builder: (context) {
-                var w = min(MediaQuery.of(context).size.width*0.2,MediaQuery.of(context).size.height*0.2);
-                //When logged in
-                if (User.currentUser != null)
-                  return Column(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.center,
-                        width: w,
-                        height: w,
-                        margin: EdgeInsets.all(10),
-                        child: ProfilePictureWidget(url: User.currentUser.profilePicture),
-                      ),
-                      Text(User.currentUser.name, style: Theme.of(context).textTheme.title),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: RaisedButton(
-                          child: Text("Logout"),
-                          onPressed: () {
-                            //Todo Logout
-                          },
-                        ),
-                      )
-                    ],
-                  );
-                else
-                  return Column(
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.center,
-                        width: w,
-                        height: w,
-                        margin: EdgeInsets.all(10),
-                        child: ProfilePictureWidget(url: null),
-                      ),
-                      Text("", style: Theme.of(context).textTheme.title),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: RaisedButton(
-                          child: Text("Login or sign up"),
-                          onPressed: () {
-                            //Todo in
-                          },
-                        ),
-                      )
-                    ],
-                  );
-              }),
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(90), bottomRight: Radius.circular(0))
             ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
+            clipBehavior: Clip.hardEdge,
+            elevation: 8,
+            margin: EdgeInsets.all(0),
+            child: Container(
+              decoration: BoxDecoration(
+                //color: Theme.of(context).accentColor,
+                gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  stops: [0,0.7],
+                  colors: [
+                    Color.fromRGBO(244,81,30,1),
+                    Color.fromRGBO(109,76,65,1)
+                  ]
+                )
+              ),
+              child: SafeArea(
+                child: Builder(builder: (context) {
+                  var w = min(MediaQuery.of(context).size.width*0.2,MediaQuery.of(context).size.height*0.2);
+                  //When logged in
+                  if (User.currentUser != null)
+                    return Column(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          width: w,
+                          height: w,
+                          margin: EdgeInsets.all(10),
+                          child: ProfilePictureWidget(url: User.currentUser.profilePicture),
+                        ),
+                        Text(User.currentUser.name, style: Theme.of(context).textTheme.title),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: RaisedButton(
+                            child: Text("Logout"),
+                            onPressed: () {
+                              //Todo Logout
+                            },
+                          ),
+                        )
+                      ],
+                    );
+                  else
+                    return Column(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          width: w,
+                          height: w,
+                          margin: EdgeInsets.all(10),
+                          child: ProfilePictureWidget(url: null),
+                        ),
+                        Text("", style: Theme.of(context).textTheme.title),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: RaisedButton(
+                            child: Text("Login or sign up"),
+                            onPressed: () {
+                              //Todo in
+                            },
+                          ),
+                        )
+                      ],
+                    );
+                }),
+              )
             ),
           ),
           Padding(

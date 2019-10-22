@@ -29,7 +29,17 @@ class _DiscoverAppBarState extends State<DiscoverAppBar> {
         elevation: 0,
         child: Container(
           decoration: new BoxDecoration(
-            color: Theme.of(context).accentColor,
+            //color: Theme.of(context).accentColor,
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomLeft,
+              stops: [0,0.5, 0.7],
+              colors: [
+                Color.fromRGBO(188,91,60,1),
+                Color.fromRGBO(148,84,62,1),
+                Color.fromRGBO(109,76,65,1)
+              ]
+            ),
             boxShadow: [
               new BoxShadow(blurRadius: 25.0)
             ],

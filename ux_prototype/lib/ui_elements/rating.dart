@@ -5,8 +5,15 @@ class ExperienceRatingWidget extends StatelessWidget {
 
   final double rating;
   final bool useColumn;
+  final double iconSize;
+  final double fontSize;
 
-  ExperienceRatingWidget({@required this.rating, this.useColumn = false}) {
+  ExperienceRatingWidget({
+    @required this.rating, 
+    this.useColumn = false,
+    this.iconSize = 24,
+    this.fontSize = 16
+    }) {
     if (rating < 1 || rating > 5)
       throw ArgumentError.value(rating, "Experience Rating", "Rating must be a double value between 1 and 5");
   }
@@ -28,10 +35,11 @@ class ExperienceRatingWidget extends StatelessWidget {
             Icon(
               Icons.star,
               color: i <= j ? Colors.orange[300] : Colors.grey,
+              size: this.iconSize,
             )
         ],
       ),
-      Text(rating.toStringAsFixed(1))
+      Text(rating.toStringAsFixed(1), style: TextStyle(fontSize: this.fontSize))
     ];
 
     if (!this.useColumn)
@@ -54,8 +62,14 @@ class DifficultyRatingWidget extends StatelessWidget {
 
   final double rating;
   final bool useColumn;
+  final double iconSize;
+  final double fontSize;
 
-  DifficultyRatingWidget({@required this.rating, this.useColumn = false}) {
+  DifficultyRatingWidget({
+    @required this.rating, 
+    this.useColumn = false,
+    this.iconSize = 24,
+    this.fontSize = 16}) {
     if (rating < 1 || rating > 5)
       throw ArgumentError.value(rating, "Difficulty Rating", "Rating must be a double value between 1 and 5");
   }
@@ -79,10 +93,11 @@ class DifficultyRatingWidget extends StatelessWidget {
             Icon(
               Icons.accessibility_new,
               color: i <= j ? color : Colors.grey,
+              size: this.iconSize
             ),
           ],
       ),
-      Text(textRating)
+      Text(textRating, style: TextStyle(fontSize: this.fontSize),)
     ];
 
     if (!this.useColumn)

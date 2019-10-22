@@ -57,8 +57,8 @@ class SearchResultCardWidget extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            ExperienceRatingWidget(rating: route.avgRating),
-                            DifficultyRatingWidget(rating: route.avgDifficulty),
+                            ExperienceRatingWidget(rating: route.avgRating, iconSize: 17, fontSize: 15,),
+                            DifficultyRatingWidget(rating: route.avgDifficulty, iconSize: 17, fontSize: 15,),
                             //Profile Picture
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
@@ -93,9 +93,9 @@ class SearchResultCardWidget extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
                                   route.length<1000
-                                    ?Text("${route.length} meter")
-                                    :Text("${route.length.toDouble().toStringAsFixed(1)} km"),
-                                  Icon(Icons.gesture)
+                                    ?Text("${route.length} meter", style: TextStyle(fontSize: 12))
+                                    :Text("${route.length.toDouble().toStringAsFixed(1)} km", style: TextStyle(fontSize: 12)),
+                                  Icon(Icons.gesture, size: 19)
                                 ],
                               ),
                               //steepness of route
@@ -103,9 +103,9 @@ class SearchResultCardWidget extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
                                   route.steepness<1000
-                                    ?Text("${route.steepness} meter")
-                                    :Text("${route.steepness.toDouble().toStringAsFixed(1)} km"),
-                                  Icon(Icons.show_chart)
+                                    ?Text("${route.steepness} meter", style: TextStyle(fontSize: 12))
+                                    :Text("${route.steepness.toDouble().toStringAsFixed(1)} km", style: TextStyle(fontSize: 12)),
+                                  Icon(Icons.show_chart, size: 19)
                                 ],
                               ),
                               //avg time needed to complete
@@ -119,22 +119,22 @@ class SearchResultCardWidget extends StatelessWidget {
                                       String timestr = "$hours h";
                                       if (hours == 0) timestr = "$minutes min";
                                       else if (minutes != 0) timestr += " $minutes min";
-                                      return Text(timestr);
+                                      return Text(timestr, style: TextStyle(fontSize: 12));
                                     },
                                   ),
-                                  Icon(Icons.timelapse)
+                                  Icon(Icons.timelapse, size: 19)
                                 ],
                               ),
                               //nearest city
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
-                                  Text("${route.nearestCity}, "),
+                                  Text("${route.nearestCity}, ", style: TextStyle(fontSize: 12)),
                                   Text(
                                     route.country,
-                                    style: TextStyle(fontSize: 10),
+                                    style: TextStyle(fontSize: 9),
                                     textAlign: TextAlign.end,),
-                                  Icon(Icons.map)
+                                  Icon(Icons.map, size: 19)
                                 ],
                               ),
                             ],
