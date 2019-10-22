@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
+import 'package:ux_prototype/ui_elements/profile_picture.dart';
 import 'package:ux_prototype/ui_elements/rating.dart';
 
 import '../../data_models/user.dart';
@@ -40,91 +41,119 @@ class SearchResultCardWidget extends StatelessWidget {
                   heroTag: this.heroTag==null?UniqueKey().toString():this.heroTag,
                 )
               ),
-              //<Ratings length and user info>
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ExperienceRatingWidget(rating: route.avgRating),
-                      DifficultyRatingWidget(rating: route.avgDifficulty)
-                    ],
-                  ),
-                  Expanded(
-                    child: Column(
+
+              //<Body of Card>
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    //<Ratings length and user info>
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            route.length<1000
-                              ?Text("${route.length} meter")
-                              :Text("${route.length.toDouble().toStringAsFixed(1)} km"),
-                            Icon(Icons.gesture)
+                            ExperienceRatingWidget(rating: route.avgRating),
+                            DifficultyRatingWidget(rating: route.avgDifficulty),
+                            //Profile Picture
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: FutureBuilder(
+                                future: User.fromID(route.userID),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    if (snapshot.hasError)
+                                      return Container();
+                                    else
+                                      return Row(children: <Widget>[
+                                        Container(
+                                          child: ProfilePictureWidget(url:snapshot.data.profilePicture),
+                                          height: 30,
+                                          margin: EdgeInsets.only(right: 10),
+                                        ),
+                                        Text(snapshot.data.name)
+                                      ]);
+                                  } else {
+                                    return Container(height: 30);
+                                  }
+                                },
+                              ),
+                            )
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            route.length<1000
-                              ?Text("${route.steepness} meter")
-                              :Text("${route.steepness.toDouble().toStringAsFixed(1)} km"),
-                            Icon(Icons.show_chart)
-                          ],
-                        )
-                      ],
-                    )
-                  ),
-                ],
-              ),
-
-              FutureBuilder(
-                    future: User.fromID(route.userID),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasError)
-                          return Container();
-                        else
-                          return Row(children: <Widget>[
-                            /* FadeInImage.memoryNetwork(
-                                placeholder: kTransparentImage,
-                                image: images[index],
-                                fit: BoxFit.cover,
-                              ) */
-                            Container(
-                              child: Stack(
-                                fit: StackFit.passthrough,
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              //length of route
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
-                                  ClipOval(
-                                    child: Image.asset(
-                                      "assets/images/blank_profile_picture.png",
-                                      fit: BoxFit.cover
-                                    )
-                                  ),
-                                  ClipOval(
-                                    child: FadeInImage.memoryNetwork(
-                                      placeholder: kTransparentImage,
-                                      image: snapshot.data.profilePicture,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                                  route.length<1000
+                                    ?Text("${route.length} meter")
+                                    :Text("${route.length.toDouble().toStringAsFixed(1)} km"),
+                                  Icon(Icons.gesture)
                                 ],
                               ),
-                              height: 30,
-                              width: 30,
-                            ),
-                            Text(snapshot.data.name)
-                          ]);
-                      } else {
-                        return Container();
-                      }
-                    },
+                              //steepness of route
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  route.steepness<1000
+                                    ?Text("${route.steepness} meter")
+                                    :Text("${route.steepness.toDouble().toStringAsFixed(1)} km"),
+                                  Icon(Icons.show_chart)
+                                ],
+                              ),
+                              //avg time needed to complete
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Builder(
+                                    builder: (context) {
+                                      int hours = (route.avgTime/(60*60)).floor();
+                                      int minutes = (route.avgTime%(60*60)).floor();
+                                      String timestr = "$hours h";
+                                      if (hours == 0) timestr = "$minutes min";
+                                      else if (minutes != 0) timestr += " $minutes min";
+                                      return Text(timestr);
+                                    },
+                                  ),
+                                  Icon(Icons.timelapse)
+                                ],
+                              ),
+                              //nearest city
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Text("${route.nearestCity}, "),
+                                  Text(
+                                    route.country,
+                                    style: TextStyle(fontSize: 10),
+                                    textAlign: TextAlign.end,),
+                                  Icon(Icons.map)
+                                ],
+                              ),
+                            ],
+                          )
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                      child: Text(route.title, style: Theme.of(context).textTheme.title),
+                    ),
+                    Text(
+                      route.description,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                    ),
+                  ],
+                ),
               ),
-              Text("near Seoul", style: Theme.of(context).textTheme.title),
-              Text("Hallo Werltw"),
-              Text("Hallo Werlt3"),
-              Text("Hallo Werlt4"),
             ],
           ),
         ),

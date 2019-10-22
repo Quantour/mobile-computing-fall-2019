@@ -11,7 +11,7 @@ class HikingRoute {
   final String          routeID;
   final String          userID = "0";
   final String          title = "Title";
-  final List<Location>  route = <Location>[for (int i=0;i<10;i++)Location(45.521500+00.000921*i, -122.677443+-000.000095*i)];
+  final List<Location>  route = <Location>[for (int i=0;i<10;i++)Location(45.521500+00.000921*i, -122.677443+000.000600*i)];
   final int             timestamp = 1571561662;
 
   //optional, changeable, editable by everyone
@@ -26,7 +26,7 @@ class HikingRoute {
   //derived Informartion
   double get avgRating => 2.4;
   double get avgDifficulty => 3.0;
-  double get avgTime => 36000;
+  int get avgTime => 36000;
 
   int get length {
     int dist = 0;

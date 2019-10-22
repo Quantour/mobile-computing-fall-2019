@@ -23,4 +23,8 @@ class User {
     _localMirroredData[userID] = u;
     return Future.delayed(Duration(seconds: 3),()=>u);
   }
+
+  static User get currentUser {
+    return User._("Id");
+  }
 }
