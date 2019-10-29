@@ -1,5 +1,7 @@
 import 'dart:math' as Math;
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 const double _pi = 3.1415926535897932385;
 
 double _degreesToRadians(double degree) {
@@ -40,15 +42,22 @@ class Location {
   //source: http://www.geomidpoint.com/calculation.html
   static Location average(List<Location> locations) {
     if (locations == null) throw NullThrownError();
+    //TODO: implement and test this method
+    
+    List<double> la = locations.map((p) => p.latitude).toList();
+    List<double> lo = locations.map((p) => p.longitude).toList();
+    return Location((la.reduce(Math.min) + la.reduce(Math.max))/2, (lo.reduce(Math.min) + lo.reduce(Math.max))/2);
+
     List<List<double>> radLatLong = locations.map(
-      (l) => [_degreesToRadians(l.latitude),_degreesToRadians(l.longitude)]);
+      (l) => [_degreesToRadians(l.latitude), _degreesToRadians(l.longitude)]
+    ).toList();
 
     List<double> xs = radLatLong.map(
-      (c) => Math.cos(c[0]) + Math.cos(c[1]));
+      (c) => Math.cos(c[0]) + Math.cos(c[1])).toList();
     List<double> ys = radLatLong.map(
-      (c) => Math.sin(c[0]) + Math.sin(c[1]));
+      (c) => Math.sin(c[0]) + Math.sin(c[1])).toList();
     List<double> zs = radLatLong.map(
-      (c) => Math.sin(c[0]));
+      (c) => Math.sin(c[0])).toList();
     
     double sumX = xs.reduce((x1,x2)=>x1+x2);
     double avgX = sumX / xs.length;
@@ -68,5 +77,26 @@ class Location {
 
     return Location(lat,lon);
   }
+
+  LatLng toLatLng() {
+    return LatLng(latitude, longitude);
+  } 
+
+/*
+  static LatLngBounds getLatLngBounds(List<Location> locations) {
+
+    List<double> la = locations.map((p) => p.latitude).toList();
+    List<double> lo = locations.map((p) => p.longitude).toList();
+    double minLa = la.reduce(Math.min);
+    double maxLa =  la.reduce(Math.max);
+    double minLo = lo.reduce(Math.min);
+    double maxLo =  lo.reduce(Math.max);
+    
+    return LatLngBounds(
+      northeast: LatLng(maxLa, minLo),
+      southwest: LatLng(minLa, maxLo)
+    );
+
+  }*/
 
 }

@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/profile_picture.dart';
 import 'package:ux_prototype/ui_elements/rating.dart';
 
+import '../../data_models/user.dart';
 import '../../data_models/user.dart';
 
 class FilterDrawer extends StatefulWidget {
@@ -49,7 +51,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                 child: Builder(builder: (context) {
                   var w = min(MediaQuery.of(context).size.width*0.2,MediaQuery.of(context).size.height*0.2);
                   //When logged in
-                  if (User.currentUser != null)
+                  if (User.isLoggedIn)
                     return Column(
                       children: <Widget>[
                         Container(
@@ -62,16 +64,21 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         Text(User.currentUser.name, style: Theme.of(context).textTheme.title),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: RaisedButton(
-                            child: Text("Logout"),
+                          child: CustomButton(
+                            text: "Logout",
                             onPressed: () {
-                              //Todo Logout
-                            },
-                          ),
+                              //TODO Logout
+                              //For UI debug purposes:
+                              setState(() {
+                               User.isLoggedIn = false; 
+                              });
+                            }
+                          )
                         )
                       ],
                     );
                   else
+                    //When not logged in
                     return Column(
                       children: <Widget>[
                         Container(
@@ -81,15 +88,25 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           margin: EdgeInsets.all(10),
                           child: ProfilePictureWidget(url: null),
                         ),
-                        Text("", style: Theme.of(context).textTheme.title),
+                        //Text("", style: Theme.of(context).textTheme.title),
+                        CustomButton(
+                          text: "Sign up",
+                          onPressed: () {
+                            //TODO: implement sign up
+                          },
+                        ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: RaisedButton(
-                            child: Text("Login or sign up"),
+                          padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+                          child: CustomButton(
+                            text: "  Login  ",
                             onPressed: () {
-                              //Todo in
-                            },
-                          ),
+                              //TODO log in
+                              //For UI debug purposes:
+                              setState(() {
+                               User.isLoggedIn = true; 
+                              });
+                            }
+                          )
                         )
                       ],
                     );
@@ -150,7 +167,8 @@ class _FilterDrawerState extends State<FilterDrawer> {
               });
             },
             min: 1.0,
-            max: 5.0
+            max: 5.0,
+            divisions: 4,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, top: 8),
@@ -172,7 +190,8 @@ class _FilterDrawerState extends State<FilterDrawer> {
               });
             },
             min: 1.0,
-            max: 5.0
+            max: 5.0,
+            divisions: 4,
           ),
         ],
       )

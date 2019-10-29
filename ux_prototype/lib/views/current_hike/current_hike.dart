@@ -46,4 +46,3 @@ class _CurrentHikeState extends State<CurrentHike> {
   }
 
 }
-

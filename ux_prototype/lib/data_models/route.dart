@@ -11,7 +11,12 @@ class HikingRoute {
   final String          routeID;
   final String          userID = "0";
   final String          title = "Title";
-  final List<Location>  route = <Location>[for (int i=0;i<10;i++)Location(45.521500+00.000921*i, -122.677443+000.000600*i)];
+  final List<Location>  route = <Location>[
+    Location(51.220285, 6.792312),
+    Location(51.217869, 6.788197),
+    Location(51.215642, 6.771117),
+    Location(51.212078, 6.779353)
+  ];
   final int             timestamp = 1571561662;
 
   //optional, changeable, editable by everyone

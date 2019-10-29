@@ -27,4 +27,13 @@ class User {
   static User get currentUser {
     return User._("Id");
   }
+
+  static bool get isLoggedIn {
+    return _login_status;
+  }
+
+  //<REMOVE THIS> for UI debug purposes
+  static bool _login_status = false;
+  static set isLoggedIn(bool status) => _login_status = status;
+  //</REMOVE THIS>
 }

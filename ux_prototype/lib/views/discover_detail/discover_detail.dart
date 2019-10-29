@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:ux_prototype/data_models/route.dart';
+import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
+import 'package:ux_prototype/ui_elements/route_info.dart';
 
 class DiscoverDetail extends StatefulWidget {
   final HikingRoute route;
@@ -47,7 +49,22 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                     imageBuilder: () => widget.route.images,
                     heroTag: widget.heroTag==null?UniqueKey().toString():widget.heroTag,
                   )
-                )
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(8),
+                      child: CustomButton(
+                        text: "Start this route",
+                        onPressed: () {
+                          
+                        },
+                      ),
+                    )
+                  ],
+                ),
+                RouteInfo(route: widget.route, extended: true,)
               ],
             ),
           ),
