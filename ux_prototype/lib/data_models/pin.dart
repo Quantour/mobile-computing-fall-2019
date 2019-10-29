@@ -28,9 +28,11 @@ class Pin {
     return Future.delayed(Duration(seconds: 3), ()=>p);
   }
 
-  /*
-  static Set<Pin> fromArea(Location start, Location end) {
-    return <Pin>[Pin.fromID("1"),Pin.fromID("2")].toSet();
-  }*/
+  //TODO: implement properly with server communication
+  static List<Pin> fromArea(Location location, int radius) {
+    return <Pin>[
+      //...
+    ];
+  }
 
 }
