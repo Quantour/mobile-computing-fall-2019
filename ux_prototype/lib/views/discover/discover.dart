@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ux_prototype/data_models/route.dart';
-import 'package:ux_prototype/ui_elements/buttom_navigation.dart';
 import 'package:ux_prototype/views/discover/filter_drawer.dart';
 import 'package:ux_prototype/views/discover/search_result_card.dart';
 import 'package:ux_prototype/views/discover_detail/discover_detail.dart';

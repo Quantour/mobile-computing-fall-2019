@@ -4,6 +4,14 @@ import 'package:ux_prototype/views/current_hike/current_hike.dart';
 import 'package:ux_prototype/views/discover/discover.dart';
 import 'package:ux_prototype/views/hike_history/hike_history.dart';
 
+/**
+ * This Screen is the Master screen for the App.
+ * It holds the views discover, history and current hike as children
+ * in a Stack. Because of that, the views preserve their state, even
+ * when there not shown, because they are never removed from the 
+ * widget tree.
+ * 
+ */
 class MasterView extends StatefulWidget {
   MasterView({Key key}) : super(key: key);
 
