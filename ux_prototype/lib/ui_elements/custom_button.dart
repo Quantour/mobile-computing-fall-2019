@@ -5,22 +5,24 @@ import 'package:flutter/widgets.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
+  final Color color;
   final void Function() onPressed;
-  const CustomButton({this.onPressed, this.text, Key key}) : super(key: key);
+  const CustomButton({this.color, this.onPressed, this.text, Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Color color = this.color==null?Theme.of(context).accentColor:this.color;
     return Container(
       child: RaisedButton(
         shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(18.0),
-            side: BorderSide(color: Color.fromRGBO(244,81,30,1), width: 4)
+            side: BorderSide(color: color, width: 4)
         ),
         padding: const EdgeInsets.fromLTRB(40, 10, 40, 10),
         child: Text(
           this.text,
           style: TextStyle(
-            color: Color.fromRGBO(244,81,30,1),
+            color: color,
             fontWeight: FontWeight.bold,
             fontSize: 16
           )

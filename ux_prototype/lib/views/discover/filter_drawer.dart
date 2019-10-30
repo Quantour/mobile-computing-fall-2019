@@ -66,6 +66,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           padding: const EdgeInsets.all(8.0),
                           child: CustomButton(
                             text: "Logout",
+                            color: Color.fromRGBO(244,81,30,1),
                             onPressed: () {
                               //TODO Logout
                               //For UI debug purposes:
@@ -91,6 +92,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         //Text("", style: Theme.of(context).textTheme.title),
                         CustomButton(
                           text: "Sign up",
+                          color: Color.fromRGBO(244,81,30,1),
                           onPressed: () {
                             //TODO: implement sign up
                           },
@@ -99,6 +101,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
                           child: CustomButton(
                             text: "  Login  ",
+                            color: Color.fromRGBO(244,81,30,1),
                             onPressed: () {
                               //TODO log in
                               //For UI debug purposes:
