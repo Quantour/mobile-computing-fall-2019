@@ -7,7 +7,6 @@ import 'package:ux_prototype/ui_elements/profile_picture.dart';
 import 'package:ux_prototype/ui_elements/rating.dart';
 
 import '../../data_models/user.dart';
-import '../../data_models/user.dart';
 
 class FilterDrawer extends StatefulWidget {
   @override
