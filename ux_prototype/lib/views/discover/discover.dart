@@ -51,7 +51,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
             delegate: SliverChildListDelegate(
               
               <Widget>[
-                for (var i = 0; i < 2; ++i)
+                for (var i = 0; i < 5; ++i)
                   SearchResultCardWidget(
                     onTap: () {
                       Navigator.push(
@@ -64,7 +64,8 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                       );
                     },
                     heroTag: "$i ROUTE",
-                    route: HikingRoute.fromID("$i ROUTE")
+                    route: HikingRoute.fromID("$i ROUTE"),
+                    user_idx: i
                   )
               ]
 
