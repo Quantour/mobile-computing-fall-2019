@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ux_prototype/views/discover/discover.dart';
 import 'style.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 void main() => runApp(MyApp());
