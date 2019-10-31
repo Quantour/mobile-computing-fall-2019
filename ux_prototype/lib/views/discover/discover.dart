@@ -6,6 +6,7 @@ import 'package:ux_prototype/views/current_hike/current_hike.dart';
 import 'package:ux_prototype/views/discover/filter_drawer.dart';
 import 'package:ux_prototype/views/discover/search_result_card.dart';
 import 'package:ux_prototype/views/discover_detail/discover_detail.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'app_bar.dart';
 import 'search_text_input.dart';
 
@@ -50,7 +51,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
             delegate: SliverChildListDelegate(
               
               <Widget>[
-                for (var i = 0; i < 20; ++i)
+                for (var i = 0; i < 2; ++i)
                   SearchResultCardWidget(
                     onTap: () {
                       Navigator.push(

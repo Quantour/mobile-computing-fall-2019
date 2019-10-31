@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class SearchResultCardWidget extends StatelessWidget {
 
