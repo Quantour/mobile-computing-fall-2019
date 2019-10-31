@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "187458542920",
+    "firebase_url": "https://dauntless-ember-256403.firebaseio.com",
+    "project_id": "dauntless-ember-256403",
+    "storage_bucket": "dauntless-ember-256403.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187458542920:android:89e39a861bb842af29277d",
+        "android_client_info": {
+          "package_name": "com.android.application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "187458542920-9cuvv1t36phdq60gnnsce3mv6jn1k2an.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEzbX_mH0hV4ru08RucHLMV3k5qsDM4Ts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "187458542920-9cuvv1t36phdq60gnnsce3mv6jn1k2an.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
