@@ -28,7 +28,19 @@ class _CurrentHikeState extends State<CurrentHike> {
           ),
           RouteMap(
             route: HikingRoute.fromID("id"),
-          )
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: FloatingActionButton(
+                onPressed: null,
+                materialTapTargetSize: MaterialTapTargetSize.padded,
+                backgroundColor: Colors.green,
+                child: const Icon(Icons.add_location, size: 36.0),
+              ),
+            ),
+          ),
         ],
       ),
       

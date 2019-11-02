@@ -4,11 +4,10 @@ import 'package:ux_prototype/data_models/pin.dart';
 import 'package:ux_prototype/data_models/route.dart';
 
 class RouteMap extends StatelessWidget {
+
   final HikingRoute route;
 
   const RouteMap ({@required this.route, Key key}) : super(key: key);
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +16,7 @@ class RouteMap extends StatelessWidget {
         initialCameraPosition: CameraPosition(
           target: route.location.toLatLng(),
           zoom: 14.0
+
           //TODO: figure out proper zoom depending on route
         ),
         polylines: Set.from(<Polyline>[
