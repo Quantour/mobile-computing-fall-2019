@@ -116,8 +116,8 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                           style: TextStyle(fontSize: 24, color: Colors.blue, fontWeight: FontWeight.bold),
                         ),
                       ),
-
-                        Text(routeName),
+                      Padding(padding: EdgeInsets.only(top: 10.0)),
+                        Text('Hike Name'),
 
                         TextField(
                           onSubmitted:(route){
@@ -125,13 +125,17 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                             hikeName = routeName;
                           },
                         ),
-
+                        Padding(padding: EdgeInsets.only(top: 20.0)),
+                        Text('Difficulty'),
                         TextField(
                           onSubmitted:(route){
                             routeInput(route);
                             difficulty = routeName;
                         },
                       ),
+                      Padding(padding: EdgeInsets.only(top: 20.0)),
+                      Text('Region'),
+
                       TextField(
                         onSubmitted:(route){
                           routeInput(route);
