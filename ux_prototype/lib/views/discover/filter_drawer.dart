@@ -1,5 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ux_prototype/ui_elements/custom_button.dart';
+import 'package:ux_prototype/ui_elements/profile_picture.dart';
+import 'package:ux_prototype/ui_elements/rating.dart';
+
+import '../../data_models/user.dart';
 
 class FilterDrawer extends StatefulWidget {
   @override
@@ -9,6 +16,9 @@ class FilterDrawer extends StatefulWidget {
 }
 
 class _FilterDrawerState extends State<FilterDrawer> {
+  double _minRating = 1, _minDifficultyRating = 1;
+
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -16,25 +26,175 @@ class _FilterDrawerState extends State<FilterDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
 
-          DrawerHeader(
-            child: Text('Add filter functionality to this'),
-            decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(90), bottomRight: Radius.circular(0))
+            ),
+            clipBehavior: Clip.hardEdge,
+            elevation: 8,
+            margin: EdgeInsets.all(0),
+            child: Container(
+              decoration: BoxDecoration(
+                //color: Theme.of(context).accentColor,
+                gradient: LinearGradient(
+                  begin: Alignment.bottomLeft,
+                  end: Alignment.topRight,
+                  stops: [0,0.7],
+                  colors: [
+                    Color.fromRGBO(244,81,30,1),
+                    Color.fromRGBO(109,76,65,1)
+                  ]
+                )
+              ),
+              child: SafeArea(
+                child: Builder(builder: (context) {
+                  var w = min(MediaQuery.of(context).size.width*0.2,MediaQuery.of(context).size.height*0.2);
+                  //When logged in
+                  if (User.isLoggedIn)
+                    return Column(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          width: w,
+                          height: w,
+                          margin: EdgeInsets.all(10),
+                          child: ProfilePictureWidget(url: User.currentUser.profilePicture),
+                        ),
+                        Text(User.currentUser.name, style: Theme.of(context).textTheme.title),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CustomButton(
+                            text: "Logout",
+                            color: Color.fromRGBO(244,81,30,1),
+                            onPressed: () {
+                              //TODO Logout
+                              //For UI debug purposes:
+                              setState(() {
+                               User.isLoggedIn = false; 
+                              });
+                            }
+                          )
+                        )
+                      ],
+                    );
+                  else
+                    //When not logged in
+                    return Column(
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          width: w,
+                          height: w,
+                          margin: EdgeInsets.all(10),
+                          child: ProfilePictureWidget(url: null),
+                        ),
+                        //Text("", style: Theme.of(context).textTheme.title),
+                        CustomButton(
+                          text: "Sign up",
+                          color: Color.fromRGBO(244,81,30,1),
+                          onPressed: () {
+                            //TODO: implement sign up
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+                          child: CustomButton(
+                            text: "  Login  ",
+                            color: Color.fromRGBO(244,81,30,1),
+                            onPressed: () {
+                              //TODO log in
+                              //For UI debug purposes:
+                              setState(() {
+                               User.isLoggedIn = true; 
+                              });
+                            }
+                          )
+                        )
+                      ],
+                    );
+                }),
+              )
             ),
           ),
-          ListTile(
-            title: Text('Item 1'),
-            onTap: () {
-              Navigator.pop(context);
-            },
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text("min./max. distance", style: Theme.of(context).textTheme.subtitle),
+                ),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
+                        child: TextField(
+                          decoration: InputDecoration(labelText: "min. km"),
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          decoration: InputDecoration(labelText: "max. km"),
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
-          ListTile(
-            title: Text('Item 2'),
-            onTap: () {
-              Navigator.pop(context);
-            },
+          Padding(
+            padding: const EdgeInsets.only(left: 8,  top: 8),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text("min. experience rating", style: Theme.of(context).textTheme.subtitle),
+                ),
+                ExperienceRatingWidget(rating: _minRating, useColumn: true),
+              ],
+            ),
           ),
-
+          Slider(
+            value: _minRating,
+            onChanged: (val) {
+              setState(() {
+                _minRating = val;
+              });
+            },
+            min: 1.0,
+            max: 5.0,
+            divisions: 4,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, top: 8),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text("min. difficulty rating", style: Theme.of(context).textTheme.subtitle),
+                ),
+                DifficultyRatingWidget(rating: _minDifficultyRating, useColumn: true),
+              ],
+            ),
+          ),
+          Slider(
+            value: _minDifficultyRating,
+            onChanged: (val) {
+              setState(() {
+                _minDifficultyRating = val;
+              });
+            },
+            min: 1.0,
+            max: 5.0,
+            divisions: 4,
+          ),
         ],
       )
     );

@@ -1,8 +1,10 @@
 
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
+import 'package:ux_prototype/ui_elements/route_info.dart';
 
 class SearchResultCardWidget extends StatelessWidget {
 
@@ -14,6 +16,7 @@ class SearchResultCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool extendView = true;
     return InkWell(
       onTap: this.onTap!=null?this.onTap:(){},
       child: Container(
@@ -28,6 +31,7 @@ class SearchResultCardWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              //<Image Scroller>
               Container(
                 height: MediaQuery.of(context).size.height * 0.2,
                 child: ImageScrollerWidget(
@@ -35,10 +39,8 @@ class SearchResultCardWidget extends StatelessWidget {
                   heroTag: this.heroTag==null?UniqueKey().toString():this.heroTag,
                 )
               ),
-              Text("near Seoul", style: Theme.of(context).textTheme.title),
-              Text("Hallo Werltw"),
-              Text("Hallo Werlt3"),
-              Text("Hallo Werlt4"),
+              //<Body of route info>
+              RouteInfo(route: route, extended: false,)
             ],
           ),
         ),

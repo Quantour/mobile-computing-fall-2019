@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ux_prototype/views/current_hike/current_hike.dart';
 import 'package:ux_prototype/views/discover/discover.dart';
+import 'package:ux_prototype/views/hike_history/hike_history.dart';
+import 'package:ux_prototype/views/master/master.dart';
 import 'style.dart';
 
 void main() => runApp(MyApp());
@@ -11,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Wanderlust UI Prototyp',
       theme: appTheme(),
-      home: SearchScreenWidget(),
+      home: MasterView(),
     );
   }
 }

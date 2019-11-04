@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ux_prototype/data_models/route.dart';
-import 'package:ux_prototype/ui_elements/buttom_navigation.dart';
-import 'package:ux_prototype/views/current_hike/current_hike.dart';
 import 'package:ux_prototype/views/discover/filter_drawer.dart';
 import 'package:ux_prototype/views/discover/search_result_card.dart';
 import 'package:ux_prototype/views/discover_detail/discover_detail.dart';
@@ -14,9 +12,7 @@ class SearchScreenWidget extends StatefulWidget {
   SearchScreenWidget({Key key}) : super(key: key);
 
   @override
-  State<SearchScreenWidget> createState() {
-    return _SearchScreenWidgetState();
-  }
+  State<SearchScreenWidget> createState() => _SearchScreenWidgetState();
 }
 
 class _SearchScreenWidgetState extends State<SearchScreenWidget> {
@@ -73,17 +69,6 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
         ],
       ),
       
-      bottomNavigationBar: CommonNavBar(
-        currentIndex: CommonNavBar.DISCOVER,
-        onTap: (int index) {
-          if (index == CommonNavBar.CURRENT_HIKE) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CurrentHike()),
-            );
-          }
-        },
-      ),
       
     );
   }

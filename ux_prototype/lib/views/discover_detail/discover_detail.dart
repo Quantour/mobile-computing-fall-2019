@@ -2,13 +2,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:ux_prototype/data_models/route.dart';
+import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
+import 'package:ux_prototype/ui_elements/route_info.dart';
 
 class DiscoverDetail extends StatefulWidget {
   final HikingRoute route;
   final String heroTag;
 
-  DiscoverDetail({Key key, @required this.route, this.heroTag}) : super(key: key);
+  DiscoverDetail({Key key, @required this.route, this.heroTag})
+   : super(key: key);
 
   @override
   State<DiscoverDetail> createState() {
@@ -47,7 +50,42 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                     imageBuilder: () => widget.route.images,
                     heroTag: widget.heroTag==null?UniqueKey().toString():widget.heroTag,
                   )
-                )
+                ),
+                SingleChildScrollView(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      CustomButton(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
+                        text: "Start",
+                        child: Icon(Icons.play_arrow, color: Theme.of(context).accentColor, size: 18,),
+                        onPressed: () {
+                          
+                        },
+                      ),
+                      CustomButton(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
+                        text: "Rate",
+                        child: Icon(Icons.rate_review, color: Theme.of(context).accentColor, size: 18,),
+                        onPressed: () {
+                          
+                        },
+                      ),
+                      CustomButton(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
+                        text: "Edit",
+                        child: Icon(Icons.edit, color: Theme.of(context).accentColor, size: 18,),
+                        onPressed: () {
+                          
+                        },
+                      )
+                    ],
+                  ),
+                ),
+                RouteInfo(route: widget.route, extended: true,)
               ],
             ),
           ),
