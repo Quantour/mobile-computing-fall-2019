@@ -28,6 +28,8 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
   String difficulty;
   String region;
 
+  int number_routes = 3;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +58,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
             delegate: SliverChildListDelegate(
               
               <Widget>[
-                for (var i = 0; i < 1; ++i)
+                for (var i = 0; i < number_routes; ++i)
                   SearchResultCardWidget(
                     onTap: () {
                       Navigator.push(
@@ -135,6 +137,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                           routeInput(route);
                           region = routeName;
                           Firestore.instance.collection("hike").document().setData({'route' : hikeName, 'difficulty' : difficulty, 'region' : region});
+                          number_routes += 1;
                         },
                       )
 
