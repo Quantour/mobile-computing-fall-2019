@@ -22,7 +22,8 @@ class SearchScreenWidget extends StatefulWidget {
 
 class _SearchScreenWidgetState extends State<SearchScreenWidget> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  
+  String test = 'hike';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,8 +87,54 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
           }
         },
       ),
-      
+      floatingActionButton: new FloatingActionButton(
+        onPressed: () {
+          //          Firestore.instance.collection("user").document().setData({'username' : "Paul", 'expertise' : 5, 'difficulty' : 9.8, 'region' : "Italy"});
+          //          var currentLocation = location.getLocation();
+          //Firestore.instance.collection("test").document(snapshot.data.documents[1].documentID).setData({'name' : 'userABC' });
+          showDialog(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                elevation: 16,
+                child: Container(
+                  height: 400.0,
+                  width: 360.0,
+                  child: ListView(
+                    children: <Widget>[
+                      SizedBox(height: 20),
+                      Center(
+                        child: Text(
+                          "Add hiking route",
+                          style: TextStyle(fontSize: 24, color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+
+                        Text(test),
+
+                        TextField(
+                          onChanged:(route){
+                            routeInput(route);
+                          },
+
+                        )
+
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
-
+  void routeInput(String route) {
+    setState(() {
+      test = route;
+      Firestore.instance.collection("user").document().setData({'username' : route, 'expertise' : 5, 'difficulty' : 9.8, 'region' : "Italy"});
+    });
+  }
 }
+
