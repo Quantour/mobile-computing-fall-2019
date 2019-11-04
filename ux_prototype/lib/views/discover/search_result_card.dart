@@ -18,7 +18,7 @@ class SearchResultCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-     stream: Firestore.instance.collection('user').snapshots(),
+     stream: Firestore.instance.collection('hike').snapshots(),
      builder: (context, snapshot) {
        if (!snapshot.hasData) return LinearProgressIndicator();
     
@@ -43,8 +43,8 @@ class SearchResultCardWidget extends StatelessWidget {
                       heroTag: this.heroTag==null?UniqueKey().toString():this.heroTag,
                     )
                   ),
-                  Text("${snapshot.data.documents[user_idx].data['username']}", style: Theme.of(context).textTheme.title),
-                  Text("Expertise : ${snapshot.data.documents[user_idx].data['expertise']}"),
+                  Text("${snapshot.data.documents[user_idx].data['route']}", style: Theme.of(context).textTheme.title),
+                  //Text("Expertise : ${snapshot.data.documents[user_idx].data['expertise']}"),
                   Text("Difficulty : ${snapshot.data.documents[user_idx].data['difficulty']}"),
                   Text("Region : ${snapshot.data.documents[user_idx].data['region']}"),
                 ],

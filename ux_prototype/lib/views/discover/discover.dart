@@ -22,7 +22,11 @@ class SearchScreenWidget extends StatefulWidget {
 
 class _SearchScreenWidgetState extends State<SearchScreenWidget> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  String test = 'hike';
+  String routeName = 'hike';
+
+  String hikeName;
+  String difficulty;
+  String region;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
             delegate: SliverChildListDelegate(
               
               <Widget>[
-                for (var i = 0; i < 5; ++i)
+                for (var i = 0; i < 1; ++i)
                   SearchResultCardWidget(
                     onTap: () {
                       Navigator.push(
@@ -111,14 +115,28 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                         ),
                       ),
 
-                        Text(test),
+                        Text(routeName),
 
                         TextField(
-                          onChanged:(route){
+                          onSubmitted:(route){
                             routeInput(route);
+                            hikeName = routeName;
                           },
+                        ),
 
-                        )
+                        TextField(
+                          onSubmitted:(route){
+                            routeInput(route);
+                            difficulty = routeName;
+                        },
+                      ),
+                      TextField(
+                        onSubmitted:(route){
+                          routeInput(route);
+                          region = routeName;
+                          Firestore.instance.collection("hike").document().setData({'route' : hikeName, 'difficulty' : difficulty, 'region' : region});
+                        },
+                      )
 
                     ],
                   ),
@@ -132,8 +150,8 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
   }
   void routeInput(String route) {
     setState(() {
-      test = route;
-      Firestore.instance.collection("user").document().setData({'username' : route, 'expertise' : 5, 'difficulty' : 9.8, 'region' : "Italy"});
+      routeName = route;
+      //Firestore.instance.collection("hike").document().setData({'username' : route, 'expertise' : 5, 'difficulty' : 9.8, 'region' : "Italy"});
     });
   }
 }
