@@ -9,7 +9,7 @@ import 'package:ux_prototype/views/discover_detail/discover_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'app_bar.dart';
 import 'search_text_input.dart';
-
+//Jonas
 class SearchScreenWidget extends StatefulWidget {
   
   SearchScreenWidget({Key key}) : super(key: key);
