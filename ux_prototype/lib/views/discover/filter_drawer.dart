@@ -5,10 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/profile_picture.dart';
 import 'package:ux_prototype/ui_elements/rating.dart';
+import 'package:ux_prototype/views/discover/discover_search_parameter.dart';
 
 import '../../data_models/user.dart';
 
 class FilterDrawer extends StatefulWidget {
+
+  final DiscoverSearchParameter searchParameter;
+  final void Function() updateNotifier;
+
+  FilterDrawer(this.searchParameter, this.updateNotifier);
+
   @override
   State<StatefulWidget> createState() {
     return _FilterDrawerState();
@@ -16,8 +23,18 @@ class FilterDrawer extends StatefulWidget {
 }
 
 class _FilterDrawerState extends State<FilterDrawer> {
-  double _minRating = 1, _minDifficultyRating = 1;
 
+  TextEditingController minKmController;
+  TextEditingController maxKmController;
+
+  @override
+  void initState() {
+    super.initState();
+    minKmController = TextEditingController();
+    minKmController.text = (widget.searchParameter.minMeter.toDouble()/1000.0).toString();
+    maxKmController = TextEditingController();
+    maxKmController.text = (widget.searchParameter.maxMeter.toDouble()/1000.0).toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +133,9 @@ class _FilterDrawerState extends State<FilterDrawer> {
               )
             ),
           ),
+
+          //Filter functionality
+
           Padding(
             padding: const EdgeInsets.only(left: 8.0, top: 8),
             child: Column(
@@ -131,7 +151,16 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
                         child: TextField(
                           decoration: InputDecoration(labelText: "min. km"),
+                          controller: minKmController,
                           keyboardType: TextInputType.number,
+                          onChanged: (txt) {
+                            setState(() {
+                              double minKm = double.tryParse(txt);
+                              if (minKm == null) return; //TODO implement error msg
+                              widget.searchParameter.minMeter = (minKm*1000).floor();
+                            });
+                            widget.updateNotifier();
+                          },
                         ),
                       ),
                     ),
@@ -141,6 +170,15 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         child: TextField(
                           decoration: InputDecoration(labelText: "max. km"),
                           keyboardType: TextInputType.number,
+                          controller: maxKmController,
+                          onChanged: (txt) {
+                            setState(() {
+                              double maxKm = double.tryParse(txt);
+                              if (maxKm == null) return; //TODO implement error msg
+                              widget.searchParameter.maxMeter = (maxKm*1000).floor();
+                            });
+                            widget.updateNotifier();
+                          },
                         ),
                       ),
                     )
@@ -157,16 +195,17 @@ class _FilterDrawerState extends State<FilterDrawer> {
                   padding: const EdgeInsets.all(4.0),
                   child: Text("min. experience rating", style: Theme.of(context).textTheme.subtitle),
                 ),
-                ExperienceRatingWidget(rating: _minRating, useColumn: true),
+                ExperienceRatingWidget(rating: widget.searchParameter.minExperienceRating, useColumn: true),
               ],
             ),
           ),
           Slider(
-            value: _minRating,
+            value: widget.searchParameter.minExperienceRating,
             onChanged: (val) {
               setState(() {
-                _minRating = val;
+                widget.searchParameter.minExperienceRating = val;
               });
+              widget.updateNotifier();
             },
             min: 1.0,
             max: 5.0,
@@ -180,16 +219,17 @@ class _FilterDrawerState extends State<FilterDrawer> {
                   padding: const EdgeInsets.all(4.0),
                   child: Text("min. difficulty rating", style: Theme.of(context).textTheme.subtitle),
                 ),
-                DifficultyRatingWidget(rating: _minDifficultyRating, useColumn: true),
+                DifficultyRatingWidget(rating: widget.searchParameter.minDifficultyRating, useColumn: true),
               ],
             ),
           ),
           Slider(
-            value: _minDifficultyRating,
+            value: widget.searchParameter.minDifficultyRating,
             onChanged: (val) {
               setState(() {
-                _minDifficultyRating = val;
+                widget.searchParameter.minDifficultyRating = val;
               });
+              widget.updateNotifier();
             },
             min: 1.0,
             max: 5.0,

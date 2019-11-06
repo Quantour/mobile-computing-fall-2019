@@ -44,7 +44,7 @@ class HikingRoute {
   int get steepness => 0;
 
   Location get location => Location.average(route);
-
+  
   String get nearestCity => "Berlin";
   String get country     => "Germany";
   
