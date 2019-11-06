@@ -118,7 +118,7 @@ class RouteInfo extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-              child: Text(route.title, style: Theme.of(context).textTheme.title),
+              child: Text("", style: Theme.of(context).textTheme.title), // route.title
             ),
             Expanded(
               child: Builder(
@@ -134,7 +134,7 @@ class RouteInfo extends StatelessWidget {
           ],
         ),
         Text(
-          route.description,
+          "", //route.description
           overflow: TextOverflow.ellipsis,
           maxLines: extended?100:2,
         ),

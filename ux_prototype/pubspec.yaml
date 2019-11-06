@@ -25,6 +25,11 @@ dependencies:
   cupertino_icons: ^0.1.2
   transparent_image: ^1.0.0
   google_maps_flutter: ^0.5.0
+  cloud_firestore: ^0.12.9+6 #Version from dev flutter
+  provider: ^3.0.0
+  location: ^2.3.5
+
+
 
 dev_dependencies:
   flutter_test:
