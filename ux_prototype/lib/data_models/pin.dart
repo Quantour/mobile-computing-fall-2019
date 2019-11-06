@@ -29,7 +29,7 @@ class Pin {
   }
 
   //TODO: implement properly with server communication
-  static List<Pin> fromArea(Location location, int radius) {
+  static List<Pin> fromArea(/* Use attributes that can be derived from HikingRoute */) {
     return <Pin>[
       //...
     ];

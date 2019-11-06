@@ -9,16 +9,15 @@ class RouteMap extends StatelessWidget {
 
   const RouteMap ({@required this.route, Key key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
+  Widget buildWithPins(BuildContext context, List<Pin> pins) {
     return Container(
       child: GoogleMap(
         initialCameraPosition: CameraPosition(
           target: route.location.toLatLng(),
           zoom: 14.0
-
           //TODO: figure out proper zoom depending on route
         ),
+        //draw route onto map
         polylines: Set.from(<Polyline>[
           //actual hiking route drawed ontop of the map
           Polyline(
@@ -31,24 +30,46 @@ class RouteMap extends StatelessWidget {
             startCap: Cap.roundCap
           )
         ]),
-        markers: Set.from(<Marker>[
-          Marker(
+        //draw pins onto map
+        markers: ((List<Pin> pins) {
+          Set<Marker> markers = Set();
+
+          //add midpoint of current route
+          markers.add(Marker(
             markerId: MarkerId("route_loc"),
             position: route.location.toLatLng(),
-            //custom icon:
             //icon: BitmapDescriptor.fromAssetImage(configuration, assetName)
-          ),
-        //Add Pins as Markers on the Map
-        ])..addAll(
-          Pin
-            .fromArea(route.location, route.length*4) //fromArea is not implemented yet
-            .map((p) => Marker(
-              markerId: MarkerId(p.pinID),
-              position: p.location.toLatLng(),
+          ));
+
+          //Add all the pins to Map
+          for (Pin pin in pins)
+            markers.add(Marker(
+              markerId: MarkerId("pin${pin.pinID}"),
+              position: pin.location.toLatLng(),
               //icon: ... 
-            ))
-        ),
+            ));
+
+          return markers;
+        })(pins)
+        
       ),
     );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    
+    List<Pin> pins = [];
+
+    //#####################################
+    //##
+    //TODO Fetch pins for this area, location from route: route.location
+    //rewrite Pin.fromArea(Area)
+    //#####################################
+
+
+    return buildWithPins(context, pins);
+
   }
 }
