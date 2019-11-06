@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ux_prototype/data_models/route.dart';
+import 'package:ux_prototype/views/discover/discover_search_parameter.dart';
 import 'package:ux_prototype/views/discover/filter_drawer.dart';
 import 'package:ux_prototype/views/discover/search_result_card.dart';
 import 'package:ux_prototype/views/discover_detail/discover_detail.dart';
@@ -17,24 +18,19 @@ class SearchScreenWidget extends StatefulWidget {
   State<SearchScreenWidget> createState() => _SearchScreenWidgetState();
 }
 
-class _DiscoverSearchParameter {
-  double minExperienceRating;
-  double minDifficultyRating;
-  int    minMeter;
-  int    maxMeter;
-  String searchTerm;
-}
-
 class _SearchScreenWidgetState extends State<SearchScreenWidget> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   
-  final _DiscoverSearchParameter searchParameter = _DiscoverSearchParameter();
+  final DiscoverSearchParameter searchParameter = DiscoverSearchParameter();
 
   Widget _buildWithRoutes(BuildContext context, List<HikingRoute> routes) {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: FilterDrawer(),
+      drawer: FilterDrawer(searchParameter, () {
+        //called when searchParameter is updated
+        setState((){});
+      }),
 
       body: CustomScrollView(
         slivers: <Widget>[
@@ -45,8 +41,10 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                 //shows onput fields for filtering 
                 _scaffoldKey.currentState.openDrawer();
               },
-              onSearchRequest: (String input) {
-
+              onTextInputChanged: (String input) {
+                setState(() {
+                 searchParameter.searchTerm = input;
+                });
               },
               searchSuggestionBuilder: (String input) {
                 return <String>[for(var i = 0; i < 10; i++) "$i"];
@@ -54,7 +52,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
             )
           ),
 
-          if (routes == null || routes.length == 0)
+          if (routes == null)
           SliverList(
             delegate: SliverChildListDelegate(<Widget> [
               Container(
@@ -62,6 +60,25 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                 height: MediaQuery.of(context).size.height*0.4,
                 child: Center(
                   child: CircularProgressIndicator(),
+                ),
+              ),
+            ]),
+          ),
+
+          if (routes != null && routes.length == 0)
+          SliverList(
+            delegate: SliverChildListDelegate(<Widget> [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height*0.4,
+                child: Center(
+                  child: Builder(
+                    builder: (context) {
+                      if (searchParameter.searchTerm != null && searchParameter.searchTerm != "")
+                        return Text("No results found for \"${searchParameter.searchTerm}\"! \nTry update your filters.");
+                      return Text("No results found! \nTry update your filters.");
+                    },
+                  ),
                 ),
               ),
             ]),
@@ -180,17 +197,18 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
      builder: (context, snapshot) {
         if (!snapshot.hasData) return _buildWithRoutes(context, null);
 
-        List<HikingRoute> routes;
+        List<HikingRoute> routes = [];
 
         //#####################################
         //##
         //TODO create list of routes here
-        //## use searchParameter attribute of this class!
+        //## use "searchParameter" attribute of this class!
         //##
         //#####################################
 
         //e.g. if (searchParameter.maxMeter...)
 
+        //if list is empty "no results found!" is shown, otherwise an CircularProgressIndicator
         return _buildWithRoutes(context, routes);
     }
    );

@@ -5,13 +5,11 @@ import 'package:flutter/widgets.dart';
 //Interface for controlling input field and listen to events
 class SearchTextInputFieldController {
   void Function() onFilterPressed;
-  void Function(String input) onSearchRequest;
   void Function(String input) onTextInputChanged;
   List<String> Function(String input) searchSuggestionBuilder;
 
   SearchTextInputFieldController({
     this.onFilterPressed,
-    this.onSearchRequest,
     this.onTextInputChanged,
     this.searchSuggestionBuilder
   });
@@ -60,12 +58,14 @@ class _SearchTextInputFieldWidgetState extends State<SearchTextInputFieldWidget>
 
   void _onTextInputChanged(String text) {
     print("Changed Input to $text");
+    widget.controller.onTextInputChanged(text);
     setState(() {
+      //TODO: This line is never called!! why? 
+      print("This Line is never called");
       this._overlayEntry.remove();
       this._overlayEntry = this._createOverlayEntry();
         Overlay.of(context).insert(this._overlayEntry);
       _currentInput = text;
-      widget.controller.onTextInputChanged(text);
     });
   }
 
@@ -107,8 +107,8 @@ class _SearchTextInputFieldWidgetState extends State<SearchTextInputFieldWidget>
                       title: Text(_currentInput, style: TextStyle(fontWeight: FontWeight.bold)),
                       onTap: () {
                         widget.focusNode.unfocus();
-                        if (widget.controller.onSearchRequest != null)
-                          widget.controller.onSearchRequest(_currentInput);
+                        if (widget.controller.onTextInputChanged != null)
+                          widget.controller.onTextInputChanged(_currentInput);
                       },
                     ),
 
@@ -122,8 +122,8 @@ class _SearchTextInputFieldWidgetState extends State<SearchTextInputFieldWidget>
                             textEditingController.text = suggestion;
                             widget.focusNode.unfocus();
                           });
-                          if (widget.controller.onSearchRequest != null)
-                            widget.controller.onSearchRequest(suggestion);
+                          if (widget.controller.onTextInputChanged != null)
+                            widget.controller.onTextInputChanged(suggestion);
                         },
                       ),
 
@@ -158,6 +158,8 @@ class _SearchTextInputFieldWidgetState extends State<SearchTextInputFieldWidget>
         link: this._layerLink,
         child: TextField(
           onChanged: _onTextInputChanged,
+          onSubmitted: _onTextInputChanged,
+          
           controller: textEditingController,
           key: widget.key,
           focusNode: widget.focusNode,
@@ -185,8 +187,8 @@ class _SearchTextInputFieldWidgetState extends State<SearchTextInputFieldWidget>
           onPressed: () {
             setState(() {
               widget.focusNode.unfocus();
-              if (widget.controller.onSearchRequest!=null)
-                widget.controller.onSearchRequest(_currentInput);
+              if (widget.controller.onTextInputChanged!=null)
+                widget.controller.onTextInputChanged(_currentInput);
               });
           }
         ),
