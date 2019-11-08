@@ -114,14 +114,12 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "FloatingActionButton:discover",
         child: Icon(Icons.add),
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) {
-              //create new route
-              return HikeEditPage();
-            })
+            MaterialPageRoute(builder: (context) => HikeEditPage()),
           );
 
 

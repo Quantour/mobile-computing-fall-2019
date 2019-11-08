@@ -55,6 +55,7 @@ class _CurrentHikeState extends State<CurrentHike> {
               ],
             ),
                 floatingActionButton: new FloatingActionButton(
+                  heroTag: "FloatingActionButton:currentHike",
                 onPressed: () {
         //          Firestore.instance.collection("user").document().setData({'username' : "Paul", 'expertise' : 5, 'difficulty' : 9.8, 'region' : "Italy"});
         //          var currentLocation = location.getLocation();

@@ -166,10 +166,33 @@ class _HikeEditPageState extends State<HikeEditPage> {
     );
   }
 
+  Widget buildWhenUserNotLoggedIn(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height*0.3,
+            ),
+            Center(
+              child: Icon(Icons.error, size: 20,),
+            ),
+            Container(height: 20,),
+            Center(
+              child: Text("Please log in or register to ${widget.isNew?"create a new route":"edit a route"}!"),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!User.isLoggedIn)
+      return buildWhenUserNotLoggedIn(context);
 
+    
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -177,6 +200,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
             child: Container(
               padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
               child: FloatingActionButton(
+                heroTag: "FloatingActionButton:edit_page",
                 backgroundColor: Theme.of(context).accentColor.withAlpha(200),
                 onPressed: (){
                   Navigator.pop(context);
@@ -185,43 +209,45 @@ class _HikeEditPageState extends State<HikeEditPage> {
               )
             ),
           ),
-          Builder(
-            builder: (c) {
-              
-              //if user is logged in they can not edit or create a new route
-              if (!User.isLoggedIn)
-              return Center(
-                child: Column(
-                  children: <Widget>[
-                    Center(
-                      child: Icon(Icons.error, size: 20,),
-                    ),
-                    Container(height: 20,),
-                    Center(
-                      child: Text("Please log in or register to ${widget.isNew?"create a new route":"edit a route"}!"),
-                    )
-                  ],
-                ),
-              );
-
-              //user is logged in
-              return Container(
-                padding: const EdgeInsets.all(10),
-                margin: const EdgeInsets.all(10),
-                child: SingleChildScrollView(
+          SingleChildScrollView(
+            child: Builder(
+              builder: (c) {
+                
+                //if user is logged in they can not edit or create a new route
+                if (!User.isLoggedIn)
+                return Center(
                   child: Column(
-                  children: <Widget>[
-
-
-                      buildImagePicker(context)
-
-
+                    children: <Widget>[
+                      Center(
+                        child: Icon(Icons.error, size: 20,),
+                      ),
+                      Container(height: 20,),
+                      Center(
+                        child: Text("Please log in or register to ${widget.isNew?"create a new route":"edit a route"}!"),
+                      )
                     ],
                   ),
-                ),
-              );
+                );
 
-            },
+                //user is logged in
+                return Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
+                  child: SingleChildScrollView(
+                    child: Column(
+                    children: <Widget>[
+
+
+                        buildImagePicker(context)
+
+
+                      ],
+                    ),
+                  ),
+                );
+
+              },
+            ),
           )
         ].reversed.toList(),
       ),

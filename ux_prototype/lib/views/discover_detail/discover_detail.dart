@@ -30,6 +30,7 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
             child: Container(
               padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
               child: FloatingActionButton(
+                heroTag: "FloatingActionButton:discover_detail",
                 backgroundColor: Theme.of(context).accentColor.withAlpha(200),
                 onPressed: (){
                   Navigator.pop(context);
