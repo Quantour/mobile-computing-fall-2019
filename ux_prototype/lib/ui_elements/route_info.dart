@@ -8,13 +8,16 @@ import 'package:ux_prototype/ui_elements/profile_picture.dart';
 import 'package:ux_prototype/ui_elements/rating.dart';
 import 'package:ux_prototype/ui_elements/route_map.dart';
 
+import '../data_models/route.dart';
+import '../data_models/route.dart';
+
 class RouteInfo extends StatelessWidget {
   final extended;
-  final HikingRoute route;
+  final Future<HikingRoute> route;
   const RouteInfo({@required this.route, this.extended = false, Key key}) : super(key: key);
 
 
-  Widget buildOverView(BuildContext context) {
+  Widget buildOverView(BuildContext context, HikingRoute route) {
     return Column(
       //TODO: Maybe add HeroWidget here
       mainAxisAlignment: MainAxisAlignment.start,
@@ -143,7 +146,7 @@ class RouteInfo extends StatelessWidget {
     );
   }
 
-  Widget buildExtended(BuildContext context) {
+  Widget buildExtended(BuildContext context, HikingRoute route) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -170,7 +173,7 @@ class RouteInfo extends StatelessWidget {
               Center(
                 child: CircularProgressIndicator(),
               ),
-              RouteMap(route: route)
+              RouteMap(route: Future.value(route))
             ],
           )
         )
@@ -181,18 +184,50 @@ class RouteInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return //<Body of Card>
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            buildOverView(context),
-            if (extended)
-              buildExtended(context)
-          ],
-        )
-      );
+
+    return FutureBuilder(
+      future: route,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          //still waiting for data
+          return Container(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          //future completed with error
+          return Container(
+            child: Center(
+              child: Column(
+                children: <Widget>[
+                  Center(
+                    child: Icon(Icons.error),
+                  ),
+                  Center(
+                    child: Text("Error while loading route information!"),
+                  )
+                ],
+              ),
+            ),
+          );
+        } else {
+          //future done with data!
+          return //<Body of Card>
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                buildOverView(context, snapshot.data),
+                if (extended)
+                  buildExtended(context, snapshot.data)
+              ],
+            )
+          ); 
+        }
+      }
+    );
   }
 }
