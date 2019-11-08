@@ -6,6 +6,7 @@ import 'package:ux_prototype/views/discover/filter_drawer.dart';
 import 'package:ux_prototype/views/discover/search_result_card.dart';
 import 'package:ux_prototype/views/discover_detail/discover_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ux_prototype/views/edit_page/edit_page.dart';
 import '../../data_models/route.dart';
 import 'app_bar.dart';
 import 'search_text_input.dart';
@@ -115,6 +116,14 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) {
+              //create new route
+              return HikeEditPage();
+            })
+          );
+
 
           //#####################################
           //##
