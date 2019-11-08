@@ -96,14 +96,14 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => DiscoverDetail(
-                              route: route,
+                              route: Future.value(route),
                               heroTag: "${route.routeID} ROUTE"
                             ),
                           ),
                         );
                       },
                       heroTag: "${route.routeID} ROUTE",
-                      route: route
+                      route: Future.value(route)
                     )
                 ]
 

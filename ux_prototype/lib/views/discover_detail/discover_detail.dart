@@ -7,7 +7,7 @@ import 'package:ux_prototype/ui_elements/image_scroller.dart';
 import 'package:ux_prototype/ui_elements/route_info.dart';
 
 class DiscoverDetail extends StatefulWidget {
-  final HikingRoute route;
+  final Future<HikingRoute> route;
   final String heroTag;
 
   DiscoverDetail({Key key, @required this.route, this.heroTag})
@@ -39,56 +39,71 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
             ),
           ),
           
-          SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.35,
-                  child: ImageScrollerWidget(
-                    imageBuilder: () => widget.route.images,
-                    heroTag: widget.heroTag==null?UniqueKey().toString():widget.heroTag,
-                  )
-                ),
-                SingleChildScrollView(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      CustomButton(
-                        padding: const EdgeInsets.all(8),
-                        margin: const EdgeInsets.all(8),
-                        text: "Start",
-                        child: Icon(Icons.play_arrow, color: Theme.of(context).accentColor, size: 18,),
-                        onPressed: () {
-                          
-                        },
-                      ),
-                      CustomButton(
-                        padding: const EdgeInsets.all(8),
-                        margin: const EdgeInsets.all(8),
-                        text: "Rate",
-                        child: Icon(Icons.rate_review, color: Theme.of(context).accentColor, size: 18,),
-                        onPressed: () {
-                          
-                        },
-                      ),
-                      CustomButton(
-                        padding: const EdgeInsets.all(8),
-                        margin: const EdgeInsets.all(8),
-                        text: "Edit",
-                        child: Icon(Icons.edit, color: Theme.of(context).accentColor, size: 18,),
-                        onPressed: () {
-                          
-                        },
-                      )
-                    ],
+          FutureBuilder(
+            future: widget.route,
+            builder: (c, snapshot) {
+              //if hiking route not loaded or loaded woth error this shows appropiate message to user
+              if (snapshot.connectionState != ConnectionState.done
+                 || snapshot.hasError)
+                return Container(
+                  child: Center(
+                    child: RouteInfo(route: widget.route, extended: false)
                   ),
+                );
+
+              //future is completed with data!
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      child: ImageScrollerWidget(
+                        imageBuilder: () => snapshot.data.images,
+                        heroTag: widget.heroTag==null?UniqueKey().toString():widget.heroTag,
+                      )
+                    ),
+                    SingleChildScrollView(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          CustomButton(
+                            padding: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
+                            text: "Start",
+                            child: Icon(Icons.play_arrow, color: Theme.of(context).accentColor, size: 18,),
+                            onPressed: () {
+                              
+                            },
+                          ),
+                          CustomButton(
+                            padding: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
+                            text: "Rate",
+                            child: Icon(Icons.rate_review, color: Theme.of(context).accentColor, size: 18,),
+                            onPressed: () {
+                              
+                            },
+                          ),
+                          CustomButton(
+                            padding: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.all(8),
+                            text: "Edit",
+                            child: Icon(Icons.edit, color: Theme.of(context).accentColor, size: 18,),
+                            onPressed: () {
+                              
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                    RouteInfo(route: widget.route, extended: true,)
+                  ],
                 ),
-                RouteInfo(route: widget.route, extended: true,)
-              ],
-            ),
-          ),
+              );
+            }
+          )          
         ].reversed.toList(),
       ),
     );
