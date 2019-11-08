@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -50,6 +48,25 @@ class _HikeEditPageState extends State<HikeEditPage> {
   //List of local Files for uploading images or strings -> URL to uploadedimage
   List<_NetwOrFileImg> images = [];
 
+  //Controller for textfields
+  TextEditingController titleController;
+  TextEditingController descriptionController;
+  TextEditingController tipsController;
+
+  @override
+  void initState() {
+    super.initState();
+    //initialize controller
+    titleController = TextEditingController();
+    descriptionController = TextEditingController();
+    tipsController = TextEditingController();
+    if (!widget.isNew) {
+      titleController.text = widget.oldroute.title;
+      descriptionController.text = widget.oldroute.description==null?"":widget.oldroute.description;
+      tipsController.text = widget.oldroute.tipsAndTricks==null?"":widget.oldroute.tipsAndTricks;
+    }
+  }
+
   //Shows the User a dialog to pick a new image for the route
   void _showNewImageDialog(BuildContext context) {
     showDialog(
@@ -74,7 +91,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
               child: Text("camera"),
               onPressed: () {
                 Navigator.pop(context);
-                ImagePicker.pickImage(source: ImageSource.camera)
+                ImagePicker.pickImage(source: ImageSource.camera, )
                     .then((file) async {
                   if (await file.exists())
                     setState(() {
@@ -132,94 +149,11 @@ class _HikeEditPageState extends State<HikeEditPage> {
       )
     ));
   }
-  /*void _showImageDialog(BuildContext context, _NetwOrFileImg img) {
-    showDialog(
-      context: context,
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 3.0,
-        backgroundColor: Colors.transparent,
-        child: Column(
-          children: <Widget>[
-            Image(
-                  image: img.image,
-                  fit: BoxFit.contain,
-            )
 
-          ],
-        ),
-      )
-    );
-  }
-  void _showImageDialog(BuildContext context, _NetwOrFileImg img) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      child: Dialog(
-        child: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              
-              Container(
-                child: Image(
-                  image: img.image,
-                  
-                ),
-              ),
-              /*Container(
-                height: MediaQuery.of(context).size.height * 0.6,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.contain,
-                    image: img.image //Image provider of image widget created from _NetwOrFileImg img
-                  )
-                ),
-              ),*/
-              //Ok and Delete buttons for the image
-              Center(
-                child: Row(
-                  children: <Widget>[
-                    RaisedButton(
-                      onPressed: () {
-                        //close Dialog
-                        Navigator.of(context, rootNavigator: true).pop();
-                      },
-                      child: Text(
-                        "OK",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      color: Colors.green,
-                    ),
-                    RaisedButton(
-                        onPressed: () {
-                          //close Dialog & remove img from list
-                          Navigator.of(context, rootNavigator: true).pop();
-                          setState(() {
-                            images.remove(img);
-                          });
-                        },
-                        child: Text(
-                          "Delete",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        color: Colors.red)
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }*/
-
-  Widget buildImagePicker() {
+  Widget _buildImagePicker() {
     return Builder(
       builder: (context) {
-        const double number_of_colums = 4;
+        const double number_of_colums = 5;
         double widthOfGridElement =
             MediaQuery.of(context).size.width / number_of_colums;
         //build list of widgets which are going to be displayed in a grid view
@@ -247,7 +181,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                   color: Colors.white,
                 ),
               ),
-              decoration: BoxDecoration(color: Theme.of(context).accentColor),
+              decoration: BoxDecoration(color: Theme.of(context).accentColor.withAlpha(200)),
             ),
           )
         ];
@@ -317,21 +251,92 @@ class _HikeEditPageState extends State<HikeEditPage> {
 
     return Scaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(40),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height * 0.3,
-              color: Colors.green,
+            //----->Title<-----
+            Container(height: 30,),
+            Text("Title", style: TextStyle(fontSize: 20)),
+            Container(height: 7,),
+            TextField(
+              enabled: widget.isNew,
+              controller: titleController,
+              decoration: InputDecoration(fillColor: widget.isNew?Theme.of(context).accentColor.withAlpha(30):Colors.grey.withAlpha(30), filled: true),
             ),
+            //----->Description<-----
+            Container(height: 30,),
+            Text("Description", style: TextStyle(fontSize: 20)),
+            Container(height: 7,),
+            TextField(
+              controller: descriptionController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
+            ),
+            //----->Tips&Tricks<-----
+            Container(height: 30,),
+            Text("Tips & Tricks", style: TextStyle(fontSize: 20)),
+            Container(height: 7,),
+            TextField(
+              controller: tipsController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
+            ),
+            //----->Images<-----
+            Container(height: 30,),
+            Text("Images", style: TextStyle(fontSize: 20)),
+            Container(height: 10,),
             ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(20)),
               child: Container(
                 color: Color.fromRGBO(200, 200, 200, 1),
-                child: buildImagePicker()
+                child: _buildImagePicker()
               ),
             ),
             
+            //----->Save/Cancel<-----
+            Container(height: 50,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                ClipRRect(
+                  clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  child: GestureDetector(
+                    onTap: () {
+                      //check if all neccessarry fields are initialized when isNew is true
+                    }, //TODO onSave event
+                    child: Container(
+                      width: MediaQuery.of(context).size.width*0.3,
+                      height: 50,
+                      color: Colors.green,
+                      child: Center(
+                        child: Text("Save", style: TextStyle(fontSize: 20),),
+                      ),
+                    ),
+                  ),
+                ),
+
+                ClipRRect(
+                  clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                  child: GestureDetector(
+                    onTap: ()=>Navigator.pop(context),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width*0.3,
+                      height: 50,
+                      color: Colors.red,
+                      child: Center(
+                        child: Text("Cancel", style: TextStyle(fontSize: 20),),
+                      ),
+                    ),
+                  ),
+                ),
+
+              ]
+            )
           ],
         ),
       ),
