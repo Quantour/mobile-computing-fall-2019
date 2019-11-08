@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:ux_prototype/views/edit_page/edit_loc_data_page.dart';
+import '../../data_models/location.dart';
 import '../../data_models/route.dart';
 import '../../data_models/user.dart';
 
@@ -52,6 +55,11 @@ class _HikeEditPageState extends State<HikeEditPage> {
   TextEditingController titleController;
   TextEditingController descriptionController;
   TextEditingController tipsController;
+
+  //Route info
+  List<Location> routeList = [];
+  //Camera pos of Maps, if you return to this page
+  CameraPosition cameraPosition;
 
   @override
   void initState() {
@@ -295,6 +303,38 @@ class _HikeEditPageState extends State<HikeEditPage> {
                 child: _buildImagePicker()
               ),
             ),
+
+            //----->put in route information<-----
+            if (widget.isNew)
+              Container(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: ClipRRect(
+                    clipBehavior: Clip.hardEdge,
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => EditLocInfoPage(this.routeList, this.cameraPosition)
+                        )).then((data) {
+                          this.routeList=data[0];
+                          this.cameraPosition=data[1];
+                        });
+                        //)).then((routeList) => this.routeList = routeList);
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width*0.7,
+                        height: 50,
+                        color: Theme.of(context).accentColor.withAlpha(150),
+                        child: Center(
+                          child: Text("Edit route information", style: TextStyle(fontSize: 20),),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
             
             //----->Save/Cancel<-----
             Container(height: 50,),
