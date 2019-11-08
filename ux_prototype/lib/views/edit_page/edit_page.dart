@@ -1,6 +1,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,22 +20,40 @@ class HikeEditPage extends StatefulWidget {
   _HikeEditPageState createState() {
     _HikeEditPageState state = _HikeEditPageState();
     if (isNew) {
-      state.images = [];
+
     } else {
-      state.images = [for (String str in oldroute.images) str];
+      state.images = [for (String url in oldroute.images) _NetwOrFileImg(url: url)];
     }
     return state;
   }
 }
 
+/*
+ * Represents a Image which is either loaded from the network or choosen locally as a file
+ */
+class _NetwOrFileImg {
+  _NetwOrFileImg({this.file, this.url});
+  File file;
+  String url;
+  bool get isFile => file!=null;
+  bool get isNetw => url!=null;
+  Image get image {
+    if (isFile)
+      return Image.file(file);
+    else if (isNetw)
+      return Image.network(url);
+    else return Image.memory(kTransparentImage);
+  } 
+}
+
 class _HikeEditPageState extends State<HikeEditPage> {
 
   //List of local Files for uploading images or strings -> URL to uploadedimage
-  List<dynamic> images;
+  List<_NetwOrFileImg> images = [];
 
   //Shows the User a dialog to pick a new image for the route
   void _showNewImageDialog(BuildContext context) {
-
+    
     showDialog(
       context: context,
       child: AlertDialog(
@@ -43,24 +62,28 @@ class _HikeEditPageState extends State<HikeEditPage> {
           FlatButton(
             child: Text("gallery"),
             onPressed: () {
+              Navigator.pop(context);
               ImagePicker.pickImage(
                 source: ImageSource.gallery
-              ).then((file) {
-                setState(() {
-                  images.add(file);
-                });
+              ).then((file) async {
+                if (await file.exists())
+                  setState(() {
+                    images.add(_NetwOrFileImg(file: file));
+                  });
               });
             },
           ),
           FlatButton(
             child: Text("camera"),
             onPressed: () {
+              Navigator.pop(context);
               ImagePicker.pickImage(
                 source: ImageSource.camera
-              ).then((file) {
-                setState(() {
-                  images.add(file);
-                });
+              ).then((file) async {
+                if (await file.exists())
+                  setState(() {
+                    images.add(_NetwOrFileImg(file: file));
+                  });
               });
             },
           )
@@ -71,7 +94,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
   }
 
   //Shows the User a specific image and if the user wants to keep the image or rather delete it
-  void _showImageDialog(BuildContext context, dynamic img) {
+  void _showImageDialog(BuildContext context, _NetwOrFileImg img) {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -86,7 +109,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.contain,
-                      image: (img is String)?Image.network(img):( (img is File)?Image.file(img):kTransparentImage )
+                      image: img.image.image //Image provider of image widget created from _NetwOrFileImg img
                     )
                   ),
                 ),
@@ -106,8 +129,10 @@ class _HikeEditPageState extends State<HikeEditPage> {
                     RaisedButton(
                       onPressed: () {
                         //close Dialog & remove img from list
-                        images.remove(img);
                         Navigator.of(context, rootNavigator: true).pop();
+                        setState(() {
+                          images.remove(img);
+                        });
                       },
                       child: Text("Delete", style: TextStyle(color: Colors.white),),
                       color: Colors.red
@@ -122,18 +147,79 @@ class _HikeEditPageState extends State<HikeEditPage> {
     );
   } 
 
+
+  Widget buildImagePicker() {
+    return Builder(
+      builder: (context) {
+        const double number_of_colums = 4;
+        double widthOfGridElement = MediaQuery.of(context).size.width/number_of_colums; 
+        //build list of widgets which are going to be displayed in a grid view
+        List<Widget> gridItems= [
+          for (_NetwOrFileImg img in images)
+            InkWell(
+              onTap: () => _showImageDialog(context, img), //display image and give user chance to delete it
+              child: Container(
+                width: widthOfGridElement,
+                height: widthOfGridElement,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: img.image.image
+                  )
+                ),
+              ),
+            ),
+          InkWell(
+            onTap: () => _showNewImageDialog(context), //pick new image
+            child: Container(
+              width: widthOfGridElement,
+              height: widthOfGridElement,
+              child: Center(
+                child: Icon(Icons.add, size: 40, color: Colors.white,),
+              ),
+              decoration: BoxDecoration(color: Theme.of(context).accentColor),
+            ),
+          )
+        ];
+
+        //put gridItems in matrix
+        List<List<Widget>> grid = [];
+        for (int i = 0; i < gridItems.length; i++) {
+          int row = (i / (number_of_colums.floor())).floor();
+          //int col = (i % (number_of_colums.floor()));
+          if (grid.length <= row) grid.add([]);
+          grid[row].add(gridItems[i]);
+        }
+
+        //display matrix
+        return Column(
+          children: <Widget>[
+            for (List<Widget> row in grid)
+              Row(
+                children: row,
+              )
+          ],
+        );
+
+      },
+    );
+        
+  }
+
+  /*
   Widget buildImagePicker(BuildContext context) {
     return Container(
       color: Colors.grey,
+      height: MediaQuery.of(context).size.height*0.3,
       padding: EdgeInsets.all(10),
       child: GridView.count(
         primary: false,
         padding: const EdgeInsets.all(20),
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        crossAxisCount: 3,
+        crossAxisCount: 4,
         children: <Widget>[
-          for (dynamic img in images)
+          for (_NetwOrFileImg img in images)
             GestureDetector(
               onTap: () {
                 _showImageDialog(context, img);
@@ -143,7 +229,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                   image: DecorationImage(
                     fit: BoxFit.cover,
                     //load image from network or read as local file
-                    image: (img is String)?Image.network(img):( (img is File)?Image.file(img):kTransparentImage ),
+                    image: img.image.image
                   )
                 ),
               ),
@@ -157,14 +243,14 @@ class _HikeEditPageState extends State<HikeEditPage> {
             child: Container(
               color: Colors.grey[200],
               child: Center(
-                child: Icon(Icons.add, size: 15,),
+                child: Icon(Icons.add, size: 40,),
               ),
             ),
           )
         ],
       ),
     );
-  }
+  }*/
 
   Widget buildWhenUserNotLoggedIn(BuildContext context) {
     return Scaffold(
@@ -175,11 +261,17 @@ class _HikeEditPageState extends State<HikeEditPage> {
               height: MediaQuery.of(context).size.height*0.3,
             ),
             Center(
-              child: Icon(Icons.error, size: 20,),
+              child: Icon(Icons.error, size: 40, color: Theme.of(context).accentColor,),
             ),
             Container(height: 20,),
             Center(
               child: Text("Please log in or register to ${widget.isNew?"create a new route":"edit a route"}!"),
+            ),
+            Center(
+              child: FlatButton(
+                child: Text("close", style: TextStyle(color: Theme.of(context).accentColor),),
+                onPressed: () => Navigator.pop(context),
+              ),
             )
           ],
         ),
@@ -187,71 +279,30 @@ class _HikeEditPageState extends State<HikeEditPage> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     if (!User.isLoggedIn)
       return buildWhenUserNotLoggedIn(context);
 
     
+
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          SafeArea(
-            child: Container(
-              padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-              child: FloatingActionButton(
-                heroTag: "FloatingActionButton:edit_page",
-                backgroundColor: Theme.of(context).accentColor.withAlpha(200),
-                onPressed: (){
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back),
-              )
-            ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(10),
+        child: Column(
+            children: <Widget>[
+              Container(
+                height: MediaQuery.of(context).size.height*0.3,
+                color: Colors.green,
+              ),
+              buildImagePicker()
+            ],
           ),
-          SingleChildScrollView(
-            child: Builder(
-              builder: (c) {
-                
-                //if user is logged in they can not edit or create a new route
-                if (!User.isLoggedIn)
-                return Center(
-                  child: Column(
-                    children: <Widget>[
-                      Center(
-                        child: Icon(Icons.error, size: 20,),
-                      ),
-                      Container(height: 20,),
-                      Center(
-                        child: Text("Please log in or register to ${widget.isNew?"create a new route":"edit a route"}!"),
-                      )
-                    ],
-                  ),
-                );
-
-                //user is logged in
-                return Container(
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.all(10),
-                  child: SingleChildScrollView(
-                    child: Column(
-                    children: <Widget>[
-
-
-                        buildImagePicker(context)
-
-
-                      ],
-                    ),
-                  ),
-                );
-
-              },
-            ),
-          )
-        ].reversed.toList(),
       ),
+      
     );
 
   }
+  
 }

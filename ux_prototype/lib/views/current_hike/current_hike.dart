@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/route_map.dart';
-import 'package:location/location.dart';
 
 class CurrentHike extends StatefulWidget {
   CurrentHike({Key key}) : super(key: key);
@@ -22,7 +21,7 @@ class _CurrentHikeState extends State<CurrentHike> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
-        var location = new Location();
+        /*var location = new Location();
         double currentLatitude = 0; double currentLongitude = 0; double currentAltitude = 0;
         
         location.onLocationChanged().listen((LocationData currentLocation) {
@@ -39,7 +38,7 @@ class _CurrentHikeState extends State<CurrentHike> {
           currentLatitude = currentLocation.latitude;
           currentLongitude = currentLocation.longitude;
           currentAltitude = currentLocation.altitude;
-        });
+        });*/
 
         return Scaffold(
 
@@ -59,7 +58,7 @@ class _CurrentHikeState extends State<CurrentHike> {
                 onPressed: () {
         //          Firestore.instance.collection("user").document().setData({'username' : "Paul", 'expertise' : 5, 'difficulty' : 9.8, 'region' : "Italy"});
         //          var currentLocation = location.getLocation();
-                  Firestore.instance.collection("user").document(snapshot.data.documents[1].documentID).setData({'marker' : currentAltitude });
+                  //Firestore.instance.collection("user").document(snapshot.data.documents[1].documentID).setData({'marker' : currentAltitude });
                 },
               ),
         );
