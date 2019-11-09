@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:ux_prototype/ui_elements/route_map.dart';
 import 'package:ux_prototype/views/edit_page/edit_loc_data_page.dart';
 import '../../data_models/location.dart';
 import '../../data_models/route.dart';
@@ -75,6 +76,43 @@ class _HikeEditPageState extends State<HikeEditPage> {
     }
   }
 
+  void _onSave(BuildContext context) {
+    if (this.titleController.text==null||this.titleController.text=="") {
+      showDialog(
+        context: context,
+        child: AlertDialog(
+          content: Text("Please fill out the title before you save!"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Ok"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        )
+      );
+      return;
+    }
+    if (this.routeList == null||this.routeList.length<2) {
+      showDialog(
+        context: context,
+        child: AlertDialog(
+          content: Text("Please enter location information about the route before you save!"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Ok"),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        )
+      );
+      return;
+    }
+    
+    //TODO: Upload images and save route
+
+    Navigator.pop(context);
+  }
+
   //Shows the User a dialog to pick a new image for the route
   void _showNewImageDialog(BuildContext context) {
     showDialog(
@@ -117,6 +155,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
     Navigator.push(context, MaterialPageRoute(
       builder: (context) => Scaffold(
         body: Container(
+          color: Colors.black.withAlpha(200),
           padding: EdgeInsets.all(15),
           child: Center(
             child: Image(
@@ -161,7 +200,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
   Widget _buildImagePicker() {
     return Builder(
       builder: (context) {
-        const double number_of_colums = 5;
+        const int number_of_colums = 5;
         double widthOfGridElement =
             MediaQuery.of(context).size.width / number_of_colums;
         //build list of widgets which are going to be displayed in a grid view
@@ -196,11 +235,15 @@ class _HikeEditPageState extends State<HikeEditPage> {
 
         //put gridItems in matrix
         List<List<Widget>> grid = [];
+        int row = 0; int col = 0;
         for (int i = 0; i < gridItems.length; i++) {
-          int row = (i / (number_of_colums.floor())).floor();
-          //int col = (i % (number_of_colums.floor()));
           if (grid.length <= row) grid.add([]);
-          grid[row].add(gridItems[i]);
+          grid[row] = grid[row]..add(gridItems[i]);
+          col++;
+          if (col >= number_of_colums-1) {
+            col = 0;
+            row++;
+          }
         }
 
         //display matrix
@@ -320,7 +363,6 @@ class _HikeEditPageState extends State<HikeEditPage> {
                           this.routeList=data[0];
                           this.cameraPosition=data[1];
                         });
-                        //)).then((routeList) => this.routeList = routeList);
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width*0.7,
@@ -335,6 +377,14 @@ class _HikeEditPageState extends State<HikeEditPage> {
                 ),
               ),
 
+            //------>show map when is old  route<-----
+            if (!widget.isNew)
+              Container(
+                margin: EdgeInsets.only(top: 25),
+                height: 300,
+                child: RouteMap(route: Future.value(widget.oldroute),),
+              ),
+              
             
             //----->Save/Cancel<-----
             Container(height: 50,),
@@ -345,9 +395,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                   clipBehavior: Clip.hardEdge,
                   borderRadius: BorderRadius.all(Radius.circular(15)),
                   child: GestureDetector(
-                    onTap: () {
-                      //check if all neccessarry fields are initialized when isNew is true
-                    }, //TODO onSave event
+                    onTap: ()=>_onSave(context), //TODO onSave event
                     child: Container(
                       width: MediaQuery.of(context).size.width*0.3,
                       height: 50,

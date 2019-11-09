@@ -5,6 +5,7 @@ import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
 import 'package:ux_prototype/ui_elements/route_info.dart';
+import 'package:ux_prototype/views/edit_page/edit_page.dart';
 
 class DiscoverDetail extends StatefulWidget {
   final Future<HikingRoute> route;
@@ -93,7 +94,12 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                             text: "Edit",
                             child: Icon(Icons.edit, color: Theme.of(context).accentColor, size: 18,),
                             onPressed: () {
-                              
+                              widget.route.then((route){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => HikeEditPage(oldroute: route)),
+                                );
+                              });
                             },
                           )
                         ],

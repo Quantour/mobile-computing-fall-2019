@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -29,18 +31,22 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
 
   void _locateUser() {
     Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((pos){
-      if (mapController!=null)
-        mapController.animateCamera(
-          CameraUpdate.newLatLng(LatLng(pos.latitude, pos.longitude))
-        );     
+      try {
+        if (mapController!=null)
+          mapController.animateCamera(
+            CameraUpdate.newLatLng(LatLng(pos.latitude, pos.longitude))
+          );  
+      } catch (e) {}   
     });
   }
 
   void _locateDatLoc(Dat.Location loc) {
-    if (mapController!=null)
-      mapController.animateCamera(
-        CameraUpdate.newLatLng(loc.toLatLng())
-      );     
+    try {
+      if (mapController!=null)
+        mapController.animateCamera(
+          CameraUpdate.newLatLng(loc.toLatLng())
+        ); 
+    }catch(e){}    
   }
 
   Widget buildGoogleMap(BuildContext context) {
@@ -84,32 +90,15 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         actions: <Widget>[
           FlatButton(
             onPressed: (){},
             child: Icon(Icons.search),
           )
         ]
-      ),
-      body: buildGoogleMap(context),
-      /*body: FutureBuilder<Position>(
-        future: Geolocator().getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best).timeout(Duration(seconds: 3)),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState!=ConnectionState.done)
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          
-          if (snapshot.hasData)
-            currentCameraPosition = CameraPosition(
-              target: LatLng(snapshot.data.latitude, snapshot.data.longitude), zoom: 12);
-          
-          return buildGoogleMap(context);
-        },
       ),*/
-
+      body: buildGoogleMap(context),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
