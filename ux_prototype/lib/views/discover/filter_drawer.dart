@@ -6,6 +6,8 @@ import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/profile_picture.dart';
 import 'package:ux_prototype/ui_elements/rating.dart';
 import 'package:ux_prototype/views/discover/discover_search_parameter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 import '../../data_models/user.dart';
 
@@ -37,7 +39,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget buildWithUser(BuildContext context, User currentUser) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -75,9 +77,9 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           width: w,
                           height: w,
                           margin: EdgeInsets.all(10),
-                          child: ProfilePictureWidget(url: User.currentUser.profilePicture),
+                          child: ProfilePictureWidget(url: null),
                         ),
-                        Text(User.currentUser.name, style: Theme.of(context).textTheme.title),
+                        Text(currentUser.getName, style: Theme.of(context).textTheme.title),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CustomButton(
@@ -237,6 +239,44 @@ class _FilterDrawerState extends State<FilterDrawer> {
           ),
         ],
       )
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: Firestore.instance.collection('users').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return null;
+
+          // ignore: missing_return
+          List<DocumentSnapshot> firebaseUsers = snapshot.data.documents; //[0].data['region'];
+
+          List<Map<String,dynamic>> list = new List();
+
+          list = firebaseUsers.map((DocumentSnapshot hike){
+            return hike.data;
+          }).toList(); //Makes all entries to List<Map<String,dynamic>>
+
+          String query = 'Saga'; //Input userID by user.
+
+          String ID;
+          String name;
+          for(Map<String,dynamic> users in list){
+            String userIDTemp = users['userID'].toString();
+            if(userIDTemp == query){
+              ID = userIDTemp;
+              name = users["name"].toString();
+              break;
+            } else {
+              name = 'No name found';
+              ID =   'No ID found';
+            }
+          }
+
+          User currentUser = User(name,ID);
+          return buildWithUser(context, currentUser);
+        }
+
     );
   }
 }

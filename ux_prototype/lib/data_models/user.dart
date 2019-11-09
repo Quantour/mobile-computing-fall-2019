@@ -1,5 +1,5 @@
 
-Map<String, User> _localMirroredData = Map();
+//Map<String, User> _localMirroredData = Map();
 
 /**
  * User has following (public) data
@@ -9,9 +9,9 @@ Map<String, User> _localMirroredData = Map();
  * expertise: int (from 1 to 5)
  */
 class User {
-  User._(String id): userID = id;
+  //User._(String id): userID = id;
 
-  final String userID;
+  /*final String userID;
   String get   profilePicture => "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
   String get   name => "John Doe";  
   int get      expertise => 2;
@@ -26,6 +26,16 @@ class User {
 
   static User get currentUser {
     return User._("Id");
+  } */
+  String name;
+  String ID;
+  User(this.name,this.ID);
+
+  String get getID{
+    return ID;
+  }
+  String get getName{
+    return name;
   }
 
   static bool get isLoggedIn {
