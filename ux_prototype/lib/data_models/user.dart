@@ -33,7 +33,7 @@ class User {
   }
 
   //<REMOVE THIS> for UI debug purposes
-  static bool _login_status = false;
+  static bool _login_status = true;
   static set isLoggedIn(bool status) => _login_status = status;
   //</REMOVE THIS>
 }

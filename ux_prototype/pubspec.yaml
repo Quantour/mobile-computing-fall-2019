@@ -27,7 +27,10 @@ dependencies:
   google_maps_flutter: ^0.5.0
   cloud_firestore: ^0.12.9+6 #Version from dev flutter
   provider: ^3.0.0
-  location: ^2.3.5
+  geolocator: ^5.1.4+2
+  image_picker: ^0.6.1+10
+  #location: ^2.3.5
+  
 
 
 
