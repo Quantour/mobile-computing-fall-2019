@@ -27,7 +27,7 @@ class HikingRoute {
   final String          userID;
   final String          title;
   final List<Location>  route;
-  final int             timestamp;
+  final int             timestamp; //Unix style timestamp, in milliseconds since 1970/1/1, 0:00 o'clock 
 
 
   //optional, changeable, editable by everyone

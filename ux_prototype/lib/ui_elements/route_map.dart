@@ -8,8 +8,11 @@ import '../data_models/route.dart';
 class RouteMap extends StatelessWidget {
 
   final Future<HikingRoute> route;
+  final void Function(GoogleMapController) onMapCreated;
+  final List<Polyline> additionalPolylines;
+  final bool myLocationEnabled;
 
-  const RouteMap ({@required this.route, Key key}) : super(key: key);
+  const RouteMap ({@required this.route, Key key, this.onMapCreated, this.additionalPolylines, this.myLocationEnabled}) : super(key: key);
 
   Widget buildWithPins(BuildContext context, List<Pin> pins) {
     return FutureBuilder(
@@ -45,6 +48,8 @@ class RouteMap extends StatelessWidget {
 
           return Container(
             child: GoogleMap(
+              myLocationEnabled: myLocationEnabled,
+              onMapCreated: onMapCreated,
               initialCameraPosition: CameraPosition(
                 target: r.location.toLatLng(),
                 zoom: 14.0
@@ -62,17 +67,17 @@ class RouteMap extends StatelessWidget {
                   endCap: Cap.roundCap,
                   startCap: Cap.roundCap
                 )
-              ]),
+              ]..addAll(additionalPolylines==null?[]:additionalPolylines)),
               //draw pins onto map
               markers: ((List<Pin> pins) {
                 Set<Marker> markers = Set();
 
                 //add midpoint of current route
-                markers.add(Marker(
+                /*markers.add(Marker(
                   markerId: MarkerId("route_loc"),
                   position: r.location.toLatLng(),
                   //icon: BitmapDescriptor.fromAssetImage(configuration, assetName)
-                ));
+                ));*/
 
                 //Add all the pins to Map
                 for (Pin pin in pins)

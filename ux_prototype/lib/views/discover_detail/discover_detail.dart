@@ -5,6 +5,7 @@ import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
 import 'package:ux_prototype/ui_elements/route_info.dart';
+import 'package:ux_prototype/views/current_hike/current_hike.dart';
 import 'package:ux_prototype/views/edit_page/edit_page.dart';
 
 class DiscoverDetail extends StatefulWidget {
@@ -76,7 +77,7 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                             text: "Start",
                             child: Icon(Icons.play_arrow, color: Theme.of(context).accentColor, size: 18,),
                             onPressed: () {
-                              
+                              CurrentHike.setActiveWithRoute(snapshot.data);
                             },
                           ),
                           CustomButton(

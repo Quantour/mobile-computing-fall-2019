@@ -125,7 +125,7 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
           ),
           Container(width: 15,),
           FloatingActionButton(
-            heroTag: "FlHeroTagRemoveLocatePosition",
+            heroTag: "FlHeroTagLocateUsrPosition",
             onPressed: () => _locateUser(),
             child: Icon(Icons.location_searching),
           )
