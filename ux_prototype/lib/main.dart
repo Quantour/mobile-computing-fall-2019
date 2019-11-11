@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Wanderlust UI Prototyp',
       theme: appTheme(),
-      home: MasterView(),
+      home: MasterView(), 
     );
   }
 }

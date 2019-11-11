@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ux_prototype/data_models/pin.dart';
 import 'package:ux_prototype/data_models/route.dart';
+import 'package:ux_prototype/data_models/location.dart';
 
 import '../data_models/route.dart';
 
@@ -12,7 +14,7 @@ class RouteMap extends StatelessWidget {
   const RouteMap ({@required this.route, Key key}) : super(key: key);
 
   Widget buildWithPins(BuildContext context, List<Pin> pins) {
-    return FutureBuilder(
+    var futureBuilder = FutureBuilder(
       future: route,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -92,22 +94,27 @@ class RouteMap extends StatelessWidget {
         }
       },
     );
+    return futureBuilder;
     
   }
 
+  Future<List<Pin>> getPins() async {
+      List<Pin> pins = [];
+      QuerySnapshot querySnapshot = await Firestore.instance.collection("pin").getDocuments();
+      var list = querySnapshot.documents;
+      for(int i=0;i<list.length;i++){
+        var doc = list[i];
+        pins.add(new Pin(doc.data['pinID'],new Location(doc.data['latitude'],doc.data['longitude']), doc.data['images'],doc.data['typeno']));
+      }
+      return pins;
+  }
 
   @override
   Widget build(BuildContext context) {
-    
-    List<Pin> pins = [];
 
-    //#####################################
-    //##
-    //TODO Fetch pins for this area, location from route: route.location
-    //rewrite Pin.fromArea(Area)
-    //#####################################
-
-
+    //TODO implement converting the return value of getPins() of the type Future<List<Pin>> to List<Pin>
+    List<Pin> pins = []; //getPins();
+   
     return buildWithPins(context, pins);
 
   }
