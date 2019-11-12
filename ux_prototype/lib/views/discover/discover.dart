@@ -139,7 +139,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
           future: HikingRoute.fromID("test"),
           builder: (context, snapshot) {
             if (snapshot.hasData)
-              return _buildWithRoutes(context, [snapshot.data,snapshot.data,snapshot.data]);
+              return _buildWithRoutes(context, [snapshot.data]);
             else
               return _buildWithRoutes(context, null);
           }

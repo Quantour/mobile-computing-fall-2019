@@ -5,6 +5,7 @@ import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
 import 'package:ux_prototype/ui_elements/route_info.dart';
+import 'package:ux_prototype/util.dart';
 import 'package:ux_prototype/views/current_hike/current_hike.dart';
 import 'package:ux_prototype/views/edit_page/edit_page.dart';
 import 'package:ux_prototype/views/master/master.dart';
@@ -64,7 +65,7 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                       height: MediaQuery.of(context).size.height * 0.35,
                       child: ImageScrollerWidget(
                         imageBuilder: () => snapshot.data.images,
-                        heroTag: widget.heroTag==null?UniqueKey().toString():widget.heroTag,
+                        heroTag: widget.heroTag==null?UUID():widget.heroTag,
                       )
                     ),
                     SingleChildScrollView(

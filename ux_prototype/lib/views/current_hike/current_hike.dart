@@ -6,6 +6,8 @@ import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/route_map.dart';
 import 'dart:async';
 
+import 'package:ux_prototype/util.dart';
+
 class ActiveHike {
   final HikingRoute route;
   final DateTime timestamp_start;
@@ -164,6 +166,7 @@ class _CurrentHikeState extends State<CurrentHike> {
           ),
           Container(width: 7,),
           FloatingActionButton(
+            heroTag: UUID(),
             onPressed: () {
               //TODO: Stop hike
             },
@@ -172,16 +175,19 @@ class _CurrentHikeState extends State<CurrentHike> {
           Container(width: 15,),
           if (activeHike.isPaused)
             FloatingActionButton(
+              heroTag: UUID(),
               onPressed: (){activeHike.isPaused = false;},
               child: Icon(Icons.play_arrow),
             ),
           if (!activeHike.isPaused)
             FloatingActionButton(
+              heroTag: UUID(),
               onPressed: (){activeHike.isPaused = true;},
               child: Icon(Icons.pause),
             ),
           Container(width: 15,),
           FloatingActionButton(
+            heroTag: UUID(),
             onPressed: () => _locateUser(),
             child: Icon(Icons.location_searching),
           )
