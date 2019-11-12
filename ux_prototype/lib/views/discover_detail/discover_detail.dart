@@ -33,7 +33,6 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
             child: Container(
               padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
               child: FloatingActionButton(
-                heroTag: "FloatingActionButton:discover_detail",
                 backgroundColor: Theme.of(context).accentColor.withAlpha(200),
                 onPressed: (){
                   Navigator.pop(context);
@@ -75,12 +74,30 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                           CustomButton(
                             padding: const EdgeInsets.all(8),
                             margin: const EdgeInsets.all(8),
+                            color: CurrentHike.isActive?Colors.grey:null,
                             text: "Start",
-                            child: Icon(Icons.play_arrow, color: Theme.of(context).accentColor, size: 18,),
+                            child: Icon(Icons.play_arrow, color: CurrentHike.isActive?Colors.grey:Theme.of(context).accentColor, size: 18,),
                             onPressed: () {
-                              Navigator.pop(context);
-                              CurrentHike.setActiveWithRoute(snapshot.data);
-                              MasterView.navigate(MasterView.CURRENT_HIKE);
+                              if (CurrentHike.isActive) {
+                                showDialog(
+                                  context: context,
+                                  child: AlertDialog(
+                                    content: Text("Please stop current active hike before starting a new one!"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        child: Text("Ok"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      )
+                                    ],
+                                  )
+                                );
+                              } else {
+                                Navigator.pop(context);
+                                CurrentHike.setActiveWithRoute(snapshot.data);
+                                MasterView.navigate(MasterView.CURRENT_HIKE);
+                              }
                             },
                           ),
                           CustomButton(

@@ -105,7 +105,6 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
         children: <Widget>[
           //<----- add current location ---->
           FloatingActionButton(
-            heroTag: "FlHeroTagAddPosToRoute",
             onPressed: () {setState(() {
               //add current pos to list
               route.add(Dat.Location(currentCameraPosition.target.latitude, currentCameraPosition.target.longitude));
@@ -114,7 +113,6 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
           ),
           Container(width: 15,),
           FloatingActionButton(
-            heroTag: "FlHeroTagRemovePosFromRoute",
             onPressed: (){
               if (route.length>0)
                 route.removeLast();
@@ -125,7 +123,6 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
           ),
           Container(width: 15,),
           FloatingActionButton(
-            heroTag: "FlHeroTagLocateUsrPosition",
             onPressed: () => _locateUser(),
             child: Icon(Icons.location_searching),
           )

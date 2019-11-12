@@ -155,12 +155,15 @@ class _CurrentHikeState extends State<CurrentHike> {
                 int sec  = total.inSeconds % 60;
                 int min = total.inMinutes % 60;
                 int hour = total.inHours;
-                return Text("Time elapsed: $hour:$min:$sec");
+                return Container(
+                  padding: const EdgeInsets.all(5),
+                  child: Text("Time elapsed: $hour:$min:$sec")
+                );
               }
             )
           ),
+          Container(width: 7,),
           FloatingActionButton(
-            heroTag: "CurHikeFlHeroTagStop",
             onPressed: () {
               //TODO: Stop hike
             },
@@ -169,19 +172,16 @@ class _CurrentHikeState extends State<CurrentHike> {
           Container(width: 15,),
           if (activeHike.isPaused)
             FloatingActionButton(
-              heroTag: "CurHikeFlHeroResume",
               onPressed: (){activeHike.isPaused = false;},
               child: Icon(Icons.play_arrow),
             ),
           if (!activeHike.isPaused)
             FloatingActionButton(
-              heroTag: "CurHikeFlHeroPause",
               onPressed: (){activeHike.isPaused = true;},
               child: Icon(Icons.pause),
             ),
           Container(width: 15,),
           FloatingActionButton(
-            heroTag: "CurHikeFlHeroTagLocateUsrPosition",
             onPressed: () => _locateUser(),
             child: Icon(Icons.location_searching),
           )
