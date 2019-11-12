@@ -22,20 +22,20 @@ class ActiveHike {
       timestamp_last_unpaused = DateTime.now();
     } else {
       //pause now
-      total_duration_until_last_paused += timestamp_last_unpaused.difference(DateTime.now());
+      total_duration_until_last_paused += DateTime.now().difference(timestamp_last_unpaused);
     }
     _isPaused = !_isPaused;
   }
 
   Duration get totalTime {
     Duration dur =  total_duration_until_last_paused;
-    if (!isPaused) total_duration_until_last_paused += timestamp_last_unpaused.difference(DateTime.now());
+    if (!isPaused) dur += DateTime.now().difference(timestamp_last_unpaused);
     return dur;
   }
 
-  ActiveHike(this.route, DateTime timestamp_start)
-  : this.timestamp_start = timestamp_start,
-    timestamp_last_unpaused = timestamp_start;
+  ActiveHike(this.route, DateTime timestampStart)
+  : this.timestamp_start = timestampStart,
+    timestamp_last_unpaused = timestampStart;
 }
 
 class CurrentHike extends StatefulWidget {
