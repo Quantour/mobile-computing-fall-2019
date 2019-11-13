@@ -29,10 +29,10 @@ class User {
   //just let it be with mockup data until ou have implemented it
   String get   profilePicture => "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
 
-  /*
+  //mockup needed for UI until implemented
   static User get currentUser {
     return User("CurrentUserID", "Sven Peterson");
-  }*/
+  }
 
   //This function is neccessary, so that the User can be loaded and shown
   //for route information widget(creator of the route)
