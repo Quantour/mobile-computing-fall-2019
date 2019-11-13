@@ -13,13 +13,20 @@ import '../../data_models/user.dart';
 class HikeEditPage extends StatefulWidget {
   final bool isNew;
   final HikingRoute oldroute;
+  final List<Location> routeSuggestion;
 
-  HikeEditPage({this.oldroute}) : isNew = (oldroute == null);
+  HikeEditPage({this.oldroute, this.routeSuggestion}) : isNew = (oldroute == null) {
+    //Either it is a new or an old route
+    assert(!(oldroute!=null && routeSuggestion!=null));
+  }
+
 
   @override
   _HikeEditPageState createState() {
     _HikeEditPageState state = _HikeEditPageState();
     if (isNew) {
+      if (routeSuggestion!=null)
+        state.routeList.addAll(routeSuggestion);
     } else {
       state.images = [
         for (String url in oldroute.images) _NetwOrFileImg(url: url)

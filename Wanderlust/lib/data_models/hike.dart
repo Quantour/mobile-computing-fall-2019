@@ -11,6 +11,9 @@ import 'package:flutter/widgets.dart';
  */
 class Hike {
 
+  String hikeID;
+  String userID;
+
   String routeID;
   DateTime start;
   DateTime stop;
@@ -22,10 +25,33 @@ class Hike {
 
   //TODO implemenet stuff here
   static Future<List<Hike>> getUserHistory(String userID) {
-    return Future.value([]);
+    return Future.value([
+      Hike(
+        start: DateTime.utc(2019,02,20,12),
+        stop: DateTime.utc(2019,02,20,13, 34, 12),
+        routeID: "ID",
+        actualRoute: <Location>[
+          Location(50+0.01, 6+0.01),
+          Location(50.01+0.01, 6.005+0.01),
+          Location(50.02+0.01, 6.01+0.01),
+          Location(50.03+0.01, 6.005+0.01)
+        ]
+      ),
+      Hike(
+        start: DateTime.utc(2019,02,20,12),
+        stop: DateTime.utc(2019,02,20,13, 34, 12),
+        routeID: null,
+        actualRoute: <Location>[
+          Location(50+0.01, 6+0.01),
+          Location(50.01+0.01, 6.005+0.01),
+          Location(50.02+0.01, 6.01+0.01),
+          Location(50.03+0.01, 6.005+0.01)
+        ]
+      )
+    ]);
   }
 
-  static Future<List<Hike>> getCurrentUserHistory(String userID) {
+  static Future<List<Hike>> getCurrentUserHistory() {
     if (!User.isLoggedIn)
       return Future.error("User must be logged in to view his history");
     return getUserHistory(User.currentUser.ID);

@@ -59,8 +59,8 @@ class _FilterDrawerState extends State<FilterDrawer> {
                   end: Alignment.topRight,
                   stops: [0,0.7],
                   colors: [
-                    Color.fromRGBO(244,81,30,1),
-                    Color.fromRGBO(109,76,65,1)
+                    Color.fromRGBO(244,81,30,1),  //orange
+                    Color.fromRGBO(109,76,65,1)  //brown
                   ]
                 )
               ),
