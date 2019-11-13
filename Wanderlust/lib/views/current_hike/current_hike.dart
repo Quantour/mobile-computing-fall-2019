@@ -10,6 +10,7 @@ import 'dart:async';
 import 'package:Wanderlust/util.dart';
 import 'package:Wanderlust/views/current_hike/active_hike.dart';
 
+//TODO set this to 40 seconds or so when deug o this section is finished
 const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 10);
 
 
@@ -104,7 +105,7 @@ class _CurrentHikeState extends State<CurrentHike> {
         child: Column(
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.height*0.34,
+              height: MediaQuery.of(context).size.height*0.25,
             ),
             Center(
               child: Icon(Icons.directions_walk, size: 40, color: Theme.of(context).accentColor,),
@@ -113,10 +114,17 @@ class _CurrentHikeState extends State<CurrentHike> {
               height: 10,
             ),
             Center(
-              child: Text("Please start a hike in order to see it here."),
+              child: Container(
+                width: MediaQuery.of(context).size.width*0.7,
+                child: Text("Please start a hike in order to see it here.",textAlign: TextAlign.center,)
+              ),
             ),
             Center(
-              child: Text("You can start a route from the discover page or"),
+              child: Container(
+                padding: const EdgeInsets.only(top: 20),
+                width: MediaQuery.of(context).size.width*0.7,
+                child: Text("You can start a route from the discover page or",textAlign: TextAlign.center,)
+              ),
             ),
             Center(
               child: RaisedButton(
@@ -216,7 +224,7 @@ class _CurrentHikeState extends State<CurrentHike> {
       ),
 
       //<-----Floating Action----->
-      floatingActionButton: Row(
+      floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
@@ -235,36 +243,42 @@ class _CurrentHikeState extends State<CurrentHike> {
               }
             )
           ),
-          Container(width: 7,),
-          FloatingActionButton(
-            heroTag: UUID(),
-            onPressed: _onStop,
-            child: Icon(Icons.stop),
+          Container(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              FloatingActionButton(
+                heroTag: UUID(),
+                onPressed: _onStop,
+                child: Icon(Icons.stop),
+              ),
+              Container(width: 15,),
+              if (activeHike.isPaused)
+                FloatingActionButton(
+                  heroTag: UUID(),
+                  onPressed: (){setState(() {
+                    activeHike.isPaused = false;
+                  });},
+                  child: Icon(Icons.play_arrow),
+                ),
+              if (!activeHike.isPaused)
+                FloatingActionButton(
+                  heroTag: UUID(),
+                  onPressed: (){setState(() {
+                    activeHike.isPaused = true;
+                  });},
+                  child: Icon(Icons.pause),
+                ),
+              Container(width: 15,),
+              FloatingActionButton(
+                heroTag: UUID(),
+                onPressed: activeHike.isPaused?null:(){_locateUser();},
+                backgroundColor: activeHike.isPaused?Colors.grey:Theme.of(context).accentColor,
+                child: Icon(Icons.location_searching, color: activeHike.isPaused?Colors.black:Colors.white),
+              )
+            ],
           ),
-          Container(width: 15,),
-          if (activeHike.isPaused)
-            FloatingActionButton(
-              heroTag: UUID(),
-              onPressed: (){setState(() {
-                activeHike.isPaused = false;
-              });},
-              child: Icon(Icons.play_arrow),
-            ),
-          if (!activeHike.isPaused)
-            FloatingActionButton(
-              heroTag: UUID(),
-              onPressed: (){setState(() {
-                activeHike.isPaused = true;
-              });},
-              child: Icon(Icons.pause),
-            ),
-          Container(width: 15,),
-          FloatingActionButton(
-            heroTag: UUID(),
-            onPressed: activeHike.isPaused?null:(){_locateUser();},
-            backgroundColor: activeHike.isPaused?Colors.grey:Theme.of(context).accentColor,
-            child: Icon(Icons.location_searching, color: activeHike.isPaused?Colors.black:Colors.white),
-          )
         ],
       ),
     );
