@@ -245,7 +245,11 @@ class _FilterDrawerState extends State<FilterDrawer> {
     return StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance.collection('users').snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) return null;
+          
+          if (!snapshot.hasData) {
+            User.isLoggedIn = false;
+            return buildWithUser(context, null);
+          }
 
           // ignore: missing_return
           List<DocumentSnapshot> firebaseUsers = snapshot.data.documents; //[0].data['region'];
