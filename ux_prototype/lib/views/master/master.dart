@@ -67,7 +67,10 @@ class _MasterViewState extends State<MasterView> {
           bottomNavigationBar: CommonNavBar(
             currentIndex: _index,
             onTap: (index) {
-              MasterView.navigate(index);
+              setState(() {
+                _index = index;
+                MasterView.navigate(index);
+              });
             }
           ),
         );

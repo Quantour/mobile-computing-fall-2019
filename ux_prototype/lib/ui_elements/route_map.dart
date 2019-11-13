@@ -11,8 +11,10 @@ class RouteMap extends StatelessWidget {
   final void Function(GoogleMapController) onMapCreated;
   final List<Polyline> additionalPolylines;
   final bool myLocationEnabled;
+  final CameraPosition initialCameraPosition;
+  final Function(CameraPosition) onCameraMove;
 
-  const RouteMap ({@required this.route, Key key, this.onMapCreated, this.additionalPolylines, this.myLocationEnabled}) : super(key: key);
+  const RouteMap ({@required this.route, Key key, this.onMapCreated, this.additionalPolylines, this.myLocationEnabled, this.initialCameraPosition, this.onCameraMove}) : super(key: key);
 
   Widget buildWithPins(BuildContext context, List<Pin> pins) {
     return FutureBuilder(
@@ -45,28 +47,32 @@ class RouteMap extends StatelessWidget {
           //future completed with data!
           HikingRoute r = snapshot.data;
 
-
+          //Hiking route can be null, if User starts a hike without setting a route before,
+          
           return Container(
             child: GoogleMap(
               myLocationEnabled: myLocationEnabled,
+              onCameraMove: onCameraMove,
               onMapCreated: onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: r.location.toLatLng(),
+              initialCameraPosition: initialCameraPosition!=null?initialCameraPosition:CameraPosition(
+                target: r!=null?r.location.toLatLng():LatLng(0, 0),
                 zoom: 14.0
                 //TODO: figure out proper zoom depending on route
               ),
               //draw route onto map
               polylines: Set.from(<Polyline>[
                 //actual hiking route drawed ontop of the map
-                Polyline(
-                  polylineId: PolylineId("route"),
-                  points: r.route.map((p) => p.toLatLng()).toList(),
-                  color: Theme.of(context).accentColor,
-                  geodesic: true,
-                  jointType: JointType.round,
-                  endCap: Cap.roundCap,
-                  startCap: Cap.roundCap
-                )
+                if (r!=null)
+                  Polyline(
+                    polylineId: PolylineId("route"),
+                    points: r.route.map((p) => p.toLatLng()).toList(),
+                    color: Theme.of(context).accentColor,
+                    geodesic: true,
+                    jointType: JointType.round,
+                    endCap: Cap.roundCap,
+                    startCap: Cap.roundCap,
+                    width: 5
+                  )
               ]..addAll(additionalPolylines==null?[]:additionalPolylines)),
               //draw pins onto map
               markers: ((List<Pin> pins) {

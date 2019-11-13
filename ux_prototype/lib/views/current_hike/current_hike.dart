@@ -2,59 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:ux_prototype/data_models/location.dart';
 import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/route_map.dart';
 import 'dart:async';
 
 import 'package:ux_prototype/util.dart';
+import 'package:ux_prototype/views/current_hike/active_hike.dart';
 
-class ActiveHike {
-  final HikingRoute route;
-  final DateTime timestamp_start;
+const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 10);
 
-  DateTime timestamp_last_unpaused;
-  Duration total_duration_until_last_paused = Duration.zero;
-  bool _isPaused=false;
-  
-  bool get isPaused => _isPaused;
-  set isPaused(bool p) {
-    if (p==_isPaused) return;
-    if (_isPaused) {
-      //was paused, now continue
-      timestamp_last_unpaused = DateTime.now();
-    } else {
-      //pause now
-      total_duration_until_last_paused += DateTime.now().difference(timestamp_last_unpaused);
-    }
-    _isPaused = !_isPaused;
-  }
-
-  Duration get totalTime {
-    Duration dur =  total_duration_until_last_paused;
-    if (!isPaused) dur += DateTime.now().difference(timestamp_last_unpaused);
-    return dur;
-  }
-
-  ActiveHike(this.route, DateTime timestampStart)
-  : this.timestamp_start = timestampStart,
-    timestamp_last_unpaused = timestampStart;
-}
 
 class CurrentHike extends StatefulWidget {
   CurrentHike({Key key}) : super(key: key);
 
+  static _CurrentHikeState _state;
+
   @override
   State<CurrentHike> createState() {
-    return _CurrentHikeState();
+    _state = _CurrentHikeState();
+    return _state;
   }
 
   static Completer<ActiveHike> activeHike = Completer();
+  static Stream updatePosTickerStream;
 
   static bool get isActive => activeHike.isCompleted;
 
   static void setActiveWithRoute(HikingRoute route) {
+    assert(!isActive);
     ActiveHike ah = ActiveHike(route, DateTime.now());
     activeHike.complete(ah);
+    //Start recording actual route
+
+    updatePosTickerStream = Stream.periodic(RECORD_INTERVAL_ACTUAL_ROUTE)..listen((event) {
+      _state.addActualRoutePoint();
+    });
+  }
+
+  static void setActiveWithoutRoute() => setActiveWithRoute(null);
+
+  static void stopActiveRoute() {
+    assert(isActive);
+    //stop time keeping of active hike
+    activeHike.future.timeout(Duration(milliseconds: 500)).then((ah) {
+      ah.isPaused = true;
+      updatePosTickerStream = null;
+
+      //save Stuff
+
+      //reset all
+      activeHike = Completer<ActiveHike>();
+    });
   }
 
 }
@@ -67,6 +66,7 @@ class CurrentHike extends StatefulWidget {
 class _CurrentHikeState extends State<CurrentHike> {
   
   GoogleMapController mapController;
+  CameraPosition camPos;
 
   void _locateUser() {
     Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((pos){
@@ -79,6 +79,24 @@ class _CurrentHikeState extends State<CurrentHike> {
     });
   }
 
+  void addActualRoutePoint() async {
+    Position pos = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    if (!CurrentHike.isActive) return;
+    ActiveHike ah = await CurrentHike.activeHike.future;
+    if (ah.isPaused) return;
+    setState(() {
+      ah.actualRoute.add(Location(pos.latitude, pos.longitude));
+    });
+  }
+
+  void _onStop() {
+    setState(() {
+      //reset mapController and camera position, if next hike is initiated
+      mapController = null;
+      camPos = null;
+      CurrentHike.stopActiveRoute();
+    });
+  }
 
   Widget buildInactive(BuildContext context) {
     return Scaffold(
@@ -95,7 +113,17 @@ class _CurrentHikeState extends State<CurrentHike> {
               height: 10,
             ),
             Center(
-              child: Text("Please start a Hike in order to see it here."),
+              child: Text("Please start a hike in order to see it here."),
+            ),
+            Center(
+              child: Text("You can start a route from the discover page or"),
+            ),
+            Center(
+              child: RaisedButton(
+                onPressed: () => CurrentHike.setActiveWithoutRoute(),
+                color: Theme.of(context).accentColor,
+                child: Text("Start hike without route"),
+              ),
             )
           ],
         ),
@@ -138,9 +166,52 @@ class _CurrentHikeState extends State<CurrentHike> {
             route: Future.value(activeHike.route),
             myLocationEnabled: true,
             onMapCreated: (con) {
-              mapController=con;
-            }
-          )
+              if (mapController==null) {
+                //initial setting of mapController
+                //only then locate User
+                mapController=con;
+                _locateUser();
+              } else mapController=con;
+            },
+            //if actual route is updated, the map is rebuild
+            //so this is neccessary to keep the camera on the
+            //same position
+            onCameraMove: (camera) {
+              camPos = camera;
+            },
+            initialCameraPosition:
+              //if the route map is build the first time for a just
+              //activted active route, the camera will show
+              //the start of the route, otherwise it will be the same
+              //camera position as it was before rebuild
+              (camPos!=null ||
+               activeHike.route==null ||
+               activeHike.route.route==null ||
+               activeHike.route.length==0) 
+              ? camPos
+              : CameraPosition(
+                target: activeHike.route.route[0].toLatLng(),
+                zoom: 14
+              ),
+            additionalPolylines: <Polyline>[
+              Polyline(
+                polylineId: PolylineId("currentHikeActualRoute"),
+                endCap: Cap.roundCap,
+                geodesic: true,
+                jointType: JointType.round,
+                color: Color.fromRGBO(244,81,30, 1),
+                width: 5,
+                points: activeHike.actualRoute.map((l)=>l.toLatLng()).toList()
+              )
+            ],
+          ),
+          if (activeHike.isPaused)
+            Container(
+              color: Colors.white.withAlpha(150),
+              child: Center(
+                child: Icon(Icons.pause, size: 100, color: Theme.of(context).accentColor,),
+              ),
+            )
         ],
       ),
 
@@ -167,29 +238,32 @@ class _CurrentHikeState extends State<CurrentHike> {
           Container(width: 7,),
           FloatingActionButton(
             heroTag: UUID(),
-            onPressed: () {
-              //TODO: Stop hike
-            },
+            onPressed: _onStop,
             child: Icon(Icons.stop),
           ),
           Container(width: 15,),
           if (activeHike.isPaused)
             FloatingActionButton(
               heroTag: UUID(),
-              onPressed: (){activeHike.isPaused = false;},
+              onPressed: (){setState(() {
+                activeHike.isPaused = false;
+              });},
               child: Icon(Icons.play_arrow),
             ),
           if (!activeHike.isPaused)
             FloatingActionButton(
               heroTag: UUID(),
-              onPressed: (){activeHike.isPaused = true;},
+              onPressed: (){setState(() {
+                activeHike.isPaused = true;
+              });},
               child: Icon(Icons.pause),
             ),
           Container(width: 15,),
           FloatingActionButton(
             heroTag: UUID(),
-            onPressed: () => _locateUser(),
-            child: Icon(Icons.location_searching),
+            onPressed: activeHike.isPaused?null:(){_locateUser();},
+            backgroundColor: activeHike.isPaused?Colors.grey:Theme.of(context).accentColor,
+            child: Icon(Icons.location_searching, color: activeHike.isPaused?Colors.black:Colors.white),
           )
         ],
       ),
