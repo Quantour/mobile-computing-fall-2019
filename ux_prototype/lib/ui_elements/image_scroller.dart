@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:ux_prototype/util.dart';
 
 //build functionality for loading images
 
@@ -23,7 +24,7 @@ class _ImageScrollerWidgetState extends State<ImageScrollerWidget> {
   Widget build(BuildContext context) {
     List<String> images = widget.imageBuilder();
     return Hero(
-      tag: widget.heroTag==null?UniqueKey().toString():widget.heroTag,
+      tag: widget.heroTag==null?UUID():widget.heroTag,
       child: ListView.builder(
         padding: EdgeInsets.all(0),
         scrollDirection: Axis.horizontal,

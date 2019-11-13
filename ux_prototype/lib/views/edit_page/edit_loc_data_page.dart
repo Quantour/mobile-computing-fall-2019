@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:ux_prototype/util.dart';
 //import 'package:location/location.dart' as Loc;
 import '../../data_models/location.dart' as Dat;
 import 'package:geolocator/geolocator.dart';
@@ -105,7 +106,7 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
         children: <Widget>[
           //<----- add current location ---->
           FloatingActionButton(
-            heroTag: "FlHeroTagAddPosToRoute",
+            heroTag: UUID(),
             onPressed: () {setState(() {
               //add current pos to list
               route.add(Dat.Location(currentCameraPosition.target.latitude, currentCameraPosition.target.longitude));
@@ -114,18 +115,19 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
           ),
           Container(width: 15,),
           FloatingActionButton(
-            heroTag: "FlHeroTagRemovePosFromRoute",
-            onPressed: (){
-              if (route.length>0)
-                route.removeLast();
+            heroTag: UUID(),
+            onPressed: (route.length==0)?null:(){
+              route.removeLast();
+              //if still one element in the list locate last
               if (route.length>0)
                 _locateDatLoc(route.last);
             },
-            child: Icon(Icons.location_off),
+            backgroundColor: route.length>0?Theme.of(context).accentColor:Colors.grey,
+            child: Icon(Icons.location_off, color: route.length>0?Colors.white:Colors.black,),
           ),
           Container(width: 15,),
           FloatingActionButton(
-            heroTag: "FlHeroTagRemoveLocatePosition",
+            heroTag: UUID(),
             onPressed: () => _locateUser(),
             child: Icon(Icons.location_searching),
           )

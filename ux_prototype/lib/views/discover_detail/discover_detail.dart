@@ -5,7 +5,10 @@ import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/custom_button.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
 import 'package:ux_prototype/ui_elements/route_info.dart';
+import 'package:ux_prototype/util.dart';
+import 'package:ux_prototype/views/current_hike/current_hike.dart';
 import 'package:ux_prototype/views/edit_page/edit_page.dart';
+import 'package:ux_prototype/views/master/master.dart';
 
 class DiscoverDetail extends StatefulWidget {
   final Future<HikingRoute> route;
@@ -31,7 +34,7 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
             child: Container(
               padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
               child: FloatingActionButton(
-                heroTag: "FloatingActionButton:discover_detail",
+                heroTag: UUID(),
                 backgroundColor: Theme.of(context).accentColor.withAlpha(200),
                 onPressed: (){
                   Navigator.pop(context);
@@ -63,7 +66,7 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                       height: MediaQuery.of(context).size.height * 0.35,
                       child: ImageScrollerWidget(
                         imageBuilder: () => snapshot.data.images,
-                        heroTag: widget.heroTag==null?UniqueKey().toString():widget.heroTag,
+                        heroTag: widget.heroTag==null?UUID():widget.heroTag,
                       )
                     ),
                     SingleChildScrollView(
@@ -73,10 +76,30 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                           CustomButton(
                             padding: const EdgeInsets.all(8),
                             margin: const EdgeInsets.all(8),
+                            color: CurrentHike.isActive?Colors.grey:null,
                             text: "Start",
-                            child: Icon(Icons.play_arrow, color: Theme.of(context).accentColor, size: 18,),
+                            child: Icon(Icons.play_arrow, color: CurrentHike.isActive?Colors.grey:Theme.of(context).accentColor, size: 18,),
                             onPressed: () {
-                              
+                              if (CurrentHike.isActive) {
+                                showDialog(
+                                  context: context,
+                                  child: AlertDialog(
+                                    content: Text("Please stop current active hike before starting a new one!"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        child: Text("Ok"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      )
+                                    ],
+                                  )
+                                );
+                              } else {
+                                Navigator.pop(context);
+                                CurrentHike.setActiveWithRoute(snapshot.data);
+                                MasterView.navigate(MasterView.CURRENT_HIKE);
+                              }
                             },
                           ),
                           CustomButton(

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ux_prototype/data_models/route.dart';
 import 'package:ux_prototype/ui_elements/image_scroller.dart';
 import 'package:ux_prototype/ui_elements/route_info.dart';
+import 'package:ux_prototype/util.dart';
 
 import '../../data_models/route.dart';
 
@@ -50,7 +51,7 @@ class SearchResultCardWidget extends StatelessWidget {
                         height: MediaQuery.of(context).size.height * 0.2,
                         child: ImageScrollerWidget(
                           imageBuilder: () => snapshot.data.images,
-                          heroTag: this.heroTag==null?UniqueKey().toString():this.heroTag,
+                          heroTag: this.heroTag==null?UUID():this.heroTag,
                         )
                       ),
                       //<Body of route info>

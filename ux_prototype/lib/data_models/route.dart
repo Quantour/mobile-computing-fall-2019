@@ -27,7 +27,7 @@ class HikingRoute {
   final String          userID;
   final String          title;
   final List<Location>  route;
-  final int             timestamp;
+  final int             timestamp; //Unix style timestamp, in milliseconds since 1970/1/1, 0:00 o'clock 
 
 
   //optional, changeable, editable by everyone
@@ -92,10 +92,10 @@ class HikingRoute {
             "https://www.banfflakelouise.com/sites/default/files/styles/l_1600_12x6/public/hiking_sentinel_pass_jake_dyson_2_horizontal.jpg?itok=jsU6BajR",
           ],
           route: <Location>[
-            Location(51.220285, 6.792312),
-            Location(51.217869, 6.788197),
-            Location(51.215642, 6.771117),
-            Location(51.212078, 6.779353)
+            Location(50, 6),
+            Location(50.01, 6.005),
+            Location(50.02, 6.01),
+            Location(50.03, 6.005)
           ],
           routeID: "RouteID",
           timestamp: 76345635743,
