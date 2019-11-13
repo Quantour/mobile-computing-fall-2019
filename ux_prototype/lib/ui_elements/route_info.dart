@@ -9,7 +9,6 @@ import 'package:ux_prototype/ui_elements/rating.dart';
 import 'package:ux_prototype/ui_elements/route_map.dart';
 
 import '../data_models/route.dart';
-import '../data_models/route.dart';
 
 class RouteInfo extends StatelessWidget {
   final extended;
@@ -37,7 +36,7 @@ class RouteInfo extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: FutureBuilder(
-                    future: null,//User.fromID(route.userID),
+                    future: User.fromID(route.userID),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         if (snapshot.hasError)

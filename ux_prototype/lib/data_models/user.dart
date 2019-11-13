@@ -23,10 +23,24 @@ class User {
     _localMirroredData[userID] = u;
     return Future.delayed(Duration(seconds: 3),()=>u);
   }
+  */
 
+  //neccessary to let it in the code, so the UI displays the data right,
+  //just let it be with mockup data until ou have implemented it
+  String get   profilePicture => "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
+
+  /*
   static User get currentUser {
-    return User._("Id");
-  } */
+    return User("CurrentUserID", "Sven Peterson");
+  }*/
+
+  //This function is neccessary, so that the User can be loaded and shown
+  //for route information widget(creator of the route)
+  //Just let it be with mockup data for this time until you implemented it
+  static Future<User> fromID(String i) {
+    return Future.value(User("JohnID", "John Doe"));
+  }
+
   String name;
   String ID;
   User(this.name,this.ID);

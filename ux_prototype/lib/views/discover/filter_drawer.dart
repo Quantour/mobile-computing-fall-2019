@@ -38,7 +38,6 @@ class _FilterDrawerState extends State<FilterDrawer> {
     maxKmController.text = (widget.searchParameter.maxMeter.toDouble()/1000.0).toString();
   }
 
-  @override
   Widget buildWithUser(BuildContext context, User currentUser) {
     return Drawer(
       child: ListView(
@@ -77,7 +76,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           width: w,
                           height: w,
                           margin: EdgeInsets.all(10),
-                          child: ProfilePictureWidget(url: null),
+                          child: ProfilePictureWidget(url: currentUser.profilePicture),
                         ),
                         Text(currentUser.getName, style: Theme.of(context).textTheme.title),
                         Padding(
