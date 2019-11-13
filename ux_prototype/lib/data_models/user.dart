@@ -38,7 +38,7 @@ class User {
   //for route information widget(creator of the route)
   //Just let it be with mockup data for this time until you implemented it
   static Future<User> fromID(String i) {
-    return Future.value(User("JohnID", "John Doe"));
+    return Future.value(User("John Doe", "JohnID"));
   }
 
   String name;
