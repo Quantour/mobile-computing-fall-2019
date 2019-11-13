@@ -24,6 +24,7 @@ class CustomButton extends StatelessWidget {
         ),
         padding: this.margin,
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
               this.text,
