@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ux_prototype/data_models/route.dart';
+import 'package:ux_prototype/util.dart';
 import 'package:ux_prototype/views/discover/discover_search_parameter.dart';
 import 'package:ux_prototype/views/discover/filter_drawer.dart';
 import 'package:ux_prototype/views/discover/search_result_card.dart';
@@ -114,6 +115,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: UUID(),
         child: Icon(Icons.add),
         onPressed: () {
           Navigator.push(
