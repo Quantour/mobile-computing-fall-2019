@@ -25,8 +25,12 @@ class HikeEditPage extends StatefulWidget {
   _HikeEditPageState createState() {
     _HikeEditPageState state = _HikeEditPageState();
     if (isNew) {
-      if (routeSuggestion!=null)
+      if (routeSuggestion!=null&&routeSuggestion.length>0)
         state.routeList.addAll(routeSuggestion);
+        state.cameraPosition = CameraPosition(
+          target: routeSuggestion.last.toLatLng(),
+          zoom: 12
+        );
     } else {
       state.images = [
         for (String url in oldroute.images) _NetwOrFileImg(url: url)

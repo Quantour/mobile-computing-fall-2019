@@ -14,7 +14,9 @@ class _HikeHistoryState extends State<HikeHistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Hike History"),
+        title: Center(
+          child: Text("Hike History"),
+        )
       ),
 
       body: Builder(
@@ -46,17 +48,24 @@ class _HikeHistoryState extends State<HikeHistory> {
             );
 
           //<------- Build this when User IS logged in ----->
-          return FutureBuilder<List<Hike>>(
-            future: Hike.getCurrentUserHistory(),
+          //########################################################
+          //##
+          //##
+          //TODO: use stream of firebase instead...
+          //##
+          //##
+          //########################################################
+          return StreamBuilder<List<Hike>>(
+            stream: Hike.DEBUGgetCurrentUserHistory(),
             builder: (context, snapshot) {
               //<------- no data yet ----->
-              if (snapshot.connectionState!=ConnectionState.done)
+              if (!snapshot.hasData && !snapshot.hasError)
                 return Center(
                   child: CircularProgressIndicator(),
                 );
               
               //<------- error  ----->
-              if (!snapshot.hasData)
+              if (snapshot.hasError)
                 return Center(
                   child: Column(
                     children: <Widget>[
@@ -74,7 +83,10 @@ class _HikeHistoryState extends State<HikeHistory> {
                         height: 20,
                       ),
                       Center(
-                        child: Text("Please log in or register to view your hike history!"),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width*0.7,
+                          child: Text("Please log in or register to view your hike history!", textAlign: TextAlign.center,)
+                        ),
                       )
                     ],
                   ),

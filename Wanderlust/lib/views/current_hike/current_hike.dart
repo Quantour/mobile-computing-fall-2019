@@ -149,7 +149,7 @@ class _CurrentHikeState extends State<CurrentHike> {
               child: RaisedButton(
                 onPressed: () => CurrentHike.setActiveWithoutRoute(),
                 color: Theme.of(context).accentColor,
-                child: Text("Start hike without route"),
+                child: Text("Start hike without route", style: TextStyle(color: Colors.white,)),
               ),
             )
           ],

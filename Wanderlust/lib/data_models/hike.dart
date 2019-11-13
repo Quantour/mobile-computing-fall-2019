@@ -23,8 +23,9 @@ class Hike {
 
   Hike({this.routeID, @required this.start, @required this.stop, @required this.actualRoute});
 
-  //TODO implemenet stuff here
-  static Future<List<Hike>> getUserHistory(String userID) {
+  static Stream<List<Hike>> DEBUGgetCurrentUserHistory() {
+    if (!User.isLoggedIn)
+      return Stream.error("User must be logged in to view his history");
     return Future.value([
       Hike(
         start: DateTime.utc(2019,02,20,12),
@@ -48,13 +49,7 @@ class Hike {
           Location(50.03+0.01, 6.005+0.01)
         ]
       )
-    ]);
-  }
-
-  static Future<List<Hike>> getCurrentUserHistory() {
-    if (!User.isLoggedIn)
-      return Future.error("User must be logged in to view his history");
-    return getUserHistory(User.currentUser.ID);
+    ]).asStream();
   }
 
 }

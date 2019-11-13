@@ -132,6 +132,7 @@ class _HikeCardState extends State<HikeCard> {
                           context,
                           MaterialPageRoute(builder: (context) => HikeEditPage(routeSuggestion: widget.hike.actualRoute)),
                         );
+                        //TODO save the uploaded route in this hike
 
                       }
                     },
