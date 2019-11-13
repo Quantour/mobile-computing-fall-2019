@@ -11,7 +11,7 @@ import 'package:Wanderlust/util.dart';
 import 'package:Wanderlust/views/current_hike/active_hike.dart';
 
 //TODO set this to 40 seconds or so when deug o this section is finished
-const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 10);
+const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 60);
 
 
 class CurrentHike extends StatefulWidget {
@@ -90,13 +90,32 @@ class _CurrentHikeState extends State<CurrentHike> {
     });
   }
 
-  void _onStop() {
-    setState(() {
-      //reset mapController and camera position, if next hike is initiated
-      mapController = null;
-      camPos = null;
-      CurrentHike.stopActiveRoute();
-    });
+  void _onStop(BuildContext context) {
+    showDialog(
+      context: context,
+      child: AlertDialog(
+        content: Text("Are you sure ou want to stop your hike?"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text("Yes", style: TextStyle(color: Theme.of(context).accentColor)),
+            onPressed: (){
+              //Stop route now!
+              setState(() {
+                //reset mapController and camera position, if next hike is initiated
+                mapController = null;
+                camPos = null;
+                CurrentHike.stopActiveRoute();
+              });
+              Navigator.pop(context);
+            },
+          ),
+          FlatButton(
+            child: Text("No", style: TextStyle(color: Theme.of(context).accentColor)),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      )
+    );
   }
 
   Widget buildInactive(BuildContext context) {
@@ -250,7 +269,7 @@ class _CurrentHikeState extends State<CurrentHike> {
             children: <Widget>[
               FloatingActionButton(
                 heroTag: UUID(),
-                onPressed: _onStop,
+                onPressed: ()=>_onStop(context),
                 child: Icon(Icons.stop),
               ),
               Container(width: 15,),
