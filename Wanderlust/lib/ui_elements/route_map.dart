@@ -18,8 +18,17 @@ class RouteMap extends StatelessWidget {
 
   const RouteMap ({@required this.route, Key key, this.onMapCreated, this.additionalPolylines, this.myLocationEnabled, this.initialCameraPosition, this.onCameraMove}) : super(key: key);
 
-  Widget buildWithPins(BuildContext context, List<Pin> pins) {
-    var futureBuilder = FutureBuilder(
+  static final Map<int, BitmapDescriptor> defaultIcons = {
+    PinType.fountain.index:     BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+    PinType.picturePoint.index: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+    PinType.restaurant.index:   BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
+    PinType.restingPlace.index: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+    PinType.restroom.index:     BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+    (-1):                       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+  };
+
+  Widget buildWithPins(BuildContext context, List<Pin> pins, Map<int, BitmapDescriptor> pinIcons) {
+    FutureBuilder<HikingRoute> futureBuilder = FutureBuilder<HikingRoute>(
       future: route,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -92,8 +101,16 @@ class RouteMap extends StatelessWidget {
                   markers.add(Marker(
                     markerId: MarkerId("pin${pin.pinID}"),
                     position: pin.location.toLatLng(),
-                    //icon: ... 
+                    //TODO: this line "icon:  ..." lets the app crash. Why?
+                    //icon: pinIcons[0]
                   ));
+                /*for (Pin pin in pins.where((p)=>(p.types!=null&&p.types.toSet().length>0)))
+                  markers.add(Marker(
+                    markerId: MarkerId("pin${pin.pinID}"),
+                    position: pin.location.toLatLng(),
+                    icon: pin.types.toSet().length==1?pinIcons[pin.types.toSet().first.index]:pinIcons[-1]
+                  ));
+                  */
 
                 return markers;
               })(pins)
@@ -123,14 +140,27 @@ class RouteMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return FutureBuilder(
-      future: getPins(),
+    //load images for pins async from local file system as asset images
+    return FutureBuilder<Map<int, BitmapDescriptor>>(
+      future: Pin.loadPinBitmapDescriptor(context),
       builder: (context, snapshot) {
+        Map<int, BitmapDescriptor> pinIcons;
         if (snapshot.hasData)
-          return buildWithPins(context, snapshot.data);
+          pinIcons = snapshot.data;
         else
-          return buildWithPins(context, []);
-      },
+          pinIcons = defaultIcons;
+
+        //load pins async from server
+        return FutureBuilder<List<Pin>>(
+          future: getPins(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData)
+              return buildWithPins(context, snapshot.data, pinIcons);
+            else
+              return buildWithPins(context, [], pinIcons);
+          },
+        );
+      }
     );
    
   }

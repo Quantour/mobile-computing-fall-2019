@@ -3,6 +3,8 @@ import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Wanderlust/data_models/location.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 Map<String, Pin> _localMirroredData = Map();
 
@@ -51,6 +53,30 @@ class Pin {
 
   void removefromDatabase(){
     Firestore.instance.collection('pin').document(docID).delete();
+  }
+
+  /**
+   * Loads the Bitmap descriptor for the pins in the google map
+   */
+  static Future<Map<int, BitmapDescriptor>> loadPinBitmapDescriptor(BuildContext context) async {
+    Map<int, BitmapDescriptor> descriptors = Map();
+
+    //images for pins:
+    descriptors[PinType.fountain.index] 
+      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/1.png");
+    descriptors[PinType.picturePoint.index] 
+      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/2.png");
+    descriptors[PinType.restaurant.index] 
+      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/3.png");
+    descriptors[PinType.restingPlace.index] 
+      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/4.png");
+    descriptors[PinType.restroom.index] 
+      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/5.png");
+    //image, if pin has multiple types
+    descriptors[(-1)] 
+      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/6.png");
+
+    return descriptors;
   }
 
 }
