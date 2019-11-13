@@ -112,10 +112,15 @@ class RouteMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    //TODO implement converting the return value of getPins() of the type Future<List<Pin>> to List<Pin>
-    List<Pin> pins = []; //getPins();
+    return FutureBuilder(
+      future: getPins(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData)
+          return buildWithPins(context, snapshot.data);
+        else
+          return buildWithPins(context, []);
+      },
+    );
    
-    return buildWithPins(context, pins);
-
   }
 }
