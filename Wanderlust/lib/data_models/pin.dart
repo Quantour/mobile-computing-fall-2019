@@ -36,6 +36,18 @@ class Pin {
       if((this.typeno&31)!=0) typesList.add(PinType.restingPlace);
       return typesList.toSet();
   }
+
+  //deltes pin from the database
+  static Future<bool> deletePin(String id) {
+    //TODO ...
+    //Question: why do you have docID and pinID?
+    //pinID is only, so you can identify the pin 
+    //the UI gives this method the docID for now 
+    //The future should be completed with true, if the pin was deleted from the database
+    //the future should be completed with false, if the pin wasn not deleted
+    //google dart future and dart async if you have questions about it
+    return Future.value(false);
+  }
 /*
   static List<Pin> fromArea(double currentLatitude, double currentLongitude) {
     CollectionReference col = Firestore.instance.collection('pin');

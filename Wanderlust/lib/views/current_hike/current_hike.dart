@@ -77,7 +77,20 @@ class _CurrentHikeState extends State<CurrentHike> {
   @override
   void initState() {
     super.initState();
-    pinInfo = PinInfoOverlay();
+    pinInfo = PinInfoOverlay(
+      onDelete: (pin) {
+        Pin.deletePin(pin.docID).then((wasDeleted) {
+          if (wasDeleted)
+            setState(() {
+              pinInfo.discard();
+            });
+        });
+      },
+      onEdit: (pin) {
+        //TODO: call edit page for kjfsd
+        return Future<Pin>.value(null);
+      },
+    );
   }
 
   void _locateUser() {

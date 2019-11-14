@@ -22,7 +22,7 @@ class RouteMap extends StatelessWidget {
     Key key, 
     this.onMapCreated, 
     this.additionalPolylines, 
-    this.myLocationEnabled, 
+    this.myLocationEnabled=false, 
     this.initialCameraPosition, 
     this.onCameraMove,
     this.onPinTap  

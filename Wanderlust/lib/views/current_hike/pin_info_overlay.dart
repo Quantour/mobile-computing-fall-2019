@@ -5,8 +5,11 @@ import 'package:Wanderlust/ui_elements/image_scroller.dart';
 import 'package:flutter/material.dart';
 
 class PinInfoOverlay extends StatefulWidget {
-  PinInfoOverlay({Key key}) : super(key: key);
+  PinInfoOverlay({Key key, this.onDelete, this.onEdit}) : super(key: key);
 
+  final void         Function(Pin pin) onDelete;
+  //return edited pin or error is this window should close
+  final Future<Pin> Function(Pin pin) onEdit;
   final _PinInfoOverlayState _state = _PinInfoOverlayState();
 
   @override
@@ -42,6 +45,30 @@ class _PinInfoOverlayState extends State<PinInfoOverlay> {
     }
   }
 
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      child: AlertDialog(
+        content: Text("Are you sure you want to delete this pin?"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text("yes", style: TextStyle(color: Theme.of(context).accentColor),),
+            onPressed: () {
+              Navigator.pop(context);
+              _onPop();
+              if (widget.onDelete!=null)
+                widget.onDelete(pin);
+            }
+          ),
+          FlatButton(
+            child: Text("no", style: TextStyle(color: Theme.of(context).accentColor),),
+            onPressed: ()=>Navigator.pop(context),
+          )
+        ],
+      )
+    );
+  }
+
   Widget _buildInfoBoxContent(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,13 +84,23 @@ class _PinInfoOverlayState extends State<PinInfoOverlay> {
               ),
               Row(
                 children: <Widget>[
-                  GestureDetector(
-                    onTap: _onPop, //dismiss this box
+                  GestureDetector(//Delete
+                    onTap: ()=>_showDeleteDialog(context),
                     child: Icon(Icons.delete, size: 20, color: Theme.of(context).accentColor,),
                   ),
                   SizedBox(width: 10,),
-                  GestureDetector(
-                    onTap: _onPop, //dismiss this box
+                  GestureDetector(//Edit
+                    onTap: () {
+                      if (widget.onEdit!=null)
+                        widget.onEdit(pin)
+                          .then((pin) {
+                            if (pin == null)
+                              _onPop();
+                            else
+                              setPin(pin);
+                          })
+                          .catchError((error) => _onPop());
+                    }, 
                     child: Icon(Icons.edit, size: 20, color: Theme.of(context).accentColor,),
                   ),
                 ],
