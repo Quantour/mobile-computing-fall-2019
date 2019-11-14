@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Wanderlust/data_models/location.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 Map<String, Pin> _localMirroredData = Map();
@@ -55,27 +56,30 @@ class Pin {
     Firestore.instance.collection('pin').document(docID).delete();
   }
 
+  static final Map<int, String> pinAsssetPaths = {
+    PinType.fountain.index:     "assets/images/pins/1.png",
+    PinType.picturePoint.index: "assets/images/pins/2_medium.png",
+    PinType.restaurant.index:   "assets/images/pins/3.png",
+    PinType.restingPlace.index: "assets/images/pins/4.png",
+    PinType.restroom.index:     "assets/images/pins/5.png",
+    (-1):                       "assets/images/pins/6.png",
+  };
   /**
    * Loads the Bitmap descriptor for the pins in the google map
    */
   static Future<Map<int, BitmapDescriptor>> loadPinBitmapDescriptor(BuildContext context) async {
     Map<int, BitmapDescriptor> descriptors = Map();
-
-    //images for pins:
-    descriptors[PinType.fountain.index] 
-      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/1.png");
-    descriptors[PinType.picturePoint.index] 
-      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/2.png");
-    descriptors[PinType.restaurant.index] 
-      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/3.png");
-    descriptors[PinType.restingPlace.index] 
-      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/4.png");
-    descriptors[PinType.restroom.index] 
-      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/5.png");
-    //image, if pin has multiple types
-    descriptors[(-1)] 
-      = await BitmapDescriptor.fromAssetImage(createLocalImageConfiguration(context), "assets/images/pins/6.png");
-
+    
+    //This loads the pins from assets
+    //we dont use BitmapDescriptor.fromAssetImage because this 
+    //throws no error if it cannot load the asset file which leads
+    //the google map plugin to crash
+    for (int type in PinType.values.map((t)=>t.index).toList()..add(-1)) {
+      descriptors[type] = BitmapDescriptor.fromBytes(
+        (await rootBundle.load(pinAsssetPaths[type])).buffer.asUint8List()
+      );
+    }
+  
     return descriptors;
   }
 

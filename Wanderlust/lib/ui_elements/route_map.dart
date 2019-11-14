@@ -97,21 +97,26 @@ class RouteMap extends StatelessWidget {
                 ));*/
 
                 //Add all the pins to Map
-                for (Pin pin in pins)
+                for (Pin pin in pins) {
+                  
+
                   markers.add(Marker(
                     markerId: MarkerId("pin${pin.pinID}"),
                     position: pin.location.toLatLng(),
+                    icon: pinIcons[pin.types]
                     //TODO: this line "icon:  ..." lets the app crash. Why?
                     //icon: pinIcons[0]
                   ));
-                /*for (Pin pin in pins.where((p)=>(p.types!=null&&p.types.toSet().length>0)))
-                  markers.add(Marker(
-                    markerId: MarkerId("pin${pin.pinID}"),
-                    position: pin.location.toLatLng(),
-                    icon: pin.types.toSet().length==1?pinIcons[pin.types.toSet().first.index]:pinIcons[-1]
-                  ));
-                  */
 
+                  markers.add(Marker(
+                    markerId: MarkerId("pin${pin.pinID}22"),
+                    position: pin.location.toLatLng()
+                    //TODO: this line "icon:  ..." lets the app crash. Why?
+                    //icon: pinIcons[0]
+                  ));
+
+                }
+                
                 return markers;
               })(pins)
               
