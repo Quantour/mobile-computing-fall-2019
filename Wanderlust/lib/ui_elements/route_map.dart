@@ -137,7 +137,14 @@ class RouteMap extends StatelessWidget {
       var list = querySnapshot.documents;
       for(int i=0;i<list.length;i++){
         var doc = list[i];
-        pins.add(new Pin(doc.data['pinID'],new Location(doc.data['latitude'],doc.data['longitude']), doc.data['images'],doc.data['typeno']));
+        List<String> images = <String> [
+          "https://media-cdn.tripadvisor.com/media/photo-s/0e/cc/0a/dc/restaurant-chocolat.jpg",
+          "https://www.athenaspahotel.com/media/cache/jadro_resize/rc/uJmoXtmd1563349268/jadroRoot/medias/_a1a8429.jpg"  
+        ];
+        String description = "";
+        //TODO: convert to list of strings and add description property to backend
+        //images = doc.data[images]
+        pins.add(new Pin(doc.data['pinID'],new Location(doc.data['latitude'],doc.data['longitude']),images,doc.data['typeno'],description));
       }
       return pins;
   }

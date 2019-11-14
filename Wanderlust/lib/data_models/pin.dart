@@ -19,13 +19,14 @@ enum PinType {
 
 class Pin {
 
-  final String      pinID;
-  final Location    location;
-  final List images;
+  final String       pinID;
+  final Location     location;
+  final List<String> images;
+  final String       description;
   final int typeno;
   String docID;
 
-  Pin(this.pinID, this.location, this.images, this.typeno);
+  Pin(this.pinID, this.location, this.images, this.typeno, this.description);
   Set<PinType> get types {
       List<PinType> typesList = [];
       if((this.typeno&1)!=0) typesList.add(PinType.picturePoint);

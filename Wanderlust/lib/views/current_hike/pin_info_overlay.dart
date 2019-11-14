@@ -1,6 +1,7 @@
 
 
 import 'package:Wanderlust/data_models/pin.dart';
+import 'package:Wanderlust/ui_elements/image_scroller.dart';
 import 'package:flutter/material.dart';
 
 class PinInfoOverlay extends StatefulWidget {
@@ -42,17 +43,92 @@ class _PinInfoOverlayState extends State<PinInfoOverlay> {
   }
 
   Widget _buildInfoBoxContent(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          GestureDetector(
-            onTap: _onPop, //dismiss this box
-            child: Icon(Icons.close, size: 30, color: Theme.of(context).accentColor,),
-          )
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              GestureDetector(
+                onTap: _onPop, //dismiss this box
+                child: Icon(Icons.close, size: 30, color: Theme.of(context).accentColor,),
+              ),
+              Row(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: _onPop, //dismiss this box
+                    child: Icon(Icons.delete, size: 20, color: Theme.of(context).accentColor,),
+                  ),
+                  SizedBox(width: 10,),
+                  GestureDetector(
+                    onTap: _onPop, //dismiss this box
+                    child: Icon(Icons.edit, size: 20, color: Theme.of(context).accentColor,),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            children: <Widget>[
+              if (pin.images.length>0)
+                Container(
+                  height: 200,
+                  child: ImageScrollerWidget(
+                    imageBuilder: ()=>pin.images,
+                  ),
+                ),
+
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Wrap(
+                      children: pin.types.map((t) {
+                        String txt;
+                        switch (t) {
+                          case PinType.fountain:
+                            txt = "fountain"; break;
+                          case PinType.picturePoint:
+                            txt = "pictures"; break;
+                          case PinType.restaurant:
+                            txt = "restaurant"; break;
+                          case PinType.restingPlace:
+                            txt = "resting"; break;
+                          case PinType.restroom:
+                            txt = "restroom"; break;
+                          default: 
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Chip(
+                            backgroundColor: Theme.of(context).accentColor,
+                            label: Text(txt, style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),),
+                          ),
+                        );
+                      }).toList()
+                    ),
+                    SizedBox(height: 5,),
+                    Text("Description", style: TextStyle(fontSize: 20),),
+                    SizedBox(height: 8,),
+                    if (pin.description == null || pin.description.length==0)
+                      Text(
+                        "There is no description for this pin so far. Be the first and let people know what to find here!",
+                        style:  TextStyle(color: Colors.grey),
+                      )
+                    else
+                      Text(pin.description)
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -80,7 +156,15 @@ class _PinInfoOverlayState extends State<PinInfoOverlay> {
                       borderRadius: BorderRadius.all(Radius.circular(20))
                     ),
                     elevation: 7,
-                    child: pin==null?Container():_buildInfoBoxContent(context),
+                    clipBehavior: Clip.hardEdge,
+                    child: AnimatedSwitcher(
+                      duration: animation_duration,
+                      child: pin==null?Container(
+                        child: Center(
+                          child: Text("No pin selected.\nthis should only show when debugging"),
+                        ),
+                      ):_buildInfoBoxContent(context),
+                    ),
                   ),
                 ),
               )
