@@ -27,7 +27,7 @@ class Pin {
 
   Pin(this.pinID, this.location, this.images, this.typeno);
   Set<PinType> get types {
-      List typesList = [];
+      List<PinType> typesList = [];
       if((this.typeno&1)!=0) typesList.add(PinType.picturePoint);
       if((this.typeno&3)!=0) typesList.add(PinType.fountain);
       if((this.typeno&7)!=0) typesList.add(PinType.restroom);

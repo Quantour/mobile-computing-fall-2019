@@ -27,6 +27,8 @@ class RouteMap extends StatelessWidget {
     (-1):                       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
   };
 
+
+
   Widget buildWithPins(BuildContext context, List<Pin> pins, Map<int, BitmapDescriptor> pinIcons) {
     FutureBuilder<HikingRoute> futureBuilder = FutureBuilder<HikingRoute>(
       future: route,
@@ -87,37 +89,24 @@ class RouteMap extends StatelessWidget {
               ]..addAll(additionalPolylines==null?[]:additionalPolylines)),
               //draw pins onto map
               markers: ((List<Pin> pins) {
-                Set<Marker> markers = Set();
-
-                //add midpoint of current route
-                /*markers.add(Marker(
-                  markerId: MarkerId("route_loc"),
-                  position: r.location.toLatLng(),
-                  //icon: BitmapDescriptor.fromAssetImage(configuration, assetName)
-                ));*/
+                List<Marker> markers = <Marker>[];
 
                 //Add all the pins to Map
                 for (Pin pin in pins) {
+                  BitmapDescriptor image = pinIcons[-1];
+                  if (pin.types.length==1)
+                    image = pinIcons[pin.types.last.index];
                   
-
-                  markers.add(Marker(
-                    markerId: MarkerId("pin${pin.pinID}"),
-                    position: pin.location.toLatLng(),
-                    icon: pinIcons[pin.types]
-                    //TODO: this line "icon:  ..." lets the app crash. Why?
-                    //icon: pinIcons[0]
-                  ));
-
-                  markers.add(Marker(
-                    markerId: MarkerId("pin${pin.pinID}22"),
-                    position: pin.location.toLatLng()
-                    //TODO: this line "icon:  ..." lets the app crash. Why?
-                    //icon: pinIcons[0]
-                  ));
+                  if (pin.types.length>0)
+                    markers.add(Marker(
+                      markerId: MarkerId("pin${pin.pinID}"),
+                      position: pin.location.toLatLng(),
+                      icon: image,
+                    ));
 
                 }
                 
-                return markers;
+                return markers.toSet();
               })(pins)
               
             ),
