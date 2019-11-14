@@ -1,3 +1,4 @@
+import 'package:Wanderlust/data_models/pin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -68,6 +69,9 @@ class _CurrentHikeState extends State<CurrentHike> {
   
   GoogleMapController mapController;
   CameraPosition camPos;
+  //if tappedPin==null then no info will be shown,
+  //otherwise an overview for the pin Information will be shown
+  Pin tappedPin; 
 
   void _locateUser() {
     Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((pos){
@@ -104,6 +108,7 @@ class _CurrentHikeState extends State<CurrentHike> {
                 //reset mapController and camera position, if next hike is initiated
                 mapController = null;
                 camPos = null;
+                tappedPin = null;
                 CurrentHike.stopActiveRoute();
               });
               Navigator.pop(context);
@@ -181,6 +186,54 @@ class _CurrentHikeState extends State<CurrentHike> {
     );
   }
 
+  Widget buildPinInfoOverlay() {
+    return SafeArea(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 20, right: 20),
+            child: Container(
+              width: MediaQuery.of(context).size.width*0.65,
+              height: MediaQuery.of(context).size.height-230,
+              child: Card(
+                margin: const EdgeInsets.all(0),
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))
+                ),
+                elevation: 7,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+
+    return Container(
+      child: Container(
+        width: MediaQuery.of(context).size.width*0.75,
+        height: MediaQuery.of(context).size.height-150,
+        color:  Colors.blue,
+      ),
+    );
+
+    return Container(
+      child: Padding(
+        padding: EdgeInsets.only(top: 30, right: 10),
+        child: Container(
+          width: MediaQuery.of(context).size.width*0.75,
+          height: MediaQuery.of(context).size.height-150,
+          color: Colors.black,
+          child: Container(
+            color: Colors.blue,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget buildActive(BuildContext context, ActiveHike activeHike) {
     return Scaffold(
       body: Stack(
@@ -232,6 +285,9 @@ class _CurrentHikeState extends State<CurrentHike> {
               )
             ],
           ),
+          
+          buildPinInfoOverlay(),
+
           if (activeHike.isPaused)
             Container(
               color: Colors.white.withAlpha(150),

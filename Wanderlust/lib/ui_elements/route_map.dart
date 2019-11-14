@@ -15,8 +15,18 @@ class RouteMap extends StatelessWidget {
   final bool myLocationEnabled;
   final CameraPosition initialCameraPosition;
   final Function(CameraPosition) onCameraMove;
+  final Function(Pin) onPinTap;
 
-  const RouteMap ({@required this.route, Key key, this.onMapCreated, this.additionalPolylines, this.myLocationEnabled, this.initialCameraPosition, this.onCameraMove}) : super(key: key);
+  const RouteMap ({
+    @required this.route, 
+    Key key, 
+    this.onMapCreated, 
+    this.additionalPolylines, 
+    this.myLocationEnabled, 
+    this.initialCameraPosition, 
+    this.onCameraMove,
+    this.onPinTap  
+  }) : super(key: key);
 
   static final Map<int, BitmapDescriptor> defaultIcons = {
     PinType.fountain.index:     BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
@@ -102,6 +112,7 @@ class RouteMap extends StatelessWidget {
                       markerId: MarkerId("pin${pin.pinID}"),
                       position: pin.location.toLatLng(),
                       icon: image,
+                      onTap: onPinTap==null?(){}:()=>onPinTap(pin)
                     ));
 
                 }
