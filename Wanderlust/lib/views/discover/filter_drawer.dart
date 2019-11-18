@@ -59,8 +59,8 @@ class _FilterDrawerState extends State<FilterDrawer> {
                   end: Alignment.topRight,
                   stops: [0,0.7],
                   colors: [
-                    Color.fromRGBO(244,81,30,1),  //orange
-                    Color.fromRGBO(109,76,65,1)  //brown
+                    Color.fromRGBO(244,81,30,1),  //orange, #f4511e
+                    Color.fromRGBO(109,76,65,1)  //brown, #6d4c41
                   ]
                 )
               ),
@@ -104,7 +104,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           width: w,
                           height: w,
                           margin: EdgeInsets.all(10),
-                          child: ProfilePictureWidget(url: null),
+                          child: ProfilePictureWidget(url: null, placeholderAsset: "assets/images/logo_500.png",),
                         ),
                         //Text("", style: Theme.of(context).textTheme.title),
                         CustomButton(

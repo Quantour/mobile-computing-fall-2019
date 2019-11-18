@@ -54,9 +54,33 @@ class _DiscoverAppBarState extends State<DiscoverAppBar> {
 
       //Title
       centerTitle: true,
-      title: Text(
-        "Wanderlust",
-        style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w600,color: Colors.white)
+      title: Row(
+        children: <Widget>[
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Container(
+                  width: 40,
+                  height: 40,
+                  child: Image.asset("assets/images/logo_500.png", fit: BoxFit.contain,),
+                ),
+                Container(width: 10,)
+              ],
+            ),
+          ),
+          Expanded(
+            child: Text(
+              "Wanderlust",
+              style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w600,color: Colors.white),
+              overflow: TextOverflow.visible,
+            ),
+          ),
+          Expanded(
+            child: Container()
+          )
+        ],
       ),
 
       //Container for actual search bar

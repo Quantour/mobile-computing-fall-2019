@@ -15,7 +15,7 @@ class _HikeHistoryState extends State<HikeHistory> {
     return Scaffold(
       appBar: AppBar(
         title: Center(
-          child: Text("Hike History"),
+          child: Text("Hike History", style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.w600,color: Colors.white)),
         )
       ),
 
