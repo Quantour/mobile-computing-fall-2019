@@ -1,6 +1,3 @@
-
-
-import 'dart:io';
 import 'package:Wanderlust/cloud_image.dart';
 import 'package:Wanderlust/data_models/pin.dart';
 import 'package:Wanderlust/views/edit_pin/edit_pin_loc_data_page.dart';
@@ -8,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:transparent_image/transparent_image.dart';
 import '../../data_models/location.dart';
 import '../../data_models/user.dart';
 
@@ -72,46 +68,98 @@ class _PinEditPageState extends State<PinEditPage> {
     super.initState();
   }
 
-  void _onSave(BuildContext context) {
-    Navigator.pop(context);
-    //TODO
+  Future<void> _onSave(BuildContext context) async {
+    try {
+
+      //calculate typeset
+      Set<PinType> typeset = Set();
+      for (PinType t in types.keys) {
+        if (types[t].second) {
+          typeset.add(t);
+        }
+      }
+
+      String description = descriptionController.text;
+
+      //upload all images to the cloud and delete removed ones
+      List<String> urls;
+      if (widget.isNew) {
+        urls = await uploadCloudImages(images);
+      } else {
+        urls = await updateCloudImages(widget.oldPin.images, images);
+      }
+
+      //update pin/upload pin
+      Pin editResult;
+      if (widget.isNew){
+        editResult = await Pin.uploadPin(pinLocation, typeset, description, urls);
+      } else {
+        await Pin.updatePin(widget.oldPin.pinID, typeset, description, urls);
+        editResult = Pin(widget.oldPin.pinID, pinLocation, urls, Pin.typenoFromSet(typeset), description);
+      }
+
+      Navigator.pop(context, editResult);
+
+    } catch (e) {
+      
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+            content: Text("There was an error while uploading/updating the pin!"),
+          );
+        }
+      );
+    }
+
   }
 
   //Shows the User a dialog to pick a new image for the route
   void _showNewImageDialog(BuildContext context) {
     showDialog(
         context: context,
-        child: AlertDialog(
-          content: Text("Do you want to open the gallery or the camera?"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("gallery"),
-              onPressed: () {
-                Navigator.pop(context);
-                ImagePicker.pickImage(source: ImageSource.gallery)
-                    .then((file) async {
-                  if (await file.exists())
-                    setState(() {
-                      images.add(NetwOrFileImg(file: file));
-                    });
-                });
-              },
-            ),
-            FlatButton(
-              child: Text("camera"),
-              onPressed: () {
-                Navigator.pop(context);
-                ImagePicker.pickImage(source: ImageSource.camera, )
-                    .then((file) async {
-                  if (await file.exists())
-                    setState(() {
-                      images.add(NetwOrFileImg(file: file));
-                    });
-                });
-              },
-            )
-          ],
-        ));
+        builder: (context) {
+          return AlertDialog(
+            content: Text("Do you want to open the gallery or the camera?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("gallery"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ImagePicker.pickImage(source: ImageSource.gallery)
+                      .then((file) async {
+                    if (await file.exists())
+                      setState(() {
+                        images.add(NetwOrFileImg(file: file));
+                      });
+                  });
+                },
+              ),
+              FlatButton(
+                child: Text("camera"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ImagePicker.pickImage(source: ImageSource.camera, )
+                      .then((file) async {
+                    if (await file.exists())
+                      setState(() {
+                        images.add(NetwOrFileImg(file: file));
+                      });
+                  });
+                },
+              )
+            ],
+          );
+        }
+      );
   }
 
   //Shows the User a specific image and if the user wants to keep the image or rather delete it
@@ -366,7 +414,7 @@ class _PinEditPageState extends State<PinEditPage> {
                   clipBehavior: Clip.hardEdge,
                   borderRadius: BorderRadius.all(Radius.circular(15)),
                   child: GestureDetector(
-                    onTap: ()=>_onSave(context), //TODO onSave event
+                    onTap: ()=>_onSave(context),
                     child: Container(
                       width: MediaQuery.of(context).size.width*0.3,
                       height: 50,

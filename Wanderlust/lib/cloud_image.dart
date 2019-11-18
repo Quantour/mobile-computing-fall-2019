@@ -35,7 +35,7 @@ Future<void> deleteCloudImage(String url) {
 * to the cloud and returns the url
 * of the image in a future
 */
-Future<String> uploadCloudImage(File file) {
+Future<String> _uploadCloudImage(File file) {
   //TODO: implement here
   return Future.value("http:cloud.com/my_image");
 }
@@ -67,9 +67,22 @@ Future<List<String>> updateCloudImages(List<String> original, List<NetwOrFileImg
     if (nf.isNetw) {
       ret.add(nf.url);
     } else {
-      String url = await uploadCloudImage(nf.file);
+      String url = await _uploadCloudImage(nf.file);
       ret.add(url);
     }
   }
   return ret;
+}
+
+
+/*
+ * This function
+ * 1) uploads all file items in the List "updated"
+ * 2) returns list of URLs of images in list "updated"
+ *    (the Strings in "updated" are just returned and
+ *    the urls to the uploaded files in "updated" are
+ *    returned instead of the files itself)
+ */
+Future<List<String>> uploadCloudImages(List<NetwOrFileImg> updated) {
+  return updateCloudImages([], updated);
 }

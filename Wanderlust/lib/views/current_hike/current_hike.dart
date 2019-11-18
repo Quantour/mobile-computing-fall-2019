@@ -1,7 +1,6 @@
 import 'package:Wanderlust/data_models/pin.dart';
 import 'package:Wanderlust/views/current_hike/pin_info_overlay.dart';
 import 'package:Wanderlust/views/edit_pin/edit_pin.dart';
-import 'package:Wanderlust/views/edit_pin/edit_pin_loc_data_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -81,19 +80,17 @@ class _CurrentHikeState extends State<CurrentHike> {
     super.initState();
     pinInfo = PinInfoOverlay(
       onDelete: (pin) {
-        Pin.deletePin(pin.docID).then((wasDeleted) {
-          if (wasDeleted)
-            setState(() {
+        Pin.deletePin(pin.docID).then((evt) {
+          setState(() {
               pinInfo.discard();
             });
         });
       },
       onEdit: (pin) async {
-        await Navigator.push(context, MaterialPageRoute(
+        Pin p = await Navigator.push(context, MaterialPageRoute(
           builder: (context) => PinEditPage(oldPin: pin)
         ));
-        //TODO: call edit page for kjfsd
-        return null;
+        return p;
       },
     );
   }
