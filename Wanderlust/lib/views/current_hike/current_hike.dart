@@ -1,4 +1,6 @@
+import 'package:Wanderlust/data_models/hike.dart';
 import 'package:Wanderlust/data_models/pin.dart';
+import 'package:Wanderlust/data_models/user.dart';
 import 'package:Wanderlust/views/current_hike/pin_info_overlay.dart';
 import 'package:Wanderlust/views/edit_pin/edit_pin.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +56,12 @@ class CurrentHike extends StatefulWidget {
       updatePosTickerStream = null;
 
       //save Stuff
+      String userID = User.currentUser.getID;
+      String routeID = ah.route==null?null:ah.route.routeID;
+      DateTime start = ah.timestampStart;
+      DateTime stop = DateTime.now();
+      List<Location> actualRoute = ah.actualRoute;
+      Hike.uploadHike(userID, routeID, start, stop, actualRoute);
 
       //reset all
       activeHike = Completer<ActiveHike>();

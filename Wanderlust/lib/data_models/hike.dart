@@ -4,7 +4,7 @@ import 'package:Wanderlust/data_models/location.dart';
 import 'package:Wanderlust/data_models/user.dart';
 import 'package:flutter/widgets.dart';
 
-/**
+/*
  * Saves one Hike from the User.
  * Either he/she started a route or didnt follow any route.
  * In this case is routeID null
@@ -51,5 +51,21 @@ class Hike {
       )
     ]).asStream();
   }
+
+
+  /*
+  * uploades a hike with this information
+  *Also creates unique hikeID.
+  * routeID may be null and when download a hike from the database
+  * the null value must be restored. Not something like "null"
+  */
+  static Future<Hike> uploadHike(
+    String userID, String routeID, DateTime start, DateTime stop, List<Location> actualRoute) {
+      //TODO: implement upload hike
+      //Tip: save DateTime as DateTime.millisecondsSinceEpoch in integer!
+    return Future.value(null);
+  }
+
+  
 
 }
