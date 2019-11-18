@@ -1,4 +1,5 @@
 import 'package:Wanderlust/cloud_image.dart';
+import 'package:Wanderlust/data_models/route.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -68,7 +69,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
     }
   }
 
-  void _onSave(BuildContext context) {
+  Future<void> _onSave(BuildContext context) async {
     if (this.titleController.text==null||this.titleController.text=="") {
       showDialog(
         context: context,
@@ -104,46 +105,88 @@ class _HikeEditPageState extends State<HikeEditPage> {
       return;
     }
     
-    //TODO: Upload images and save route
+    //shouldnt occur
+    if (!User.isLoggedIn) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text("You must be logged in in order to upload/update a route!"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Ok"),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
+      ).then((onValue)=>Navigator.pop(context));
+      return;
+    }
 
-    Navigator.pop(context);
+    //Here now all relevant infotmation are present and set by user
+
+    String description = descriptionController.text;
+    String tips = tipsController.text;
+    List<String> imageUrls;
+    if (widget.isNew) {
+      imageUrls = await uploadCloudImages(images);
+    } else {
+      imageUrls = await updateCloudImages(widget.oldroute.images, images);
+    }
+
+    if (widget.isNew) {
+      String userID = User.currentUser.getID;
+      String title = titleController.text;
+      int timestamp = DateTime.now().millisecondsSinceEpoch;
+      HikingRoute r = await HikingRoute.uploadRoute(userID, title, routeList, timestamp, description, tips, imageUrls);
+      Navigator.pop(context,r);
+      return;
+    } else {
+      HikingRoute r = await HikingRoute.updateRoute(widget.oldroute.routeID, description, tips, imageUrls);
+      Navigator.pop(context,r);
+      return;
+    }
   }
 
   //Shows the User a dialog to pick a new image for the route
   void _showNewImageDialog(BuildContext context) {
     showDialog(
         context: context,
-        child: AlertDialog(
-          content: Text("Do you want to open the gallery or the camera?"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("gallery"),
-              onPressed: () {
-                Navigator.pop(context);
-                ImagePicker.pickImage(source: ImageSource.gallery)
-                    .then((file) async {
-                  if (await file.exists())
-                    setState(() {
-                      images.add(NetwOrFileImg(file: file));
-                    });
-                });
-              },
-            ),
-            FlatButton(
-              child: Text("camera"),
-              onPressed: () {
-                Navigator.pop(context);
-                ImagePicker.pickImage(source: ImageSource.camera, )
-                    .then((file) async {
-                  if (await file.exists())
-                    setState(() {
-                      images.add(NetwOrFileImg(file: file));
-                    });
-                });
-              },
-            )
-          ],
-        ));
+        builder: (context) {
+          return AlertDialog(
+            content: Text("Do you want to open the gallery or the camera?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("gallery"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ImagePicker.pickImage(source: ImageSource.gallery)
+                      .then((file) async {
+                    if (await file.exists())
+                      setState(() {
+                        images.add(NetwOrFileImg(file: file));
+                      });
+                  });
+                },
+              ),
+              FlatButton(
+                child: Text("camera"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ImagePicker.pickImage(source: ImageSource.camera, )
+                      .then((file) async {
+                    if (await file.exists())
+                      setState(() {
+                        images.add(NetwOrFileImg(file: file));
+                      });
+                  });
+                },
+              )
+            ],
+          );
+        },
+    );
   }
 
   //Shows the User a specific image and if the user wants to keep the image or rather delete it
@@ -391,7 +434,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                   clipBehavior: Clip.hardEdge,
                   borderRadius: BorderRadius.all(Radius.circular(15)),
                   child: GestureDetector(
-                    onTap: ()=>_onSave(context), //TODO onSave event
+                    onTap: ()=>_onSave(context),
                     child: Container(
                       width: MediaQuery.of(context).size.width*0.3,
                       height: 50,
