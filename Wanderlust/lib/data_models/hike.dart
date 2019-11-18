@@ -66,6 +66,19 @@ class Hike {
     return Future.value(null);
   }
 
+  /*
+    This deletes a hike from the database and resolves future.
+    if this fails it resolves the future with an error
+   */
+  static Future<void> deleteHike(String hikeID) {
+    //TODO: implement deleteHike
+    return Future.value();
+  }
   
+  /* This method is called when a hike is published as a route */
+  static Future<void> updateRoute(String hikeID, String routeID) {
+    //TODO: implement updateRoute for hike!
+    return Future.value();
+  }
 
 }

@@ -76,6 +76,13 @@ class _HikeCardState extends State<HikeCard> {
                       ],
                     ),
 
+                    GestureDetector(
+                      onTap: () {
+                        Hike.deleteHike(widget.hike.hikeID);
+                      },
+                      child: Icon(Icons.delete, color: Theme.of(context).accentColor,),
+                    )
+
 
                   ],
                 ),
@@ -112,7 +119,7 @@ class _HikeCardState extends State<HikeCard> {
                 //<---- See more / less details button -----> 
                 Center(
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       if (widget.hike.routeID!=null) {
                         
                         //open detail page to this route!
@@ -128,11 +135,12 @@ class _HikeCardState extends State<HikeCard> {
                       } else {
 
                         //save thiis route and share with other people
-                        Navigator.push(
+                        HikingRoute route =  await Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => HikeEditPage(routeSuggestion: widget.hike.actualRoute)),
                         );
-                        //TODO save the uploaded route in this hike
+                        
+                        await Hike.updateRoute(widget.hike.hikeID, route.routeID);
 
                       }
                     },

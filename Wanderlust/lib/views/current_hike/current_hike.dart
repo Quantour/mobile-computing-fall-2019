@@ -48,7 +48,7 @@ class CurrentHike extends StatefulWidget {
 
   static void setActiveWithoutRoute() => setActiveWithRoute(null);
 
-  static void stopActiveRoute() {
+  static void stopActiveRoute(BuildContext context) {
     assert(isActive);
     //stop time keeping of active hike
     activeHike.future.timeout(Duration(milliseconds: 500)).then((ah) {
@@ -62,6 +62,20 @@ class CurrentHike extends StatefulWidget {
       DateTime stop = DateTime.now();
       List<Location> actualRoute = ah.actualRoute;
       Hike.uploadHike(userID, routeID, start, stop, actualRoute);
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            actions: <Widget>[
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context),
+                child: Text("This hike was saved in your hike history!", style: TextStyle(color: Theme.of(context).accentColor),),
+              )
+            ],
+          );
+        }
+      );
 
       //reset all
       activeHike = Completer<ActiveHike>();
@@ -141,7 +155,7 @@ class _CurrentHikeState extends State<CurrentHike> {
                   mapController = null;
                   camPos = null;
                   _discardPinInfo();
-                  CurrentHike.stopActiveRoute();
+                  CurrentHike.stopActiveRoute(context);
                 });
                 Navigator.pop(context);
               },

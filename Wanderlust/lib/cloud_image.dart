@@ -2,24 +2,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-/*
- * Represents a Image which is either loaded from the network or choosen locally as a file
- */
-class NetwOrFileImg {
-  NetwOrFileImg({this.file, this.url});
-  File file;
-  String url;
-  bool get isFile => file != null;
-  bool get isNetw => url != null;
-  ImageProvider get image {
-    if (isFile)
-      return FileImage(file);
-    else if (isNetw)
-      return NetworkImage(url);
-    else
-      return MemoryImage(kTransparentImage);
-  }
-}
+
 
 /*
 * This Method deletes a cloud image from the cloud
@@ -39,6 +22,28 @@ Future<String> _uploadCloudImage(File file) {
   //TODO: implement here
   return Future.value("http:cloud.com/my_image");
 }
+
+
+
+/*
+ * Represents a Image which is either loaded from the network or choosen locally as a file
+ */
+class NetwOrFileImg {
+  NetwOrFileImg({this.file, this.url});
+  File file;
+  String url;
+  bool get isFile => file != null;
+  bool get isNetw => url != null;
+  ImageProvider get image {
+    if (isFile)
+      return FileImage(file);
+    else if (isNetw)
+      return NetworkImage(url);
+    else
+      return MemoryImage(kTransparentImage);
+  }
+}
+
 
 /*
  * This function
