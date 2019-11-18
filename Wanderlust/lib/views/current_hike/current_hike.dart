@@ -56,15 +56,15 @@ class CurrentHike extends StatefulWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            content: Text("Are you sure? If you stop this hike while you're not logged in, the hike cannot be saved to the cloud!"),
+            content: Text("If you stop this hike while you're not logged in, the hike cannot be saved to the cloud!"),
             actions: <Widget>[
               FlatButton(
                 onPressed: ()=>Navigator.pop(context, true),
-                child: Text("Yes", style: TextStyle(color: Theme.of(context).accentColor),),
+                child: Text("Stop", style: TextStyle(color: Theme.of(context).accentColor),),
               ),
               FlatButton(
                 onPressed: ()=>Navigator.pop(context, false),
-                child: Text("No", style: TextStyle(color: Theme.of(context).accentColor),),
+                child: Text("Continue", style: TextStyle(color: Theme.of(context).accentColor),),
               )
             ],
           );
@@ -175,6 +175,7 @@ class _CurrentHikeState extends State<CurrentHike> {
             FlatButton(
               child: Text("Yes", style: TextStyle(color: Theme.of(context).accentColor)),
               onPressed: (){
+                Navigator.pop(context);
                 //Stop route now!
                 setState(() {
                   //reset mapController and camera position, if next hike is initiated
@@ -183,7 +184,6 @@ class _CurrentHikeState extends State<CurrentHike> {
                   _discardPinInfo();
                   CurrentHike.stopActiveRoute(context);
                 });
-                Navigator.pop(context);
               },
             ),
             FlatButton(
