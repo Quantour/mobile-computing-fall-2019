@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:Wanderlust/cloud_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:transparent_image/transparent_image.dart';
 import 'package:Wanderlust/ui_elements/route_map.dart';
 import 'package:Wanderlust/views/edit_page/edit_loc_data_page.dart';
 import '../../data_models/location.dart';
@@ -74,30 +72,34 @@ class _HikeEditPageState extends State<HikeEditPage> {
     if (this.titleController.text==null||this.titleController.text=="") {
       showDialog(
         context: context,
-        child: AlertDialog(
-          content: Text("Please fill out the title before you save!"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Ok"),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        )
+        builder: (context) {
+          return AlertDialog(
+            content: Text("Please fill out the title before you save!"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Ok"),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
       );
       return;
     }
     if (this.routeList == null||this.routeList.length<2) {
       showDialog(
         context: context,
-        child: AlertDialog(
-          content: Text("Please enter location information about the route before you save!"),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Ok"),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        )
+        builder: (context) {
+          return AlertDialog(
+            content: Text("Please enter location information about the route before you save!"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Ok"),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
       );
       return;
     }
