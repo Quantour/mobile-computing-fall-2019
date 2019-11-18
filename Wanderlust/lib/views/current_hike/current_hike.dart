@@ -48,8 +48,33 @@ class CurrentHike extends StatefulWidget {
 
   static void setActiveWithoutRoute() => setActiveWithRoute(null);
 
-  static void stopActiveRoute(BuildContext context) {
+  static Future<void> stopActiveRoute(BuildContext context) async {
     assert(isActive);
+
+    if (!User.isLoggedIn) {
+      bool answer = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text("Are you sure? If you stop this hike while you're not logged in, the hike cannot be saved to the cloud!"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context, true),
+                child: Text("Yes", style: TextStyle(color: Theme.of(context).accentColor),),
+              ),
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context, false),
+                child: Text("No", style: TextStyle(color: Theme.of(context).accentColor),),
+              )
+            ],
+          );
+        }
+      );
+      if (answer!=true) {
+        return;
+      }
+    }
+
     //stop time keeping of active hike
     activeHike.future.timeout(Duration(milliseconds: 500)).then((ah) {
       ah.isPaused = true;
@@ -67,10 +92,11 @@ class CurrentHike extends StatefulWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
+            content: Text("This hike was saved in your hike history!"),
             actions: <Widget>[
               FlatButton(
                 onPressed: ()=>Navigator.pop(context),
-                child: Text("This hike was saved in your hike history!", style: TextStyle(color: Theme.of(context).accentColor),),
+                child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
               )
             ],
           );
