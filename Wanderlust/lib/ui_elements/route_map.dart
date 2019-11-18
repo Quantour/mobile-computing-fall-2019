@@ -15,11 +15,32 @@ class RouteMap extends StatelessWidget {
   final bool myLocationEnabled;
   final CameraPosition initialCameraPosition;
   final Function(CameraPosition) onCameraMove;
+  final Function(Pin) onPinTap;
 
-  const RouteMap ({@required this.route, Key key, this.onMapCreated, this.additionalPolylines, this.myLocationEnabled, this.initialCameraPosition, this.onCameraMove}) : super(key: key);
+  const RouteMap ({
+    @required this.route, 
+    Key key, 
+    this.onMapCreated, 
+    this.additionalPolylines, 
+    this.myLocationEnabled=false, 
+    this.initialCameraPosition, 
+    this.onCameraMove,
+    this.onPinTap  
+  }) : super(key: key);
 
-  Widget buildWithPins(BuildContext context, List<Pin> pins) {
-    var futureBuilder = FutureBuilder(
+  static final Map<int, BitmapDescriptor> defaultIcons = {
+    PinType.fountain.index:     BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+    PinType.picturePoint.index: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+    PinType.restaurant.index:   BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta),
+    PinType.restingPlace.index: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+    PinType.restroom.index:     BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+    (-1):                       BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+  };
+
+
+
+  Widget buildWithPins(BuildContext context, List<Pin> pins, Map<int, BitmapDescriptor> pinIcons) {
+    FutureBuilder<HikingRoute> futureBuilder = FutureBuilder<HikingRoute>(
       future: route,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
@@ -78,24 +99,25 @@ class RouteMap extends StatelessWidget {
               ]..addAll(additionalPolylines==null?[]:additionalPolylines)),
               //draw pins onto map
               markers: ((List<Pin> pins) {
-                Set<Marker> markers = Set();
-
-                //add midpoint of current route
-                /*markers.add(Marker(
-                  markerId: MarkerId("route_loc"),
-                  position: r.location.toLatLng(),
-                  //icon: BitmapDescriptor.fromAssetImage(configuration, assetName)
-                ));*/
+                List<Marker> markers = <Marker>[];
 
                 //Add all the pins to Map
-                for (Pin pin in pins)
-                  markers.add(Marker(
-                    markerId: MarkerId("pin${pin.pinID}"),
-                    position: pin.location.toLatLng(),
-                    //icon: ... 
-                  ));
+                for (Pin pin in pins) {
+                  BitmapDescriptor image = pinIcons[-1];
+                  if (pin.types.length==1)
+                    image = pinIcons[pin.types.last.index];
+                  
+                  if (pin.types.length>0)
+                    markers.add(Marker(
+                      markerId: MarkerId("pin${pin.pinID}"),
+                      position: pin.location.toLatLng(),
+                      icon: image,
+                      onTap: onPinTap==null?(){}:()=>onPinTap(pin)
+                    ));
 
-                return markers;
+                }
+                
+                return markers.toSet();
               })(pins)
               
             ),
@@ -115,7 +137,14 @@ class RouteMap extends StatelessWidget {
       var list = querySnapshot.documents;
       for(int i=0;i<list.length;i++){
         var doc = list[i];
-        pins.add(new Pin(doc.data['pinID'],new Location(doc.data['latitude'],doc.data['longitude']), doc.data['images'],doc.data['typeno']));
+        List<String> images = <String> [
+          "https://media-cdn.tripadvisor.com/media/photo-s/0e/cc/0a/dc/restaurant-chocolat.jpg",
+          "https://www.athenaspahotel.com/media/cache/jadro_resize/rc/uJmoXtmd1563349268/jadroRoot/medias/_a1a8429.jpg"  
+        ];
+        String description = "";
+        //TODO: convert to list of strings and add description property to backend
+        //images = doc.data[images]
+        pins.add(new Pin(doc.data['pinID'],new Location(doc.data['latitude'],doc.data['longitude']),images,doc.data['typeno'],description));
       }
       return pins;
   }
@@ -123,14 +152,27 @@ class RouteMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return FutureBuilder(
-      future: getPins(),
+    //load images for pins async from local file system as asset images
+    return FutureBuilder<Map<int, BitmapDescriptor>>(
+      future: Pin.loadPinBitmapDescriptor(context),
       builder: (context, snapshot) {
+        Map<int, BitmapDescriptor> pinIcons;
         if (snapshot.hasData)
-          return buildWithPins(context, snapshot.data);
+          pinIcons = snapshot.data;
         else
-          return buildWithPins(context, []);
-      },
+          pinIcons = defaultIcons;
+
+        //load pins async from server
+        return FutureBuilder<List<Pin>>(
+          future: getPins(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData)
+              return buildWithPins(context, snapshot.data, pinIcons);
+            else
+              return buildWithPins(context, [], pinIcons);
+          },
+        );
+      }
     );
    
   }

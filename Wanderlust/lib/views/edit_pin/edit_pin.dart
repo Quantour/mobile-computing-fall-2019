@@ -1,152 +1,125 @@
 import 'package:Wanderlust/cloud_image.dart';
-import 'package:Wanderlust/data_models/route.dart';
+import 'package:Wanderlust/data_models/pin.dart';
+import 'package:Wanderlust/views/edit_pin/edit_pin_loc_data_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:Wanderlust/ui_elements/route_map.dart';
-import 'package:Wanderlust/views/edit_page/edit_loc_data_page.dart';
 import '../../data_models/location.dart';
-import '../../data_models/route.dart';
 import '../../data_models/user.dart';
 
-class HikeEditPage extends StatefulWidget {
+class PinEditPage extends StatefulWidget {
   final bool isNew;
-  final HikingRoute oldroute;
-  final List<Location> routeSuggestion;
+  final Location locationSuggestion;
+  final Pin oldPin;
 
-  HikeEditPage({this.oldroute, this.routeSuggestion}) : isNew = (oldroute == null) {
+  PinEditPage({this.oldPin, this.locationSuggestion}) : isNew = (oldPin == null) {
     //Either it is a new or an old route
-    assert(!(oldroute!=null && routeSuggestion!=null));
+    assert(!(oldPin!=null && locationSuggestion!=null));
   }
 
 
   @override
-  _HikeEditPageState createState() {
-    _HikeEditPageState state = _HikeEditPageState();
-    if (isNew) {
-      if (routeSuggestion!=null&&routeSuggestion.length>0) {
-        state.routeList.addAll(routeSuggestion);
-        state.cameraPosition = CameraPosition(
-          target: routeSuggestion.last.toLatLng(),
-          zoom: 12
-        );
+  _PinEditPageState createState() {
+    _PinEditPageState state = _PinEditPageState();
+    state.types = <PinType,Pair<String,bool>>{
+      PinType.fountain :    Pair("fountain",false),
+      PinType.picturePoint: Pair("picture",false),
+      PinType.restaurant:   Pair("restaurant",false),
+      PinType.restingPlace: Pair("resting place",false),
+      PinType.restroom:     Pair("restroom",false),
+    };
+    if (!isNew) {
+      for (PinType t in oldPin.types) {
+        state.types[t].second = true;
       }
-    } else {
-      state.images = [
-        for (String url in oldroute.images) NetwOrFileImg(url: url)
-      ];
     }
     return state;
   }
 }
 
-class _HikeEditPageState extends State<HikeEditPage> {
+
+class Pair<T,U> {
+  T first;
+  U second;
+  Pair(this.first,this.second);
+}
+
+class _PinEditPageState extends State<PinEditPage> {
   //List of local Files for uploading images or strings -> URL to uploadedimage
   List<NetwOrFileImg> images = [];
 
-  //Controller for textfields
-  TextEditingController titleController;
-  TextEditingController descriptionController;
-  TextEditingController tipsController;
+  //List of types
+  Map<PinType, Pair<String, bool>> types;
 
-  //Route info
-  List<Location> routeList = [];
-  //Camera pos of Maps, if you return to this page
-  CameraPosition cameraPosition;
+  //Controller for textfields
+  TextEditingController descriptionController;
+
+  Location pinLocation;
 
   @override
   void initState() {
-    super.initState();
     //initialize controller
-    titleController = TextEditingController();
     descriptionController = TextEditingController();
-    tipsController = TextEditingController();
     if (!widget.isNew) {
-      titleController.text = widget.oldroute.title;
-      descriptionController.text = widget.oldroute.description==null?"":widget.oldroute.description;
-      tipsController.text = widget.oldroute.tipsAndTricks==null?"":widget.oldroute.tipsAndTricks;
+      pinLocation = widget.oldPin.location;
     }
+
+    super.initState();
   }
 
   Future<void> _onSave(BuildContext context) async {
-    if (this.titleController.text==null||this.titleController.text=="") {
+    try {
+
+      //calculate typeset
+      Set<PinType> typeset = Set();
+      for (PinType t in types.keys) {
+        if (types[t].second) {
+          typeset.add(t);
+        }
+      }
+
+      String description = descriptionController.text;
+
+      //upload all images to the cloud and delete removed ones
+      List<String> urls;
+      if (widget.isNew) {
+        urls = await uploadCloudImages(images);
+      } else {
+        urls = await updateCloudImages(widget.oldPin.images, images);
+      }
+
+      //update pin/upload pin
+      Pin editResult;
+      if (widget.isNew){
+        editResult = await Pin.uploadPin(pinLocation, typeset, description, urls);
+      } else {
+        await Pin.updatePin(widget.oldPin.pinID, typeset, description, urls);
+        editResult = Pin(widget.oldPin.pinID, pinLocation, urls, Pin.typenoFromSet(typeset), description);
+      }
+
+      Navigator.pop(context, editResult);
+
+    } catch (e) {
+      
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            content: Text("Please fill out the title before you save!"),
             actions: <Widget>[
               FlatButton(
-                child: Text("Ok"),
-                onPressed: () => Navigator.pop(context),
-              ),
+                child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
             ],
+            content: Text("There was an error while uploading/updating the pin!"),
           );
-        },
+        }
       );
-      return;
-    }
-    if (this.routeList == null||this.routeList.length<2) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text("Please enter location information about the route before you save!"),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Ok"),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-    
-    //shouldnt occur
-    if (!User.isLoggedIn) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text("You must be logged in in order to upload/update a route!"),
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Ok"),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          );
-        },
-      ).then((onValue)=>Navigator.pop(context));
-      return;
     }
 
-    //Here now all relevant infotmation are present and set by user
-
-    String description = descriptionController.text;
-    String tips = tipsController.text;
-    List<String> imageUrls;
-    if (widget.isNew) {
-      imageUrls = await uploadCloudImages(images);
-    } else {
-      imageUrls = await updateCloudImages(widget.oldroute.images, images);
-    }
-
-    if (widget.isNew) {
-      String userID = User.currentUser.getID;
-      String title = titleController.text;
-      int timestamp = DateTime.now().millisecondsSinceEpoch;
-      HikingRoute r = await HikingRoute.uploadRoute(userID, title, routeList, timestamp, description, tips, imageUrls);
-      Navigator.pop(context,r);
-      return;
-    } else {
-      HikingRoute r = await HikingRoute.updateRoute(widget.oldroute.routeID, description, tips, imageUrls);
-      Navigator.pop(context,r);
-      return;
-    }
   }
 
   //Shows the User a dialog to pick a new image for the route
@@ -185,8 +158,8 @@ class _HikeEditPageState extends State<HikeEditPage> {
               )
             ],
           );
-        },
-    );
+        }
+      );
   }
 
   //Shows the User a specific image and if the user wants to keep the image or rather delete it
@@ -318,7 +291,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
             ),
             Center(
               child: Text(
-                  "Please log in or register to ${widget.isNew ? "create a new route" : "edit a route"}!"),
+                  "Please log in or register to ${widget.isNew ? "create a new pin" : "edit a pin"}!"),
             ),
             Center(
               child: FlatButton(
@@ -345,31 +318,28 @@ class _HikeEditPageState extends State<HikeEditPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            //----->Title<-----
+            //----->Types<-----
             Container(height: 30,),
-            Text("Title", style: TextStyle(fontSize: 20)),
-            Container(height: 7,),
-            TextField(
-              enabled: widget.isNew,
-              controller: titleController,
-              decoration: InputDecoration(fillColor: widget.isNew?Theme.of(context).accentColor.withAlpha(30):Colors.grey.withAlpha(30), filled: true),
-            ),
+            Text("Type(s)", style: TextStyle(fontSize: 20)),
+            for (Pair<String, bool> t in this.types.values) 
+              Column(
+                children: <Widget>[
+                  Container(height: 7,),
+                  CheckboxListTile(
+                    title:Text(t.first),
+                    value: t.second,
+                    onChanged: (bool value) {
+                      setState(() {t.second=value;});
+                    },
+                  ),
+                ],
+              ),
             //----->Description<-----
             Container(height: 30,),
             Text("Description", style: TextStyle(fontSize: 20)),
             Container(height: 7,),
             TextField(
               controller: descriptionController,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
-            ),
-            //----->Tips&Tricks<-----
-            Container(height: 30,),
-            Text("Tips & Tricks", style: TextStyle(fontSize: 20)),
-            Container(height: 7,),
-            TextField(
-              controller: tipsController,
               keyboardType: TextInputType.multiline,
               maxLines: null,
               decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
@@ -397,10 +367,9 @@ class _HikeEditPageState extends State<HikeEditPage> {
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => EditLocInfoPage(this.routeList, this.cameraPosition)
+                          builder: (context) => EditPinLocInfoPage(this.pinLocation)
                         )).then((data) {
-                          this.routeList=data[0];
-                          this.cameraPosition=data[1];
+                          this.pinLocation=data[0];
                         });
                       },
                       child: Container(
@@ -408,7 +377,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                         height: 50,
                         color: Theme.of(context).accentColor.withAlpha(150),
                         child: Center(
-                          child: Text("Edit route information", style: TextStyle(fontSize: 20),),
+                          child: Text("set pin location", style: TextStyle(fontSize: 20),),
                         ),
                       ),
                     ),
@@ -416,12 +385,23 @@ class _HikeEditPageState extends State<HikeEditPage> {
                 ),
               ),
 
-            //------>show map when is old  route<-----
+            //------>show map when is old pin<-----
             if (!widget.isNew)
               Container(
                 margin: EdgeInsets.only(top: 25),
                 height: 300,
-                child: RouteMap(route: Future.value(widget.oldroute),),
+                child: GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: pinLocation.toLatLng(),
+                    zoom: 13
+                  ),
+                  markers: Set<Marker>.from(<Marker>[
+                    Marker(
+                      markerId: MarkerId("markerOfPinLocation"),
+                      position: pinLocation.toLatLng()
+                    )
+                  ]),
+                ),
               ),
               
             

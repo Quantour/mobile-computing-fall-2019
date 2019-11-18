@@ -107,8 +107,50 @@ class HikingRoute {
     );
   }
 
-}
 
+/*This function uploades a Route
+  It also creates Id etc. for the route
+  and returns a future of the route
+  if the route was uploaded,
+  otherwise it finished the furure with an error
+  */
+  static Future<HikingRoute> uploadRoute(
+    String userID,
+    String title, 
+    List<Location> route,
+    int timestamp,
+    String description,
+    String tipsAndTricks,
+    List<String> images) {
+      //TODO: implenet upload route to the cloud!
+    return Future.value(null);
+  }
+
+
+  /*This function updates a Route with new informarion
+    It returns a future of the new route
+    if the route was uploaded,
+    otherwise it finished the furure with an error
+    */
+    static Future<HikingRoute> updateRoute(
+      String routeID,
+      String description,
+      String tipsAndTricks,
+      List<String> images) {
+        //TODO: implement updateRoute to cloud
+      return Future.value(null);
+  }
+
+  /*This function deletes a route from the cloude
+  if successful it completed the future, otheriwse it
+  completes the future with an error
+  */
+  static Future<void> deleteRoute(String id) {
+    //TODO: implement deleteRoute
+    return Future.value();
+  }
+
+}
 
 
 /*

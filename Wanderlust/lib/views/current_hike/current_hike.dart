@@ -1,3 +1,8 @@
+import 'package:Wanderlust/data_models/hike.dart';
+import 'package:Wanderlust/data_models/pin.dart';
+import 'package:Wanderlust/data_models/user.dart';
+import 'package:Wanderlust/views/current_hike/pin_info_overlay.dart';
+import 'package:Wanderlust/views/edit_pin/edit_pin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,7 +15,8 @@ import 'dart:async';
 import 'package:Wanderlust/util.dart';
 import 'package:Wanderlust/views/current_hike/active_hike.dart';
 
-const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 10);
+//TODO set this to 40 seconds or so when deug o this section is finished
+const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 60);
 
 
 class CurrentHike extends StatefulWidget {
@@ -42,14 +48,60 @@ class CurrentHike extends StatefulWidget {
 
   static void setActiveWithoutRoute() => setActiveWithRoute(null);
 
-  static void stopActiveRoute() {
+  static Future<void> stopActiveRoute(BuildContext context) async {
     assert(isActive);
+
+    if (!User.isLoggedIn) {
+      bool answer = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text("If you stop this hike while you're not logged in, the hike cannot be saved to the cloud!"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context, true),
+                child: Text("Stop", style: TextStyle(color: Theme.of(context).accentColor),),
+              ),
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context, false),
+                child: Text("Continue", style: TextStyle(color: Theme.of(context).accentColor),),
+              )
+            ],
+          );
+        }
+      );
+      if (answer!=true) {
+        return;
+      }
+    }
+
     //stop time keeping of active hike
     activeHike.future.timeout(Duration(milliseconds: 500)).then((ah) {
       ah.isPaused = true;
       updatePosTickerStream = null;
 
       //save Stuff
+      String userID = User.currentUser.getID;
+      String routeID = ah.route==null?null:ah.route.routeID;
+      DateTime start = ah.timestampStart;
+      DateTime stop = DateTime.now();
+      List<Location> actualRoute = ah.actualRoute;
+      Hike.uploadHike(userID, routeID, start, stop, actualRoute);
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text("This hike was saved in your hike history!"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context),
+                child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
+              )
+            ],
+          );
+        }
+      );
 
       //reset all
       activeHike = Completer<ActiveHike>();
@@ -67,6 +119,30 @@ class _CurrentHikeState extends State<CurrentHike> {
   
   GoogleMapController mapController;
   CameraPosition camPos;
+  //if tappedPin==null then no info will be shown,
+  //otherwise an overview for the pin Information will be shown
+  PinInfoOverlay pinInfo;
+  
+
+  @override
+  void initState() {
+    super.initState();
+    pinInfo = PinInfoOverlay(
+      onDelete: (pin) {
+        Pin.deletePin(pin.docID).then((evt) {
+          setState(() {
+              pinInfo.discard();
+            });
+        });
+      },
+      onEdit: (pin) async {
+        Pin p = await Navigator.push(context, MaterialPageRoute(
+          builder: (context) => PinEditPage(oldPin: pin)
+        ));
+        return p;
+      },
+    );
+  }
 
   void _locateUser() {
     Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((pos){
@@ -89,13 +165,35 @@ class _CurrentHikeState extends State<CurrentHike> {
     });
   }
 
-  void _onStop() {
-    setState(() {
-      //reset mapController and camera position, if next hike is initiated
-      mapController = null;
-      camPos = null;
-      CurrentHike.stopActiveRoute();
-    });
+  void _onStop(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text("Are you sure ou want to stop your hike?"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Yes", style: TextStyle(color: Theme.of(context).accentColor)),
+              onPressed: (){
+                Navigator.pop(context);
+                //Stop route now!
+                setState(() {
+                  //reset mapController and camera position, if next hike is initiated
+                  mapController = null;
+                  camPos = null;
+                  _discardPinInfo();
+                  CurrentHike.stopActiveRoute(context);
+                });
+              },
+            ),
+            FlatButton(
+              child: Text("No", style: TextStyle(color: Theme.of(context).accentColor)),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        );
+      },
+    );
   }
 
   Widget buildInactive(BuildContext context) {
@@ -104,7 +202,7 @@ class _CurrentHikeState extends State<CurrentHike> {
         child: Column(
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.height*0.34,
+              height: MediaQuery.of(context).size.height*0.25,
             ),
             Center(
               child: Icon(Icons.directions_walk, size: 40, color: Theme.of(context).accentColor,),
@@ -113,16 +211,23 @@ class _CurrentHikeState extends State<CurrentHike> {
               height: 10,
             ),
             Center(
-              child: Text("Please start a hike in order to see it here."),
+              child: Container(
+                width: MediaQuery.of(context).size.width*0.7,
+                child: Text("Please start a hike in order to see it here.",textAlign: TextAlign.center,)
+              ),
             ),
             Center(
-              child: Text("You can start a route from the discover page or"),
+              child: Container(
+                padding: const EdgeInsets.only(top: 20),
+                width: MediaQuery.of(context).size.width*0.7,
+                child: Text("You can start a route from the discover page or",textAlign: TextAlign.center,)
+              ),
             ),
             Center(
               child: RaisedButton(
                 onPressed: () => CurrentHike.setActiveWithoutRoute(),
                 color: Theme.of(context).accentColor,
-                child: Text("Start hike without route"),
+                child: Text("Start hike without route", style: TextStyle(color: Colors.white,)),
               ),
             )
           ],
@@ -154,6 +259,23 @@ class _CurrentHikeState extends State<CurrentHike> {
     );
   }
 
+  void _discardPinInfo() {
+    pinInfo.discard();
+  }
+
+  Future<bool> _onWillPop() async {
+    if (pinInfo.currentPin==null) {
+      return true; //you may pop the screen
+    } else {
+      pinInfo.discard();
+      return false; //dont pop the screen
+    }
+  }
+
+  void _onPinTap(Pin pin) {
+    pinInfo.show(pin);
+  }
+
   Widget buildActive(BuildContext context, ActiveHike activeHike) {
     return Scaffold(
       body: Stack(
@@ -173,6 +295,7 @@ class _CurrentHikeState extends State<CurrentHike> {
                 _locateUser();
               } else mapController=con;
             },
+            onPinTap: _onPinTap,
             //if actual route is updated, the map is rebuild
             //so this is neccessary to keep the camera on the
             //same position
@@ -205,6 +328,9 @@ class _CurrentHikeState extends State<CurrentHike> {
               )
             ],
           ),
+          
+          pinInfo,
+
           if (activeHike.isPaused)
             Container(
               color: Colors.white.withAlpha(150),
@@ -216,7 +342,7 @@ class _CurrentHikeState extends State<CurrentHike> {
       ),
 
       //<-----Floating Action----->
-      floatingActionButton: Row(
+      floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
@@ -235,36 +361,42 @@ class _CurrentHikeState extends State<CurrentHike> {
               }
             )
           ),
-          Container(width: 7,),
-          FloatingActionButton(
-            heroTag: UUID(),
-            onPressed: _onStop,
-            child: Icon(Icons.stop),
+          Container(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              FloatingActionButton(
+                heroTag: UUID(),
+                onPressed: ()=>_onStop(context),
+                child: Icon(Icons.stop),
+              ),
+              Container(width: 15,),
+              if (activeHike.isPaused)
+                FloatingActionButton(
+                  heroTag: UUID(),
+                  onPressed: (){setState(() {
+                    activeHike.isPaused = false;
+                  });},
+                  child: Icon(Icons.play_arrow),
+                ),
+              if (!activeHike.isPaused)
+                FloatingActionButton(
+                  heroTag: UUID(),
+                  onPressed: (){setState(() {
+                    activeHike.isPaused = true;
+                  });},
+                  child: Icon(Icons.pause),
+                ),
+              Container(width: 15,),
+              FloatingActionButton(
+                heroTag: UUID(),
+                onPressed: activeHike.isPaused?null:(){_locateUser();},
+                backgroundColor: activeHike.isPaused?Colors.grey:Theme.of(context).accentColor,
+                child: Icon(Icons.location_searching, color: activeHike.isPaused?Colors.black:Colors.white),
+              )
+            ],
           ),
-          Container(width: 15,),
-          if (activeHike.isPaused)
-            FloatingActionButton(
-              heroTag: UUID(),
-              onPressed: (){setState(() {
-                activeHike.isPaused = false;
-              });},
-              child: Icon(Icons.play_arrow),
-            ),
-          if (!activeHike.isPaused)
-            FloatingActionButton(
-              heroTag: UUID(),
-              onPressed: (){setState(() {
-                activeHike.isPaused = true;
-              });},
-              child: Icon(Icons.pause),
-            ),
-          Container(width: 15,),
-          FloatingActionButton(
-            heroTag: UUID(),
-            onPressed: activeHike.isPaused?null:(){_locateUser();},
-            backgroundColor: activeHike.isPaused?Colors.grey:Theme.of(context).accentColor,
-            child: Icon(Icons.location_searching, color: activeHike.isPaused?Colors.black:Colors.white),
-          )
         ],
       ),
     );
@@ -272,20 +404,21 @@ class _CurrentHikeState extends State<CurrentHike> {
   
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: FutureBuilder(
+        future: CurrentHike.activeHike.future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done)
+            return buildInactive(context);
 
-    return FutureBuilder(
-      future: CurrentHike.activeHike.future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done)
-          return buildInactive(context);
+          if (!snapshot.hasData)
+            return buildWhenError(context);
 
-        if (!snapshot.hasData)
-          return buildWhenError(context);
-
-        return buildActive(context, snapshot.data);
-      }
+          return buildActive(context, snapshot.data);
+        }
+      ),
     );
-
   }
 
 }

@@ -1,10 +1,8 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:Wanderlust/util.dart';
-//import 'package:location/location.dart' as Loc;
 import '../../data_models/location.dart' as Dat;
 import 'package:geolocator/geolocator.dart';
 
@@ -23,8 +21,10 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
   List<Dat.Location> route;
   CameraPosition currentCameraPosition = CameraPosition(target: LatLng(37.555031, 126.988863), zoom: 12);
   GoogleMapController mapController;
+  final bool locateUserOnCreate;
 
-  _EditLocInfoPageState(List<Dat.Location> prevList, CameraPosition prevCamPos) {
+  _EditLocInfoPageState(List<Dat.Location> prevList, CameraPosition prevCamPos)
+  : locateUserOnCreate = prevCamPos==null {
     route = []..addAll(prevList); //clone
     if (prevCamPos != null)
       currentCameraPosition = prevCamPos;
@@ -59,7 +59,8 @@ class _EditLocInfoPageState extends State<EditLocInfoPage> {
       onCameraMove: (campos) => setState(() => currentCameraPosition=campos),
       onMapCreated: (con) {
         mapController=con;
-        _locateUser();
+        if (locateUserOnCreate)
+          _locateUser();
       },
       markers: Set.from(<Marker>[
         Marker(

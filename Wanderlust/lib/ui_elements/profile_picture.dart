@@ -6,8 +6,9 @@ import 'package:transparent_image/transparent_image.dart';
 class ProfilePictureWidget extends StatelessWidget {
 
   final String url;
+  final String placeholderAsset;
 
-  ProfilePictureWidget({this.url});
+  ProfilePictureWidget({this.url, this.placeholderAsset = "assets/images/blank_profile_picture.png"});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class ProfilePictureWidget extends StatelessWidget {
           children: <Widget>[
             ClipOval(
               child: Image.asset(
-                "assets/images/blank_profile_picture.png",
+                placeholderAsset,
                 fit: BoxFit.cover
               )
             ),
