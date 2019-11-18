@@ -1,5 +1,5 @@
 import 'package:Wanderlust/cloud_image.dart';
-import 'package:Wanderlust/data_models/route.dart' as prefix0;
+import 'package:Wanderlust/data_models/route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

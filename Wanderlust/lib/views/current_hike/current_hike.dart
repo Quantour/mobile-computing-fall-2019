@@ -74,6 +74,7 @@ class _CurrentHikeState extends State<CurrentHike> {
   //if tappedPin==null then no info will be shown,
   //otherwise an overview for the pin Information will be shown
   PinInfoOverlay pinInfo;
+  
 
   @override
   void initState() {
@@ -119,29 +120,31 @@ class _CurrentHikeState extends State<CurrentHike> {
   void _onStop(BuildContext context) {
     showDialog(
       context: context,
-      child: AlertDialog(
-        content: Text("Are you sure ou want to stop your hike?"),
-        actions: <Widget>[
-          FlatButton(
-            child: Text("Yes", style: TextStyle(color: Theme.of(context).accentColor)),
-            onPressed: (){
-              //Stop route now!
-              setState(() {
-                //reset mapController and camera position, if next hike is initiated
-                mapController = null;
-                camPos = null;
-                _discardPinInfo();
-                CurrentHike.stopActiveRoute();
-              });
-              Navigator.pop(context);
-            },
-          ),
-          FlatButton(
-            child: Text("No", style: TextStyle(color: Theme.of(context).accentColor)),
-            onPressed: () => Navigator.pop(context),
-          )
-        ],
-      )
+      builder: (context) {
+        return AlertDialog(
+          content: Text("Are you sure ou want to stop your hike?"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Yes", style: TextStyle(color: Theme.of(context).accentColor)),
+              onPressed: (){
+                //Stop route now!
+                setState(() {
+                  //reset mapController and camera position, if next hike is initiated
+                  mapController = null;
+                  camPos = null;
+                  _discardPinInfo();
+                  CurrentHike.stopActiveRoute();
+                });
+                Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: Text("No", style: TextStyle(color: Theme.of(context).accentColor)),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -212,8 +215,16 @@ class _CurrentHikeState extends State<CurrentHike> {
     pinInfo.discard();
   }
 
+  Future<bool> _onWillPop() async {
+    if (pinInfo.currentPin==null) {
+      return true; //you may pop the screen
+    } else {
+      pinInfo.discard();
+      return false; //dont pop the screen
+    }
+  }
+
   void _onPinTap(Pin pin) {
-    //TODO iplement navigator back fetch by user
     pinInfo.show(pin);
   }
 
@@ -345,20 +356,21 @@ class _CurrentHikeState extends State<CurrentHike> {
   
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: FutureBuilder(
+        future: CurrentHike.activeHike.future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done)
+            return buildInactive(context);
 
-    return FutureBuilder(
-      future: CurrentHike.activeHike.future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done)
-          return buildInactive(context);
+          if (!snapshot.hasData)
+            return buildWhenError(context);
 
-        if (!snapshot.hasData)
-          return buildWhenError(context);
-
-        return buildActive(context, snapshot.data);
-      }
+          return buildActive(context, snapshot.data);
+        }
+      ),
     );
-
   }
 
 }

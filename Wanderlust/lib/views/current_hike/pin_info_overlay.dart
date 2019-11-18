@@ -12,6 +12,8 @@ class PinInfoOverlay extends StatefulWidget {
   final Future<Pin> Function(Pin pin) onEdit;
   final _PinInfoOverlayState _state = _PinInfoOverlayState();
 
+  Pin get currentPin => _state.pin;
+
   @override
   _PinInfoOverlayState createState() => _state;
 
