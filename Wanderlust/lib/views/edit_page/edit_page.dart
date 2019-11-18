@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Wanderlust/cloud_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -34,35 +35,16 @@ class HikeEditPage extends StatefulWidget {
       }
     } else {
       state.images = [
-        for (String url in oldroute.images) _NetwOrFileImg(url: url)
+        for (String url in oldroute.images) NetwOrFileImg(url: url)
       ];
     }
     return state;
   }
 }
 
-/*
- * Represents a Image which is either loaded from the network or choosen locally as a file
- */
-class _NetwOrFileImg {
-  _NetwOrFileImg({this.file, this.url});
-  File file;
-  String url;
-  bool get isFile => file != null;
-  bool get isNetw => url != null;
-  ImageProvider get image {
-    if (isFile)
-      return FileImage(file);
-    else if (isNetw)
-      return NetworkImage(url);
-    else
-      return MemoryImage(kTransparentImage);
-  }
-}
-
 class _HikeEditPageState extends State<HikeEditPage> {
   //List of local Files for uploading images or strings -> URL to uploadedimage
-  List<_NetwOrFileImg> images = [];
+  List<NetwOrFileImg> images = [];
 
   //Controller for textfields
   TextEditingController titleController;
@@ -140,7 +122,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                     .then((file) async {
                   if (await file.exists())
                     setState(() {
-                      images.add(_NetwOrFileImg(file: file));
+                      images.add(NetwOrFileImg(file: file));
                     });
                 });
               },
@@ -153,7 +135,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
                     .then((file) async {
                   if (await file.exists())
                     setState(() {
-                      images.add(_NetwOrFileImg(file: file));
+                      images.add(NetwOrFileImg(file: file));
                     });
                 });
               },
@@ -163,7 +145,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
   }
 
   //Shows the User a specific image and if the user wants to keep the image or rather delete it
-  void _showImageDialog(BuildContext context, _NetwOrFileImg img) {
+  void _showImageDialog(BuildContext context, NetwOrFileImg img) {
     Navigator.push(context, MaterialPageRoute(
       builder: (context) => Scaffold(
         body: Container(
@@ -217,7 +199,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
             MediaQuery.of(context).size.width / number_of_colums;
         //build list of widgets which are going to be displayed in a grid view
         List<Widget> gridItems = [
-          for (_NetwOrFileImg img in images)
+          for (NetwOrFileImg img in images)
             InkWell(
               onTap: () => _showImageDialog(context, img), //display image and give user chance to delete it
               child: Container(
