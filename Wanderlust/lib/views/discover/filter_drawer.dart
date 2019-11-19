@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:Wanderlust/views/login/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:Wanderlust/ui_elements/custom_button.dart';
@@ -125,6 +126,10 @@ class _FilterDrawerState extends State<FilterDrawer> {
                               setState(() {
                                User.isLoggedIn = true; 
                               });
+                              //TODO: DEBUG: THIS OPENS ACCOUNT INFO PAGE
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) => AccountInfoPage()
+                              ));
                             }
                           )
                         )
