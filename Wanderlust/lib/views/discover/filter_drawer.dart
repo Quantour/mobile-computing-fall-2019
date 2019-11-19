@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:Wanderlust/views/login/login.dart';
+import 'package:Wanderlust/views/signin/signin.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:Wanderlust/ui_elements/custom_button.dart';
@@ -112,7 +113,9 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           text: "Sign up",
                           color: Color.fromRGBO(244,81,30,1),
                           onPressed: () {
-                            //TODO: implement sign up
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (context) => SignInPage()
+                            ));
                           },
                         ),
                         Padding(
@@ -126,7 +129,6 @@ class _FilterDrawerState extends State<FilterDrawer> {
                               setState(() {
                                User.isLoggedIn = true; 
                               });
-                              //TODO: DEBUG: THIS OPENS ACCOUNT INFO PAGE
                               Navigator.push(context, MaterialPageRoute(
                                 builder: (context) => LoginPage()
                               ));

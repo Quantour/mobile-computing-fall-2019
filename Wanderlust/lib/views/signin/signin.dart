@@ -1,19 +1,21 @@
 import 'package:Wanderlust/ui_elements/waves_background.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  LoginPage({Key key}) : super(key: key);
+class SignInPage extends StatefulWidget {
+  SignInPage({Key key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _SignInPageState createState() => _SignInPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  TextEditingController passwordController = TextEditingController();
+class _SignInPageState extends State<SignInPage> {
+  TextEditingController passwordController1 = TextEditingController();
+  TextEditingController passwordController2 = TextEditingController();
   TextEditingController usernameController = TextEditingController();
 
-  void _onLogin(String username, String password, BuildContext context) {
-    //TODO: implement login of User
+  void _onSignIn(String username, String password1, String password2, BuildContext context) {
+    
+    //TODO: implement sign in of User
     //Do navigator.pop(context) when it was successful, otherwise showDialog()
     Navigator.pop(context);
   }
@@ -85,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                     color: Colors.white
                   ),
                   child: TextFormField(
-                    controller: passwordController,
+                    controller: passwordController1,
                     keyboardType: TextInputType.text,
                     obscureText: true,
                     style: TextStyle(
@@ -96,7 +98,32 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-                //Login and go back button
+
+                //Password repeat
+                Container(
+                  padding: EdgeInsets.only(bottom: 10, top: 40),
+                  child: Text("repeat Password", style: TextStyle(color: Colors.white,fontSize: 24)),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width*0.83,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    color: Colors.white
+                  ),
+                  child: TextFormField(
+                    controller: passwordController2,
+                    keyboardType: TextInputType.text,
+                    obscureText: true,
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 22,
+                      color: Colors.black
+                    ),
+                  ),
+                ),
+
+                //sign in and go back button
                 Container(
                   width: MediaQuery.of(context).size.width*0.83,
                   padding: EdgeInsets.symmetric(vertical: 40),
@@ -123,8 +150,8 @@ class _LoginPageState extends State<LoginPage> {
                             color: Colors.white
                           ),
                           child: FlatButton(
-                            child: Text("Login", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                            onPressed: (){_onLogin(usernameController.text, passwordController.text, context);},
+                            child: Text("Sign In", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                            onPressed: (){_onSignIn(usernameController.text, passwordController1.text, passwordController2.text, context);},
                           ),
                         ),
                       )
