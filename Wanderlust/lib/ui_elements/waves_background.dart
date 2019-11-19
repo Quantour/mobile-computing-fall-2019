@@ -96,9 +96,10 @@ class WavePainter extends CustomPainter {
     Path path = Path();
 
     path.moveTo(0, size.height);
-    for (double x = 0; x <= size.width; x+=10.0) {
+    for (double x = 0; x <= size.width; x+=20.0) {
       path.lineTo(x, wave.calculateWithTime(x, passedMilliseconds));
     }
+    path.lineTo(size.width, wave.calculateWithTime(size.width, passedMilliseconds));
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
@@ -124,7 +125,8 @@ class WavePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+    if (oldDelegate == null || !(oldDelegate is WavePainter)) return true;
+    return this.passedMilliseconds-(oldDelegate as WavePainter).passedMilliseconds > 30;
   }
 
 }

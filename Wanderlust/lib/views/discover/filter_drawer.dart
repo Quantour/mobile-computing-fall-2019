@@ -128,7 +128,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                               });
                               //TODO: DEBUG: THIS OPENS ACCOUNT INFO PAGE
                               Navigator.push(context, MaterialPageRoute(
-                                builder: (context) => AccountInfoPage()
+                                builder: (context) => LoginPage()
                               ));
                             }
                           )
