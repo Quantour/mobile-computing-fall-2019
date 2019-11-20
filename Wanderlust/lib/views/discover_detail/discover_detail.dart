@@ -108,8 +108,10 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                             margin: const EdgeInsets.all(8),
                             text: "Rate",
                             child: Icon(Icons.rate_review, color: Theme.of(context).accentColor, size: 18,),
-                            onPressed: () {
-                              showRatingDialog(snapshot.data.routeID, context);
+                            onPressed: () async {
+                              await showRatingDialog(snapshot.data.routeID, context);
+                              //update sum of rating when finished
+                              setState(() {});
                             },
                           ),
                           CustomButton(
