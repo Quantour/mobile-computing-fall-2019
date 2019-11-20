@@ -1,6 +1,8 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:Wanderlust/data_models/location.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:geocoder/services/base.dart';
 
 
 /**
@@ -8,7 +10,7 @@ import 'package:Wanderlust/data_models/location.dart';
  */
 class HikingRoute {
 
-  HikingRoute({
+  HikingRoute._({
     @required this.routeID,
     @required this.userID,
     @required this.title,
@@ -20,6 +22,8 @@ class HikingRoute {
     @required this.avgRating,
     @required this.avgDifficulty,
     @required this.avgTime,
+    @required this.nearestCity,
+    @required this.country
   });
 
   //required, final, only editable by Creator while creating data
@@ -40,6 +44,8 @@ class HikingRoute {
   final double          avgRating;
   final double          avgDifficulty;
   final int             avgTime;
+  final String          nearestCity;
+  final String          country;
 
   int get length {
     int dist = 0;
@@ -61,49 +67,63 @@ class HikingRoute {
 
   Location get location {
     return Location.average(route);
-  } 
-  
-  String get nearestCity {
-    return "Berlin";
-  } 
-  String get country {
-    return "Germany";
   }
+
+
 
   //######################################
   //##
   //## communicate with backend
   //##
   //######################################
+  static Future<HikingRoute> fromID(String id) async {
+    //TODO: implement fromID for HikingRoute
+    //! Do read the code/comments which calculate the nearestCity
+    //and country parameters!
 
-  static Future<HikingRoute> fromID(String id) {
-    return Future.delayed(
-      Duration(seconds: 2),
-      () {
-        //mockup data
-        return HikingRoute(
-          avgDifficulty: 2.4,
-          avgRating: 1.7,
-          avgTime: 30000,
-          description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-          images: <String>[
-            "https://www.backpacker.com/.image/t_share/MTQ5NTkxODMyNDA4MzY4NjA0/35541767156_8ba52234a0_o.jpg",
-            "https://www.outsideonline.com/sites/default/files/styles/full-page/public/2017/09/06/hiking-as-a-workout_h.jpg?itok=DyOuyqZI",
-            "https://www.banfflakelouise.com/sites/default/files/styles/l_1600_12x6/public/hiking_sentinel_pass_jake_dyson_2_horizontal.jpg?itok=jsU6BajR",
-          ],
-          route: <Location>[
-            Location(50, 6),
-            Location(50.01, 6.005),
-            Location(50.02, 6.01),
-            Location(50.03, 6.005)
-          ],
-          routeID: "RouteID",
-          timestamp: 76345635743,
-          tipsAndTricks: "Dont forget your water bottle!",
-          title: "Gwanak",
-          userID: "jon",
-        );
-      }
+    //Mockup data
+    List<Location> route = <Location>[
+      Location(50, 6),
+      Location(50.01, 6.005),
+      Location(50.02, 6.01),
+      Location(50.03, 6.005)
+    ];
+
+    //Once you have downloaded the route from the database,
+    //you can calculate nearestCity and countryproperties
+    //like this:
+    String nearestCity = "n/a"; //"n/a" stands for non applicable, if there is no city/country to find
+    String country     = "n/a";
+
+    Geocoding geocoding = Geocoder.local;
+    Coordinates coordinates = Location.average(route).toCoordinates();
+    List<Address> addresses = await geocoding.findAddressesFromCoordinates(coordinates);
+    if (addresses.length>0) {
+      Address address = addresses.first;
+      country = address.countryName;
+      nearestCity = address.adminArea;
+    }
+
+    //return Hiking route with calculated city/country information
+
+    return HikingRoute._(
+      avgDifficulty: 2.4,
+      avgRating: 1.7,
+      avgTime: 30000,
+      description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+      images: <String>[
+        "https://www.backpacker.com/.image/t_share/MTQ5NTkxODMyNDA4MzY4NjA0/35541767156_8ba52234a0_o.jpg",
+        "https://www.outsideonline.com/sites/default/files/styles/full-page/public/2017/09/06/hiking-as-a-workout_h.jpg?itok=DyOuyqZI",
+        "https://www.banfflakelouise.com/sites/default/files/styles/l_1600_12x6/public/hiking_sentinel_pass_jake_dyson_2_horizontal.jpg?itok=jsU6BajR",
+      ],
+      route: route,
+      routeID: "RouteID",
+      timestamp: 76345635743,
+      tipsAndTricks: "Dont forget your water bottle!",
+      title: "Gwanak",
+      userID: "jon",
+      nearestCity: nearestCity,
+      country: country
     );
   }
 

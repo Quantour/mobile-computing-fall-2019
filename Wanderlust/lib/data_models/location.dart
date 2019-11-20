@@ -1,5 +1,6 @@
 import 'dart:math' as Math;
 
+import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 const double _pi = 3.1415926535897932385;
@@ -80,7 +81,11 @@ class Location {
 
   LatLng toLatLng() {
     return LatLng(latitude, longitude);
-  } 
+  }
+
+  Coordinates toCoordinates() {
+    return Coordinates(latitude, longitude);
+  }
 
 /*
   static LatLngBounds getLatLngBounds(List<Location> locations) {
