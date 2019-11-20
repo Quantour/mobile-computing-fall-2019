@@ -27,7 +27,8 @@ class _SignInPageState extends State<SignInPage> {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          WavesBackground(3, MediaQuery.of(context).size),
+          //WavesBackground(3, MediaQuery.of(context).size),
+          WavesBackground(),
           SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -102,7 +103,7 @@ class _SignInPageState extends State<SignInPage> {
                 //Password repeat
                 Container(
                   padding: EdgeInsets.only(bottom: 10, top: 40),
-                  child: Text("repeat Password", style: TextStyle(color: Colors.white,fontSize: 24)),
+                  child: Text("Repeat Password", style: TextStyle(color: Colors.white,fontSize: 24)),
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width*0.83,

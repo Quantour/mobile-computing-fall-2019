@@ -25,7 +25,8 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          WavesBackground(3, MediaQuery.of(context).size),
+          //WavesBackground(3, MediaQuery.of(context).size),
+          WavesBackground(),
           SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,

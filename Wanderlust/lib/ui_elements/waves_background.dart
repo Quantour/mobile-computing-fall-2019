@@ -1,6 +1,132 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as Math;
+import 'package:simple_animations/simple_animations/controlled_animation.dart';
 
+
+
+
+class WavesBackground extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    Math.Random generator = Math.Random();
+    double Function(double min, double max) random = (min,max) => (max-min)*generator.nextDouble()+min; 
+    const Color orange = Color.fromRGBO(244,81,30,1);
+    const double speedFactor = 0.6;
+
+    return Stack(
+      children: <Widget>[
+        onBottom(AnimatedWave(
+          height: 180,
+          speed: 1.0*speedFactor,
+          color: orange.withAlpha(random(180,240).floor()),
+        )),
+        onBottom(AnimatedWave(
+          height: 120,
+          speed: 0.9*speedFactor,
+          offset: Math.pi,
+          color: orange.withAlpha(random(180,240).floor()),
+        )),
+        onBottom(AnimatedWave(
+          height: 220,
+          speed: 1.2*speedFactor,
+          offset: Math.pi / 2,
+          color: orange,
+        )),
+      ],
+    );
+  }
+
+  onBottom(Widget child) => Positioned.fill(
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: child,
+        ),
+      );
+}
+
+class AnimatedWave extends StatelessWidget {
+  final double height;
+  final double speed;
+  final double offset;
+  final Color color;
+
+  AnimatedWave({this.height, this.speed, this.offset = 0.0, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      return Container(
+        height: MediaQuery.of(context).size.height*0.8,// height,
+        width: constraints.biggest.width,
+        child: ControlledAnimation(
+            playback: Playback.LOOP,
+            duration: Duration(milliseconds: (5000 / speed).round()),
+            tween: Tween(begin: 0.0, end: 2 * Math.pi),
+            builder: (context, value) {
+              return CustomPaint(
+                foregroundPainter: CurvePainter(value + offset, height, color),
+              );
+            }),
+      );
+    });
+  }
+}
+
+class CurvePainter extends CustomPainter {
+  final double value;
+  final double height;
+  final Color color;
+
+  CurvePainter(this.value, this.height, this.color);
+
+  Paint _createPaint(Path path) {
+    LinearGradient gradient = LinearGradient(
+      colors: <Color>[
+        color,
+        Color.fromRGBO(109,76,65,1).withAlpha(color.alpha)
+      ],
+      begin: Alignment.topRight,
+      end: Alignment.bottomCenter
+    );
+
+    Paint paint = new Paint()..shader = gradient.createShader(path.getBounds());
+    return paint;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path();
+
+    final y1 = Math.sin(value);
+    final y2 = Math.sin(value + Math.pi / 2);
+    final y3 = Math.sin(value + Math.pi);
+
+    final startPointY = height * (0.5 + 0.4 * y1);
+    final controlPointY = height * (0.5 + 0.4 * y2);
+    final endPointY = height * (0.5 + 0.4 * y3);
+
+    path.moveTo(size.width * 0, startPointY);
+    path.quadraticBezierTo(
+        size.width * 0.5, controlPointY, size.width, endPointY);
+    
+    path.lineTo(size.width, height);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    final paint = _createPaint(path);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+
+/*
 
 class WavesBackground extends StatelessWidget {
   final int numWaves;
@@ -184,3 +310,6 @@ class _WaveBackgroundState extends State<WaveBackground>
   }
 }
 
+
+
+*/
