@@ -41,6 +41,14 @@ class User {
     return Future.value(User("John Doe", "JohnID"));
   }
 
+  /*
+   * This Method can update the profile picture of a User!
+   */
+  static Future<void> updateProfilePicture(String userID, String pictureURL) {
+    //TODO: implement here
+    return Future.value();
+  }
+
   String name;
   String ID;
   User(this.name,this.ID);

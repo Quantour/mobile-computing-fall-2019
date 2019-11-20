@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:Wanderlust/cloud_image.dart';
 import 'package:Wanderlust/views/login/login.dart';
 import 'package:Wanderlust/views/signin/signin.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +10,7 @@ import 'package:Wanderlust/ui_elements/profile_picture.dart';
 import 'package:Wanderlust/ui_elements/rating.dart';
 import 'package:Wanderlust/views/discover/discover_search_parameter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 import '../../data_models/user.dart';
@@ -38,6 +40,81 @@ class _FilterDrawerState extends State<FilterDrawer> {
     minKmController.text = (widget.searchParameter.minMeter.toDouble()/1000.0).toString();
     maxKmController = TextEditingController();
     maxKmController.text = (widget.searchParameter.maxMeter.toDouble()/1000.0).toString();
+  }
+
+  void _onProfilePictureChange(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text("Do you want to open the gallery or the camera?"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("gallery"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ImagePicker.pickImage(source: ImageSource.gallery).then((file) async {
+                    try {
+                      if (await file.exists()) {
+                        String url = await uploadCloudImage(file);
+                        await User.updateProfilePicture(User.currentUser.getID, url);
+                      }
+                    } catch (e) {}
+                    _onProfilePictureTap(context);
+                  });
+                },
+              ),
+              FlatButton(
+                child: Text("camera"),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ImagePicker.pickImage(source: ImageSource.camera).then((file) async {
+                    try {
+                      if (await file.exists()) {
+                        String url = await uploadCloudImage(file);
+                        await User.updateProfilePicture(User.currentUser.getID, url);
+                      }
+                    } catch (e) {}
+                    _onProfilePictureTap(context);
+                  });
+                },
+              )
+            ],
+          );
+        },
+    );
+  }
+
+  void _onProfilePictureTap(BuildContext context) {
+    assert(User.isLoggedIn);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Container(
+            width: MediaQuery.of(context).size.width*0.4,
+            height: MediaQuery.of(context).size.width*0.4,
+            child: ProfilePictureWidget(url: User.currentUser.profilePicture),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Change", style: TextStyle(color: Theme.of(context).accentColor),),
+              onPressed: () {
+                Navigator.pop(context);
+                _onProfilePictureChange(context);
+              },
+            ),
+            FlatButton(
+              child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
+              onPressed: ()=>Navigator.pop(context),
+            )
+          ],
+        );
+      }
+    );
+    
+
   }
 
   Widget buildWithUser(BuildContext context, User currentUser) {
@@ -78,7 +155,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           width: w,
                           height: w,
                           margin: EdgeInsets.all(10),
-                          child: ProfilePictureWidget(url: currentUser.profilePicture),
+                          child: ProfilePictureWidget(url: currentUser.profilePicture, onPress: ()=>_onProfilePictureTap(context),),
                         ),
                         Text(currentUser.getName, style: Theme.of(context).textTheme.title),
                         Padding(
