@@ -10,6 +10,9 @@
 .svn/
 *MAPS_API_KEY.txt
 MAPS_API_KEY.txt
+*google_maps_api.dart
+google_maps_api.dart
+lib/google_maps_api.dart
 
 # IntelliJ related
 *.iml

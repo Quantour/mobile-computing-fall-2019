@@ -1,11 +1,14 @@
 
+import 'package:Wanderlust/google_maps_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:Wanderlust/data_models/location.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geocoder/services/base.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:math' as Math;
 
-
-/**
+/*
  * This class is a data class which wraps data concerning a hiking route.
  */
 class HikingRoute {
@@ -23,7 +26,8 @@ class HikingRoute {
     @required this.avgDifficulty,
     @required this.avgTime,
     @required this.nearestCity,
-    @required this.country
+    @required this.country,
+    @required this.steepness
   });
 
   //required, final, only editable by Creator while creating data
@@ -46,6 +50,7 @@ class HikingRoute {
   final int             avgTime;
   final String          nearestCity;
   final String          country;
+  final int             steepness;
 
   int get length {
     int dist = 0;
@@ -55,21 +60,88 @@ class HikingRoute {
     return dist;
   }
 
-  //######################################
-  //##
-  //## calculate with Google Maps API...
-  //##
-  //######################################
-
-  int get steepness {
-    return 0;
-  }
-
   Location get location {
     return Location.average(route);
   }
 
+  
+  //######################################
+  //##
+  //## calculate derived info from route list
+  //##
+  //######################################
 
+  static Future<List<String>> _calculateLocationName(Location loc) async {
+    String nearestCity = "n/a"; //"n/a" stands for not applicable, if there is no city/country to find
+    String country     = "n/a";
+
+    Geocoding geocoding = Geocoder.local; //Geocoder.google(kGoogleMapsApiKey); 
+    Coordinates coordinates = loc.toCoordinates();
+    List<Address> addresses = await geocoding.findAddressesFromCoordinates(coordinates);
+    if (addresses.length>0) {
+      Address address = addresses.first;
+      country = address.countryName;
+      nearestCity = address.adminArea;
+    }
+    return [nearestCity,country];
+  }
+
+  static Future<double> _calculateAltitude(Location loc) async {
+    //Build URL for the Elevation API to fetch the data from
+    const String BASE_URL
+     = "https://maps.googleapis.com/maps/api/elevation/json?locations=<LAT>,<LON>&key=<KEY>";
+    String fetchURL;
+    fetchURL = BASE_URL.replaceFirst("<KEY>", kGoogleMapsApiKey);
+    fetchURL = fetchURL.replaceFirst("<LAT>", loc.latitude.toString());
+    fetchURL = fetchURL.replaceFirst("<LON>", loc.longitude.toString());
+
+    http.Response response = await http.get(fetchURL);
+    double elevation;
+    try {
+      //Structure of response should look like this:
+      /*
+      {
+        "results" : [
+            {
+              "elevation" : 10.5185432434082,
+              "location" : {
+                  "lat" : 40.714728,
+                  "lng" : -73.998672
+              },
+              "resolution" : 76.35161590576172
+            }
+        ],
+        "status" : "OK"
+      }*/
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      List<dynamic> results = jsonResponse["results"];
+      Map<String, dynamic> result = results.first;
+      elevation = result["elevation"];
+    } catch (e) {
+      print("Error while parsing answer from Google Map Elivation API: ${e.toString()}");
+    }
+
+    return elevation;
+  }
+
+  static Future<int> _calculateSteepness(List<Location> route) async {
+    List<double> elevations = [];
+    for (Location loc in route) {
+      double elevation = await _calculateAltitude(loc);
+      if (elevation!=null)
+        elevations.add(elevation);
+    }
+
+    if (elevations.length<2)
+      return 0;
+
+    double max = elevations.fold(elevations[0], Math.max);
+    double min = elevations.fold(elevations[0], Math.min);
+
+    double steepness = max-min;
+    
+    return steepness.floor();
+  }
 
   //######################################
   //##
@@ -90,22 +162,14 @@ class HikingRoute {
     ];
 
     //Once you have downloaded the route from the database,
-    //you can calculate nearestCity and countryproperties
-    //like this:
-    String nearestCity = "n/a"; //"n/a" stands for non applicable, if there is no city/country to find
-    String country     = "n/a";
-
-    Geocoding geocoding = Geocoder.local;
-    Coordinates coordinates = Location.average(route).toCoordinates();
-    List<Address> addresses = await geocoding.findAddressesFromCoordinates(coordinates);
-    if (addresses.length>0) {
-      Address address = addresses.first;
-      country = address.countryName;
-      nearestCity = address.adminArea;
-    }
+    //you can calculate nearestCity and country properties
+    //and the steepness of the route like this:
+    List<String> locationName = await _calculateLocationName(Location.average(route));
+    String nearestCity = locationName[0];
+    String country = locationName[1];
+    int steepness = await _calculateSteepness(route);
 
     //return Hiking route with calculated city/country information
-
     return HikingRoute._(
       avgDifficulty: 2.4,
       avgRating: 1.7,
@@ -123,7 +187,8 @@ class HikingRoute {
       title: "Gwanak",
       userID: "jon",
       nearestCity: nearestCity,
-      country: country
+      country: country,
+      steepness: steepness
     );
   }
 
