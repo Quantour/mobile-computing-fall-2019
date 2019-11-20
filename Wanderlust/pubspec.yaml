@@ -29,6 +29,7 @@ dependencies:
   provider: ^3.0.0
   geolocator: ^5.1.4+2
   image_picker: ^0.6.1+10
+  simple_animations: ^1.2.0
   #location: ^2.3.5
   
 

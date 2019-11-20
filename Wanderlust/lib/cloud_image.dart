@@ -18,7 +18,7 @@ Future<void> deleteCloudImage(String url) {
 * to the cloud and returns the url
 * of the image in a future
 */
-Future<String> _uploadCloudImage(File file) {
+Future<String> uploadCloudImage(File file) {
   //TODO: implement here
   return Future.value("http:cloud.com/my_image");
 }
@@ -72,7 +72,7 @@ Future<List<String>> updateCloudImages(List<String> original, List<NetwOrFileImg
     if (nf.isNetw) {
       ret.add(nf.url);
     } else {
-      String url = await _uploadCloudImage(nf.file);
+      String url = await uploadCloudImage(nf.file);
       ret.add(url);
     }
   }

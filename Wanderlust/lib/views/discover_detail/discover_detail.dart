@@ -1,4 +1,5 @@
 
+import 'package:Wanderlust/views/discover_detail/rating_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:Wanderlust/data_models/route.dart';
@@ -107,8 +108,10 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                             margin: const EdgeInsets.all(8),
                             text: "Rate",
                             child: Icon(Icons.rate_review, color: Theme.of(context).accentColor, size: 18,),
-                            onPressed: () {
-                              
+                            onPressed: () async {
+                              await showRatingDialog(snapshot.data.routeID, context);
+                              //update sum of rating when finished
+                              setState(() {});
                             },
                           ),
                           CustomButton(

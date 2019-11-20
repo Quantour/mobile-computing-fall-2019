@@ -31,7 +31,7 @@ class User {
 
   //mockup needed for UI until implemented
   static User get currentUser {
-    return User("CurrentUserID", "Sven Peterson");
+    return User("Sven Peterson", "CurrentUserID");
   }
 
   //This function is neccessary, so that the User can be loaded and shown
@@ -39,6 +39,14 @@ class User {
   //Just let it be with mockup data for this time until you implemented it
   static Future<User> fromID(String i) {
     return Future.value(User("John Doe", "JohnID"));
+  }
+
+  /*
+   * This Method can update the profile picture of a User!
+   */
+  static Future<void> updateProfilePicture(String userID, String pictureURL) {
+    //TODO: implement here
+    return Future.value();
   }
 
   String name;
