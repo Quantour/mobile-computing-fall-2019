@@ -31,7 +31,7 @@ class User {
 
   //mockup needed for UI until implemented
   static User get currentUser {
-    return User("CurrentUserID", "Sven Peterson");
+    return User("Sven Peterson", "CurrentUserID");
   }
 
   //This function is neccessary, so that the User can be loaded and shown
