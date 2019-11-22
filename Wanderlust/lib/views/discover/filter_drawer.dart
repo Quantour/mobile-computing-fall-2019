@@ -9,9 +9,13 @@ import 'package:Wanderlust/ui_elements/rating.dart';
 import 'package:Wanderlust/views/discover/discover_search_parameter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'profile_picture_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 
 import '../../data_models/user.dart';
+import '../../data_models/auth.dart';
 
 class FilterDrawer extends StatefulWidget {
 
@@ -41,8 +45,8 @@ class _FilterDrawerState extends State<FilterDrawer> {
   }
 
   
-
-  Widget buildWithUser(BuildContext context, User currentUser) {
+  //Convert this to a futurebuilder
+  Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -69,10 +73,18 @@ class _FilterDrawerState extends State<FilterDrawer> {
                 )
               ),
               child: SafeArea(
-                child: Builder(builder: (context) {
+                child: FutureBuilder<FirebaseUser>(
+                  future: Provider.of<AuthService>(context).getUser(),
+                  builder: (context, AsyncSnapshot<FirebaseUser> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+
+                  FirebaseUser currentUser = snapshot.data;
+                  String abc = currentUser.email;
+
+
                   var w = min(MediaQuery.of(context).size.width*0.2,MediaQuery.of(context).size.height*0.2);
                   //When logged in
-                  if (User.isLoggedIn)
+                  if (User.isLoggedIn) //auth.getUser == null
                     return Column(
                       children: <Widget>[
                         Container(
@@ -80,9 +92,9 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           width: w,
                           height: w,
                           margin: EdgeInsets.all(10),
-                          child: ProfilePictureWidget(url: currentUser.profilePicture, onPress: ()=>onProfilePictureTap(context),),
+                          child: ProfilePictureWidget(url: null, onPress: ()=>onProfilePictureTap(context),), //TODO fetch user picture
                         ),
-                        Text(currentUser.getName, style: Theme.of(context).textTheme.title),
+                        Text(abc, style: Theme.of(context).textTheme.title), //TODO fetch user name
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CustomButton(
@@ -92,7 +104,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                               //TODO Logout
                               //For UI debug purposes:
                               setState(() {
-                               User.isLoggedIn = false; 
+                               User.isLoggedIn = false;
                               });
                             }
                           )
@@ -129,7 +141,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                               //TODO log in
                               //For UI debug purposes:
                               setState(() {
-                               User.isLoggedIn = true; 
+                               User.isLoggedIn = true;
                               });
                               Navigator.push(context, MaterialPageRoute(
                                 builder: (context) => LoginPage()
@@ -139,7 +151,13 @@ class _FilterDrawerState extends State<FilterDrawer> {
                         )
                       ],
                     );
-                }),
+                  } else {
+                    // show loading indicator
+                    return LoadingCircle();
+                  }
+
+                },
+                )
               )
             ),
           ),
@@ -249,7 +267,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
       )
     );
   }
-  @override
+  /*@override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
         stream: Firestore.instance.collection('users').snapshots(),
@@ -289,6 +307,17 @@ class _FilterDrawerState extends State<FilterDrawer> {
           return buildWithUser(context, currentUser);
         }
 
+    );
+  } */
+}
+class LoadingCircle extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        child: CircularProgressIndicator(),
+        alignment: Alignment(0.0, 0.0),
+      ),
     );
   }
 }
