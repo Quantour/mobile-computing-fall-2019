@@ -1,5 +1,6 @@
 import 'dart:math' as Math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -77,6 +78,44 @@ class Location {
     lon = lon * 180/_pi;
 
     return Location(lat,lon);
+  }
+
+  //Calculates the zoom level for the map, if the whole route is to be presented on the map
+  //zoom level 0: Whole world map
+  //zoom level n+1: doubles the length factor
+  //Google map is designed to be 256 pixels wide/heigh, adjust for actual size
+  static double calculateMapsZoomLevel(List<Location> route, Size mapSize) {
+    //how much inwards space must there be on the map between outermost location
+    //in route list and border of the map?
+    const double FACTOR = 0.85;
+    const double GLOBE_WIDTH = 256;
+
+    //<Calculate zoom level to fit longitude bounds!>
+    List<double> longitudes = route.map((l)=>l.longitude).toList();
+    double minLng = longitudes.fold(longitudes[0], Math.min);
+    double maxLng = longitudes.fold(longitudes[0], Math.max);
+    double angleLng = maxLng - minLng;
+    if (angleLng < 0) angleLng += 360;
+    double lngZoom = Math.log(mapSize.width * 360.0 / angleLng / GLOBE_WIDTH) / Math.ln2;
+    
+    //<calculate zoom level to fit latitude bounds>
+    List<double> latitudes = route.map((l)=>l.latitude).toList();
+    double minLat = latitudes.fold(latitudes[0], Math.min);
+    double maxLat = latitudes.fold(latitudes[0], Math.max);
+    double midAngle = (maxLat+minLat)/2;
+    //alpha is total angle distance of alpha AND beta to midangle
+    double alpha  = maxLat-midAngle;
+    //Projection screen is orthogonal to vector with angle midAngle
+    //portion of horizontal scale:
+    double yPortion = Math.sin(alpha*Math.pi/180) / 2;
+    double latZoom = Math.log(mapSize.height / GLOBE_WIDTH / yPortion) / Math.ln2;
+    
+    //return min (max zoom) of both zoom levels
+    double zoom = Math.min(lngZoom, latZoom);
+    //"multiply" factor to zoom factor in *linear scale*
+    //The following is this calculation simplified
+    double adjustedZoom = (Math.log(FACTOR) / Math.ln2) + zoom;
+    return adjustedZoom;
   }
 
   LatLng toLatLng() {
