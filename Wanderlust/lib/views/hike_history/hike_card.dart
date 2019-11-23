@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Wanderlust/data_models/hike.dart';
 import 'package:Wanderlust/data_models/location.dart';
 import 'package:Wanderlust/data_models/route.dart';
@@ -97,11 +99,12 @@ class _HikeCardState extends State<HikeCard> {
                   child: RouteMap(
                     route: widget.hike.routeID==null?Future.value(null):HikingRoute.fromID(widget.hike.routeID),
                     myLocationEnabled: false,
-                    initialCameraPosition: CameraPosition(
-                      target: Location.average(widget.hike.actualRoute).toLatLng(),
-                      //Todo: figure out proper zoom
-                      zoom: 12
-                    ),
+                    initialCameraPositionBuilder: (mapSize) {
+                      return CameraPosition(
+                        target: Location.average(widget.hike.actualRoute).toLatLng(),
+                        zoom: Location.calculateMapsZoomLevel(widget.hike.actualRoute, mapSize)
+                      );
+                    },
                     additionalPolylines: <Polyline>[
                       Polyline(
                         polylineId: PolylineId("actualRouteFromHistory"),

@@ -13,7 +13,7 @@ class RouteMap extends StatelessWidget {
   final void Function(GoogleMapController) onMapCreated;
   final List<Polyline> additionalPolylines;
   final bool myLocationEnabled;
-  final CameraPosition initialCameraPosition;
+  final CameraPosition Function(Size mapSize) initialCameraPositionBuilder;
   final Function(CameraPosition) onCameraMove;
   final Function(Pin) onPinTap;
 
@@ -23,7 +23,7 @@ class RouteMap extends StatelessWidget {
     this.onMapCreated, 
     this.additionalPolylines, 
     this.myLocationEnabled=false, 
-    this.initialCameraPosition, 
+    this.initialCameraPositionBuilder, 
     this.onCameraMove,
     this.onPinTap  
   }) : super(key: key);
@@ -73,53 +73,66 @@ class RouteMap extends StatelessWidget {
           //Hiking route can be null, if User starts a hike without setting a route before,
           
           return Container(
-            child: GoogleMap(
-              myLocationEnabled: myLocationEnabled,
-              onCameraMove: onCameraMove,
-              onMapCreated: onMapCreated,
-              initialCameraPosition: initialCameraPosition!=null?initialCameraPosition:CameraPosition(
-                target: r!=null?r.location.toLatLng():LatLng(0, 0),
-                zoom: 14.0
-                //TODO: figure out proper zoom depending on route
-              ),
-              //draw route onto map
-              polylines: Set.from(<Polyline>[
-                //actual hiking route drawed ontop of the map
-                if (r!=null)
-                  Polyline(
-                    polylineId: PolylineId("route"),
-                    points: r.route.map((p) => p.toLatLng()).toList(),
-                    color: Theme.of(context).accentColor,
-                    geodesic: true,
-                    jointType: JointType.round,
-                    endCap: Cap.roundCap,
-                    startCap: Cap.roundCap,
-                    width: 5
-                  )
-              ]..addAll(additionalPolylines==null?[]:additionalPolylines)),
-              //draw pins onto map
-              markers: ((List<Pin> pins) {
-                List<Marker> markers = <Marker>[];
-
-                //Add all the pins to Map
-                for (Pin pin in pins) {
-                  BitmapDescriptor image = pinIcons[-1];
-                  if (pin.types.length==1)
-                    image = pinIcons[pin.types.last.index];
-                  
-                  if (pin.types.length>0)
-                    markers.add(Marker(
-                      markerId: MarkerId("pin${pin.pinID}"),
-                      position: pin.location.toLatLng(),
-                      icon: image,
-                      onTap: onPinTap==null?(){}:()=>onPinTap(pin)
-                    ));
-
-                }
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                //Calculate initialcameraposition
+                Size mapSize = Size(constraints.maxWidth, constraints.maxHeight);
+                CameraPosition initCamPos = CameraPosition(
+                  target: LatLng(0, 0),
+                  zoom: 14
+                );
+                if (r!=null && initialCameraPositionBuilder==null) initCamPos = CameraPosition(
+                  target: r.location.toLatLng(),
+                  zoom: Location.calculateMapsZoomLevel(r.route, mapSize)
+                );
+                if (initialCameraPositionBuilder!=null) 
+                  initCamPos = initialCameraPositionBuilder(mapSize);
                 
-                return markers.toSet();
-              })(pins)
-              
+                return GoogleMap(
+                  myLocationEnabled: myLocationEnabled,
+                  onCameraMove: onCameraMove,
+                  onMapCreated: onMapCreated,
+                  initialCameraPosition: initCamPos,
+                  //draw route onto map
+                  polylines: Set.from(<Polyline>[
+                    //actual hiking route drawed ontop of the map
+                    if (r!=null)
+                      Polyline(
+                        polylineId: PolylineId("route"),
+                        points: r.route.map((p) => p.toLatLng()).toList(),
+                        color: Theme.of(context).accentColor,
+                        geodesic: true,
+                        jointType: JointType.round,
+                        endCap: Cap.roundCap,
+                        startCap: Cap.roundCap,
+                        width: 5
+                      )
+                  ]..addAll(additionalPolylines==null?[]:additionalPolylines)),
+                  //draw pins onto map
+                  markers: ((List<Pin> pins) {
+                    List<Marker> markers = <Marker>[];
+
+                    //Add all the pins to Map
+                    for (Pin pin in pins) {
+                      BitmapDescriptor image = pinIcons[-1];
+                      if (pin.types.length==1)
+                        image = pinIcons[pin.types.last.index];
+                      
+                      if (pin.types.length>0)
+                        markers.add(Marker(
+                          markerId: MarkerId("pin${pin.pinID}"),
+                          position: pin.location.toLatLng(),
+                          icon: image,
+                          onTap: onPinTap==null?(){}:()=>onPinTap(pin)
+                        ));
+
+                    }
+                    
+                    return markers.toSet();
+                  })(pins)
+                  
+                );
+              }
             ),
           );
 

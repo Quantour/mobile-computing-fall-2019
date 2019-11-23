@@ -165,6 +165,42 @@ class _CurrentHikeState extends State<CurrentHike> {
     });
   }
 
+  Future<void> _onAddNewPin(BuildContext context) async {
+    if (camPos!=null) {
+      Location loc = Location(camPos.target.latitude, camPos.target.longitude);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PinEditPage(locationSuggestion: loc,))
+      );
+      setState(() {});
+    } else {
+      Position pos = await Geolocator()
+                            .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+                            .timeout(Duration(seconds: 1));
+      if (pos==null) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Text("Error while opening Menu for edit new pin"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context),
+                child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor)),
+              )
+            ],
+          )
+        );
+        return;
+      }
+      Location loc = Location(pos.latitude, pos.longitude);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PinEditPage(locationSuggestion: loc,))
+      );
+      setState(() {});
+    }
+  }
+
   void _onStop(BuildContext context) {
     showDialog(
       context: context,
@@ -302,20 +338,23 @@ class _CurrentHikeState extends State<CurrentHike> {
             onCameraMove: (camera) {
               camPos = camera;
             },
-            initialCameraPosition:
+            initialCameraPositionBuilder: (mapSize) {
               //if the route map is build the first time for a just
               //activted active route, the camera will show
               //the start of the route, otherwise it will be the same
               //camera position as it was before rebuild
-              (camPos!=null ||
+              if (camPos!=null ||
                activeHike.route==null ||
                activeHike.route.route==null ||
                activeHike.route.length==0) 
-              ? camPos
-              : CameraPosition(
+               return camPos;
+              
+              return CameraPosition(
                 target: activeHike.route.route[0].toLatLng(),
                 zoom: 14
-              ),
+              );
+            },
+            
             additionalPolylines: <Polyline>[
               Polyline(
                 polylineId: PolylineId("currentHikeActualRoute"),
@@ -366,6 +405,13 @@ class _CurrentHikeState extends State<CurrentHike> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
+              FloatingActionButton(
+                heroTag: UUID(),
+                onPressed: ()=>_onAddNewPin(context),
+                backgroundColor: Color.fromRGBO(244,81,30,1),
+                child: Icon(Icons.add_location),
+              ),
+              Container(width: 15,),
               FloatingActionButton(
                 heroTag: UUID(),
                 onPressed: ()=>_onStop(context),
