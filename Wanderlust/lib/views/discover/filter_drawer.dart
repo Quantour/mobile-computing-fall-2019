@@ -79,12 +79,12 @@ class _FilterDrawerState extends State<FilterDrawer> {
                   if (snapshot.connectionState == ConnectionState.done) {
 
                   FirebaseUser currentUser = snapshot.data;
-                  String abc = currentUser.email;
+
 
 
                   var w = min(MediaQuery.of(context).size.width*0.2,MediaQuery.of(context).size.height*0.2);
                   //When logged in
-                  if (User.isLoggedIn) //auth.getUser == null
+                  if (currentUser != null)//(User.isLoggedIn) //
                     return Column(
                       children: <Widget>[
                         Container(
@@ -94,15 +94,16 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           margin: EdgeInsets.all(10),
                           child: ProfilePictureWidget(url: null, onPress: ()=>onProfilePictureTap(context),), //TODO fetch user picture
                         ),
-                        Text(abc, style: Theme.of(context).textTheme.title), //TODO fetch user name
+                        Text(currentUser.email, style: Theme.of(context).textTheme.title), //TODO fetch user name
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CustomButton(
                             text: "Logout",
                             color: Color.fromRGBO(244,81,30,1),
                             onPressed: () {
-                              //TODO Logout
-                              //For UI debug purposes:
+                              Provider.of<AuthService>(context).logout();
+
+                              //Needed anymore?
                               setState(() {
                                User.isLoggedIn = false;
                               });
@@ -139,7 +140,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                             color: Color.fromRGBO(244,81,30,1),
                             onPressed: () {
                               //TODO log in
-                              //For UI debug purposes:
+                              //For UI debug purposes: Needed anymore?
                               setState(() {
                                User.isLoggedIn = true;
                               });

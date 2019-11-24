@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: TextFormField(
                     onSaved: (value) => _password = value,
-                    keyboardType: TextInputType.emailAddress,
+                    //keyboardType: TextInputType.emailAddress,
                     obscureText: true,
                     style: TextStyle(
                         fontFamily: "Poppins",

@@ -1,6 +1,10 @@
 import 'package:Wanderlust/ui_elements/waves_background.dart';
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../../data_models/auth.dart';
+
 class SignInPage extends StatefulWidget {
   SignInPage({Key key}) : super(key: key);
 
@@ -12,13 +16,10 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController passwordController1 = TextEditingController();
   TextEditingController passwordController2 = TextEditingController();
   TextEditingController usernameController = TextEditingController();
-
-  void _onSignIn(String username, String password1, String password2, BuildContext context) {
-    
-    //TODO: implement sign in of User
-    //Do navigator.pop(context) when it was successful, otherwise showDialog()
-    Navigator.pop(context);
-  }
+  final _formKey = GlobalKey<FormState>();
+  String _password1;
+  String _password2;
+  String _email;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,10 @@ class _SignInPageState extends State<SignInPage> {
           //WavesBackground(3, MediaQuery.of(context).size),
           WavesBackground(),
           SingleChildScrollView(
-            child: Column(
+            child: Form(
+              key: _formKey,
+
+              child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
@@ -54,7 +58,7 @@ class _SignInPageState extends State<SignInPage> {
                 //Username
                 Container(
                   padding: EdgeInsets.only(bottom: 10),
-                  child: Text("Username", style: TextStyle(color: Colors.white,fontSize: 24)),
+                  child: Text("Email", style: TextStyle(color: Colors.white,fontSize: 24)),
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width*0.83,
@@ -64,8 +68,8 @@ class _SignInPageState extends State<SignInPage> {
                     color: Colors.white
                   ),
                   child: TextFormField(
-                    controller: usernameController,
-                    keyboardType: TextInputType.text,
+                    onSaved: (value) => _email = value,
+                    keyboardType: TextInputType.emailAddress,
                     style: TextStyle(
                       fontFamily: "Poppins",
                       fontSize: 22,
@@ -88,7 +92,7 @@ class _SignInPageState extends State<SignInPage> {
                     color: Colors.white
                   ),
                   child: TextFormField(
-                    controller: passwordController1,
+                    onSaved: (value) => _password1 = value,
                     keyboardType: TextInputType.text,
                     obscureText: true,
                     style: TextStyle(
@@ -113,7 +117,7 @@ class _SignInPageState extends State<SignInPage> {
                     color: Colors.white
                   ),
                   child: TextFormField(
-                    controller: passwordController2,
+                    onSaved: (value) => _password2 = value,
                     keyboardType: TextInputType.text,
                     obscureText: true,
                     style: TextStyle(
@@ -151,8 +155,27 @@ class _SignInPageState extends State<SignInPage> {
                             color: Colors.white
                           ),
                           child: FlatButton(
-                            child: Text("Sign In", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                            onPressed: (){_onSignIn(usernameController.text, passwordController1.text, passwordController2.text, context);},
+                            child: Text("Sign Up", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                            onPressed: () async {
+                              // save the fields..
+                              final form = _formKey.currentState;
+                              form.save();
+
+                              // Validate will return true if is valid, or false if invalid.
+                              if (form.validate()) {
+                                try {
+                                  FirebaseUser result =
+                                  await Provider.of<AuthService>(context).createUser(
+                                      firstName: "abc", lastName: "def", email: _email, password: _password1); //Look into providing name or no? and pw1 == pw2 to register
+                                  print(result);
+                                  Navigator.pop(context);
+                                } on AuthException catch (error) {
+                                  return _buildErrorDialog(context, error.message);
+                                } on Exception catch (error) {
+                                  return _buildErrorDialog(context, error.toString());
+                                }
+                              }
+                            },
                           ),
                         ),
                       )
@@ -161,9 +184,28 @@ class _SignInPageState extends State<SignInPage> {
                 ),
               ],
             ),
+            )
           )
         ],
       ),
+    );
+  }
+  Future _buildErrorDialog(BuildContext context, _message) {
+    return showDialog(
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error Message'),
+          content: Text(_message),
+          actions: <Widget>[
+            FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                })
+          ],
+        );
+      },
+      context: context,
     );
   }
 }
