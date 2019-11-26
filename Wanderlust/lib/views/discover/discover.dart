@@ -1,3 +1,4 @@
+import 'package:Wanderlust/data_models/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:Wanderlust/data_models/route.dart';
@@ -132,10 +133,10 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
   @override
   Widget build(BuildContext context) {
      return StreamBuilder<QuerySnapshot>(
-     stream: Firestore.instance.collection('user2').snapshots(),
+     stream: Firestore.instance.collection('hike').snapshots(),
      builder: (context, snapshot) {
         if (!snapshot.hasData) return _buildWithRoutes(context, null);
-
+/*
         //for debug:
         return FutureBuilder(
           future: HikingRoute.fromID("test"),
@@ -146,19 +147,34 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
               return _buildWithRoutes(context, null);
           }
         );
-
-
+*/
         List<HikingRoute> routes = [];
+       
+        int numDocuments = snapshot.data.documents.length;
+        for(int i = 0; i < numDocuments;i++){
+            var doc = snapshot.data.documents[i];
+            if(doc.data["avgTime"] <= searchParameter.maxMeter && doc.data["avgTime"] >= searchParameter.minMeter &&
+              doc.data["avgDifficulty"] >= searchParameter.minDifficultyRating &&
+              doc.data["avgRating"] >= searchParameter.minExperienceRating &&
+              doc.data["title"].contains(searchParameter.searchTerm)){
 
-        //#####################################
-        //##
-        //TODO create list of routes here
-        //## use "searchParameter" attribute of this class!
-        //##
-        //#####################################
+                List<Location> route = [];
+                var docRoute = doc.data["route"];
+                for(int j = 0; j < docRoute.length; j++){
+                  route.add(Location(docRoute[j]['latitude'],docRoute[j]['longitude']));
+                }
 
-        //e.g. if (searchParameter.maxMeter...)
+                List<String> images = [];
+                var docImages = doc.data["images"];
+                for(int j = 0; j < docImages.length; j++){
+                  images.add(docImages[j]);
+                }
 
+                routes.add(HikingRoute.packInfoToObject(doc.data["routeID"], doc.data["userID"], doc.data["title"], route,
+                 doc.data["timestamp"] as int, doc.data["description"], doc.data["tipsAndTricks"], images, doc.data["avgRating"],
+                 doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"]));
+            }
+        }
         //if list is empty "no results found!" is shown, otherwise an CircularProgressIndicator
         return _buildWithRoutes(context, routes);
     }

@@ -52,6 +52,39 @@ class HikingRoute {
   final String          country;
   final int             steepness;
 
+  static HikingRoute packInfoToObject(
+    String routeID,
+    String userID,
+    String title,
+    List<Location> route,
+    int timestamp,
+    String description,
+    String tipsAndTricks,
+    List<String> images,
+    double avgRating,
+    double avgDifficulty,
+    int avgTime,
+    String nearestCity,
+    String country,
+    int steepness){
+      return HikingRoute._(
+      routeID: routeID,
+      userID: userID,
+      title: title,
+      route: route,
+      timestamp: timestamp,
+      description: description,
+      tipsAndTricks: tipsAndTricks,
+      images: images,
+      avgRating: avgRating,
+      avgDifficulty: avgDifficulty,
+      avgTime: avgTime,
+      nearestCity: nearestCity,
+      country: country,
+      steepness: steepness
+    );
+  }
+
   int get length {
     int dist = 0;
     for (int i = 0; i < route.length-1; i++) {
