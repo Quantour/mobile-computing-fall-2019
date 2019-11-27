@@ -129,7 +129,7 @@ class _CurrentHikeState extends State<CurrentHike> {
     super.initState();
     pinInfo = PinInfoOverlay(
       onDelete: (pin) {
-        Pin.deletePin(pin.docID).then((evt) {
+        Pin.deletePin(pin.pinID).then((evt) {
           setState(() {
               pinInfo.discard();
             });

@@ -22,9 +22,6 @@ class Pin {
   final List<String> images;
   final String       description;
   final int typeno;
-  //TODO: Delete docNo and replace with pinID (This is the function of pinID
-  // and all the other ids (routeID etc.)!)
-  String docID;
 
   Pin(this.pinID, this.location, this.images, this.typeno, this.description);
 
@@ -52,13 +49,7 @@ class Pin {
 
   //deltes pin from the database
   static Future<void> deletePin(String id) {
-    //TODO ...
-    //Question: why do you have docID and pinID?
-    //pinID is only, so you can identify the pin 
-    //the UI gives this method the docID for now 
-    //The future should be completed, if the pin was deleted from the database
-    //the future should be completed with error, if the pin wasn not deleted
-    //google dart future and dart async if you have questions about it
+    Firestore.instance.collection('pin').document(id).delete();
     return Future.value();
   }
 
@@ -66,16 +57,19 @@ class Pin {
   *  Furthermore it creates an unique pin ID for the Pin!
    */
   static Future<Pin> uploadPin(Location location, Set<PinType> types, String description, List<String> images) {
-    //TODO: uploade the pin
     int typeno = typenoFromSet(types);
-    return Future.value(Pin("pinID", location, images, typeno, description));
+    var a = Firestore.instance.collection("pin").document(); String docID = a.documentID;
+    a.setData({'pinID' : docID, 'latitude' : location.latitude, 'longitude' : location.longitude, 'typeno' : typeno, 'images' : images, 'description' : description});
+    return Future.value(Pin(docID, location, images, typeno, description));
 
   }
 
   /* This updates a Pin! Location cannot be changed
    */
   static Future<void> updatePin(String pinID, Set<PinType> types, String description, List<String> images) {
-    //TODO: implement here!!
+    int typeno = typenoFromSet(types);
+    var a = Firestore.instance.collection("pin").document(pinID); 
+    a.updateData({'typeno' : typeno, 'description' : description, 'images' : images });
     return Future.value();
   }
 
@@ -92,14 +86,6 @@ class Pin {
     ];
   }
 */
-  void addtoDatabase(){
-    var a = Firestore.instance.collection("pin").document(); docID = a.documentID;
-    a.setData({'pinID' : pinID, 'latitude' : location.latitude, 'longitude' : location.longitude, 'typeno' : typeno, 'images' : images});
-  }
-
-  void removefromDatabase(){
-    Firestore.instance.collection('pin').document(docID).delete();
-  }
 
   static final Map<int, String> pinAsssetPaths = {
     PinType.fountain.index:     "assets/images/pins/1.png",
