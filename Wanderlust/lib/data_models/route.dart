@@ -1,5 +1,8 @@
 
+import 'dart:ffi';
+
 import 'package:Wanderlust/google_maps_api.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:Wanderlust/data_models/location.dart';
 import 'package:geocoder/geocoder.dart';
@@ -176,16 +179,23 @@ class HikingRoute {
     return steepness.floor();
   }
 
+  static Future<int> _calculateAvgTime(List<Location> route) async {
+    Location prevLoc = route[0];
+    int totalDistance = 0;
+    for (Location loc in route) {
+      totalDistance = totalDistance + Location.distance(loc, prevLoc);
+    }
+    return totalDistance; // Assumed the walking speed of 1m/s
+  }
+
   //######################################
   //##
   //## communicate with backend
   //##
   //######################################
   static Future<HikingRoute> fromID(String id) async {
-    //TODO: implement fromID for HikingRoute
-    //! Do read the code/comments which calculate the nearestCity
-    //and country parameters!
 
+/*
     //Mockup data
     List<Location> route = <Location>[
       Location(50, 6),
@@ -193,16 +203,54 @@ class HikingRoute {
       Location(50.02, 6.01),
       Location(50.03, 6.005)
     ];
+*/
 
-    //Once you have downloaded the route from the database,
-    //you can calculate nearestCity and country properties
-    //and the steepness of the route like this:
-    List<String> locationName = await _calculateLocationName(Location.average(route));
-    String nearestCity = locationName[0];
-    String country = locationName[1];
-    int steepness = await _calculateSteepness(route);
+    Firestore.instance.collection("route").document(id).get().then((DocumentSnapshot ds) async {
+        if(!ds.exists) return Future.value(null);
+        else {
 
-    //return Hiking route with calculated city/country information
+          List<Location> route = [];
+          var docRoute = ds["route"];
+          for(int j = 0; j < docRoute.length; j++){
+            route.add(Location(docRoute[j]['latitude'],docRoute[j]['longitude']));
+          }
+
+          List<String> images = [];
+          var docImages = ds["images"];
+          for(int j = 0; j < docImages.length; j++){
+            images.add(docImages[j]);
+          }
+
+          //Once you have downloaded the route from the database,
+          //you can calculate nearestCity and country properties
+          //and the steepness of the route like this:
+          List<String> locationName = await _calculateLocationName(Location.average(route));
+          String nearestCity = locationName[0];
+          String country = locationName[1];
+          int avgTime = await _calculateAvgTime(route);
+          int steepness = await _calculateSteepness(route);
+
+          return HikingRoute._(
+            avgDifficulty: ds['avgDifficulty'],
+            avgRating: ds['avgRating'],
+            avgTime: avgTime,
+            description: ds['description'],
+            images: images,
+            route: route,
+            routeID: ds['routeID'],
+            timestamp: ds['timestamp'],
+            tipsAndTricks: ds['tipsAndTricks'],
+            title: ds['title'],
+            userID: ds['userID'],
+            nearestCity: nearestCity,
+            country: country,
+            steepness: steepness
+          );
+        }
+    });
+
+    
+/*
     return HikingRoute._(
       avgDifficulty: 2.4,
       avgRating: 1.7,
@@ -223,24 +271,55 @@ class HikingRoute {
       country: country,
       steepness: steepness
     );
+*/
+    
   }
 
 
-/*This function uploades a Route
+  /*This function uploades a Route
   It also creates Id etc. for the route
   and returns a future of the route
   if the route was uploaded,
   otherwise it finished the furure with an error
   */
-  static Future<HikingRoute> uploadRoute(
+  static Future<HikingRoute> uploadRoute (
     String userID,
     String title, 
     List<Location> route,
     int timestamp,
     String description,
     String tipsAndTricks,
-    List<String> images) {
-      //TODO: implenet upload route to the cloud!
+    List<String> images) async {
+
+    var a = Firestore.instance.collection("route").document(); String docID = a.documentID;
+    List<String> locationName = await _calculateLocationName(Location.average(route));
+    String nearestCity = locationName[0];
+    String country = locationName[1];
+    int avgTime = await _calculateAvgTime(route);
+    int steepness = await _calculateSteepness(route);
+
+    List modifiedRoute = [];
+    for(Location loc in route){
+      modifiedRoute.add({'latitude' : loc.latitude, 'longitude' : loc.longitude});
+    }
+      
+    a.setData({
+      'avgDifficulty' : 2.5,
+      'avgRating' : 2.5,
+      'avgTime' : avgTime,
+      'routeID' : docID,
+      'userID' : userID,
+      'title' : title,
+      'route' : modifiedRoute,
+      'timestamp' : timestamp,
+      'tipsAndTricks' : tipsAndTricks,
+      'description' : description,
+      'images' : images,
+      'nearestCity' : nearestCity,
+      'country' : country,
+      'steepness' : steepness
+      });
+
     return Future.value(null);
   }
 
@@ -255,7 +334,8 @@ class HikingRoute {
       String description,
       String tipsAndTricks,
       List<String> images) {
-        //TODO: implement updateRoute to cloud
+      var a = Firestore.instance.collection("route").document(routeID); 
+      a.updateData({'description' : description, 'tipsAndTricks' : tipsAndTricks, 'images' : images });
       return Future.value(null);
   }
 
@@ -264,7 +344,7 @@ class HikingRoute {
   completes the future with an error
   */
   static Future<void> deleteRoute(String id) {
-    //TODO: implement deleteRoute
+    Firestore.instance.collection("route").document(id).delete();
     return Future.value();
   }
 

@@ -133,7 +133,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
   @override
   Widget build(BuildContext context) {
      return StreamBuilder<QuerySnapshot>(
-     stream: Firestore.instance.collection('hike').snapshots(),
+     stream: Firestore.instance.collection('route').snapshots(),
      builder: (context, snapshot) {
         if (!snapshot.hasData) return _buildWithRoutes(context, null);
 /*
@@ -175,6 +175,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                  doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"]));
             }
         }
+        HikingRoute.deleteRoute("1cTz5KBBFhxL0tBh88kg");
         //if list is empty "no results found!" is shown, otherwise an CircularProgressIndicator
         return _buildWithRoutes(context, routes);
     }
@@ -187,11 +188,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
    * (automatic key from firebase)
    */
   void _onInputNewRoute(HikingRoute route) {
-    //#####################################
-    //##
-    //TODO Upload new route here
-    //##
-    //#####################################
+    HikingRoute.uploadRoute(route.userID, route.title, route.route, route.timestamp, route.description, route.tipsAndTricks, route.images);
   }
 }
 

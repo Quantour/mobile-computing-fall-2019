@@ -61,7 +61,6 @@ class Pin {
     var a = Firestore.instance.collection("pin").document(); String docID = a.documentID;
     a.setData({'pinID' : docID, 'latitude' : location.latitude, 'longitude' : location.longitude, 'typeno' : typeno, 'images' : images, 'description' : description});
     return Future.value(Pin(docID, location, images, typeno, description));
-
   }
 
   /* This updates a Pin! Location cannot be changed
