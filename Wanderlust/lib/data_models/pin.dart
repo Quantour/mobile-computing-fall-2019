@@ -31,16 +31,23 @@ class Pin {
   Set<PinType> get types {
       List<PinType> typesList = [];
       if((this.typeno&1)!=0) typesList.add(PinType.picturePoint);
-      if((this.typeno&3)!=0) typesList.add(PinType.fountain);
-      if((this.typeno&7)!=0) typesList.add(PinType.restroom);
-      if((this.typeno&15)!=0) typesList.add(PinType.restaurant);
-      if((this.typeno&31)!=0) typesList.add(PinType.restingPlace);
+      if((this.typeno&2)!=0) typesList.add(PinType.fountain);
+      if((this.typeno&4)!=0) typesList.add(PinType.restroom);
+      if((this.typeno&8)!=0) typesList.add(PinType.restaurant);
+      if((this.typeno&16)!=0) typesList.add(PinType.restingPlace);
       return typesList.toSet();
   }
 
   static int typenoFromSet(Set<PinType> types) {
-    //TODO: implement this method
-    return 0;
+    int ret = 0;
+    types.forEach((element) => {
+      if(element == PinType.picturePoint) ret = (ret+1),
+      if(element == PinType.fountain)     ret = (ret+2),
+      if(element == PinType.restroom)     ret = (ret+4),
+      if(element == PinType.restaurant)   ret = (ret+8), 
+      if(element == PinType.restingPlace) ret = (ret+16)
+    });
+    return ret;
   }
 
   //deltes pin from the database
