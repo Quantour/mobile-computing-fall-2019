@@ -304,8 +304,8 @@ class HikingRoute {
     }
       
     a.setData({
-      'avgDifficulty' : 2.5,
-      'avgRating' : 2.5,
+      'avgDifficulty' : null,
+      'avgRating' : null,
       'avgTime' : avgTime,
       'routeID' : docID,
       'userID' : userID,

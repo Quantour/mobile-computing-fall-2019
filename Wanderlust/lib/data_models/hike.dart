@@ -2,6 +2,7 @@
 
 import 'package:Wanderlust/data_models/location.dart';
 import 'package:Wanderlust/data_models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 
 /*
@@ -55,15 +56,35 @@ class Hike {
 
   /*
   * uploades a hike with this information
-  *Also creates unique hikeID.
+  * Also creates unique hikeID.
   * routeID may be null and when download a hike from the database
   * the null value must be restored. Not something like "null"
   */
   static Future<Hike> uploadHike(
-    String userID, String routeID, DateTime start, DateTime stop, List<Location> actualRoute) {
-      //TODO: implement upload hike
-      //Tip: save DateTime as DateTime.millisecondsSinceEpoch in integer!
-    return Future.value(null);
+      String userID,
+      String routeID, 
+      DateTime start, 
+      DateTime stop, 
+      List<Location> actualRoute) async {
+    
+    var a = Firestore.instance.collection("hike").document();
+    String docID = a.documentID;
+
+    List location = [];
+    for(Location loc in actualRoute) {
+      location.add({'latitude' : loc.latitude, 'longitude' : loc.longitude});
+    }
+
+    a.setData({
+      'hikeID' : docID,
+      'userID' : userID,
+      'routeID' : routeID,
+      'start' : start,
+      'stop' : stop,
+      'location' : location
+    });
+
+    return Future.value();
   }
 
   /*
@@ -71,13 +92,14 @@ class Hike {
     if this fails it resolves the future with an error
    */
   static Future<void> deleteHike(String hikeID) {
-    //TODO: implement deleteHike
+    Firestore.instance.collection('hike').document(hikeID).delete();
     return Future.value();
   }
   
   /* This method is called when a hike is published as a route */
   static Future<void> updateRoute(String hikeID, String routeID) {
-    //TODO: implement updateRoute for hike!
+    var a = Firestore.instance.collection('hike').document(hikeID);
+    a.updateData({'routeID' : routeID});
     return Future.value();
   }
 
