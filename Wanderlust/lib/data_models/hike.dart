@@ -12,71 +12,48 @@ import 'package:flutter/widgets.dart';
  */
 class Hike {
 
-  Hike._({
-    @required this.hikeID,
-    @required this.userID,
-    @required this.routeID,
-    @required this.start,
-    @required this.stop,
-    @required this.actualRoute
-  });
+  String hikeID;
+  String userID;
 
-  final String hikeID;
-  final String userID;
-
-  final String routeID;
-  final DateTime start;
-  final DateTime stop;
-  final List<Location> actualRoute;
-
-  static Hike packInfoToObject(
-      String hikeID,
-      String userID,
-      String routeID,
-      DateTime start,
-      DateTime stop,
-      List<Location> actualRoute){
-        return Hike._(
-        hikeID: hikeID,
-        userID: userID,
-        routeID: routeID,
-        start: start,
-        stop: stop,
-        actualRoute: actualRoute
-    );
-  }
+  String routeID;
+  DateTime start;
+  DateTime stop;
+  List<Location> actualRoute;
 
   Duration get duration => stop.difference(start);
+
+  Hike({this.routeID, @required this.start, @required this.stop, @required this.actualRoute});
 
   static Stream<List<Hike>> DEBUGgetCurrentUserHistory() {
     if (!User.isLoggedIn)
       return Stream.error("User must be logged in to view his history");
+    return Future.value([
+      Hike(
+        start: DateTime.utc(2019,02,20,12),
+        stop: DateTime.utc(2019,02,20,13, 34, 12),
+        routeID: "ID",
+        actualRoute: <Location>[
+          Location(50+0.01, 6+0.01),
+          Location(50.01+0.01, 6.005+0.01),
+          Location(50.02+0.01, 6.01+0.01),
+          Location(50.03+0.01, 6.005+0.01)
+        ]
+      ),
+      Hike(
+        start: DateTime.utc(2019,02,20,12),
+        stop: DateTime.utc(2019,02,20,13, 34, 12),
+        routeID: null,
+        actualRoute: <Location>[
+          Location(50+0.01, 6+0.01),
+          Location(50.01+0.01, 6.005+0.01),
+          Location(50.02+0.01, 6.01+0.01),
+          Location(50.03+0.01, 6.005+0.01)
+        ]
+      )
+    ]).asStream();
   }
 
-  static Future<Hike> fromID(String id) async {
-    Firestore.instance.collection("hike").document(id).get().then((
-        DocumentSnapshot ds) async {
-      if (!ds.exists)
-        return Future.value(null);
-      else {
-        List<Location> route = [];
-        var docRoute = ds["hike"];
-        for (int j = 0; j < docRoute.length; j++) {
-          route.add(
-              Location(docRoute[j]['latitude'], docRoute[j]['longitude']));
-        }
 
-        return Hike._(
-            hikeID: ds['hikeID'],
-            userID: ds['userID'],
-            routeID: ds['routeID'],
-            start: ds['start'],
-            stop: ds['stop'],
-            actualRoute: route
-        );
-      }
-    });
-  }
   /*
   * uploades a hike with this information
   * Also creates unique hikeID.
@@ -107,7 +84,7 @@ class Hike {
       'location' : location
     });
 
-    return Future.value(null);
+    return Future.value();
   }
 
   /*
