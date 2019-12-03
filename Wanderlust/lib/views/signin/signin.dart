@@ -1,4 +1,5 @@
 import 'package:Wanderlust/ui_elements/waves_background.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -169,6 +170,9 @@ class _SignInPageState extends State<SignInPage> {
                                       firstName: "abc", lastName: "def", email: _email, password: _password1); //Look into providing name or no? and pw1 == pw2 to register
                                   print(result);
                                   Navigator.pop(context);
+                                  FirebaseUser user = await FirebaseAuth.instance.currentUser();
+                                  var a = Firestore.instance.collection("user").document(user.uid);
+                                  a.setData({'userID' : user.uid, 'username' : user.displayName, 'profilepicture' : "", 'expertise' : 3.5});
                                 } on AuthException catch (error) {
                                   return _buildErrorDialog(context, error.message);
                                 } on Exception catch (error) {
