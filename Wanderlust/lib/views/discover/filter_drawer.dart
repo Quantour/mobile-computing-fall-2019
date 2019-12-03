@@ -92,7 +92,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
                           width: w,
                           height: w,
                           margin: EdgeInsets.all(10),
-                          child: ProfilePictureWidget(url: null, onPress: ()=>onProfilePictureTap(context),), //TODO fetch user picture
+                          child: ProfilePictureWidget(url: currentUser.photoUrl , onPress: ()=>onProfilePictureTap(context),), //TODO fetch user picture
                         ),
                         Text(currentUser.email, style: Theme.of(context).textTheme.title), //TODO fetch user name
                         Padding(

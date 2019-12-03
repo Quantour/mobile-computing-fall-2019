@@ -16,6 +16,8 @@ class AuthService with ChangeNotifier {
     return FirebaseAuth.instance.currentUser();
   }
 
+
+
   // wrapping the firebase calls
   Future logout() async {
     var result = FirebaseAuth.instance.signOut();

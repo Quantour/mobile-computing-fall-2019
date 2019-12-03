@@ -30,6 +30,7 @@ dependencies:
   cloud_firestore: ^0.12.9+6 #Version from dev flutter
   firebase_core: 0.4.0+1
   firebase_auth: 0.11.1
+  firebase_storage: ^3.0.3
   provider: ^3.0.0
   geolocator: ^5.1.4+2
   image_picker: ^0.6.1+10
