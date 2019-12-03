@@ -1,9 +1,80 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 
+class Uploader extends StatefulWidget {
+  final File file;
+
+  Uploader({Key key, this.file}) : super(key: key);
+
+  createState() => _UploaderState();
+
+}
+
+class _UploaderState extends State<Uploader> {
+  final FirebaseStorage _storage =
+  FirebaseStorage(storageBucket: 'gs://wanderlust-a2dd4.appspot.com/');
+
+  StorageUploadTask _uploadTask;
+
+  _startUpload() {
+    String filePath = 'images/${DateTime.now()}.png';
+
+    setState(() {
+      _uploadTask = _storage.ref().child(filePath).putFile(widget.file)
+    });
+
+    @override
+    Widget build(BuildContext context) {
+      if (_uploadTask != null) {
+        return StreamBuilder <StorageTaskEvent>(
+            stream: _uploadTask.events,
+            builder: (context, snapshot) {
+              var event = snapshot?.data?.snapshot;
+
+              double progressPercent = event != null
+                  ? event.bytesTransferred / event.totalByteCount
+                  : 0;
+
+              return Column(
+                children: <Widget>[
+                  if (_uploadTask.isComplete)
+                    Text('Sucess'),
+                  if (_uploadTask.isPaused)
+                    FlatButton(
+                      child: Icon(Icons.play_arrow),
+                      onPressed: _uploadTask.resume,
+                    ),
+                  if (_uploadTask.isInProgress)
+                    FlatButton(
+                      child: Icon(Icons.pause),
+                      onPressed: _uploadTask.pause,
+                    ),
+
+
+                  LinearProgressIndicator(value: progressPercent),
+                  Text(
+                      '${(progressPercent * 100).toStringAsFixed(2)} %'
+                  ),
+                ],
+              );
+            });
+      } else {
+        return FlatButton.icon(
+          label: Text('Upload to Firebase'),
+          icon: Icon(Icons.cloud_upload),
+          onPressed: _startUpload,
+        );
+      }
+    }
+  }
+
+}
 /*
 * This Method deletes a cloud image from the cloud
 * and is given its URL
@@ -24,16 +95,19 @@ Future<String> uploadCloudImage(File file) {
 }
 
 
-
 /*
  * Represents a Image which is either loaded from the network or choosen locally as a file
  */
 class NetwOrFileImg {
   NetwOrFileImg({this.file, this.url});
+
   File file;
   String url;
+
   bool get isFile => file != null;
+
   bool get isNetw => url != null;
+
   ImageProvider get image {
     if (isFile)
       return FileImage(file);
@@ -56,10 +130,12 @@ class NetwOrFileImg {
  *    the urls to the uploaded files in "updated" are
  *    returned instead of the files itself)
  */
-Future<List<String>> updateCloudImages(List<String> original, List<NetwOrFileImg> updated) async {
+Future<List<String>> updateCloudImages(List<String> original,
+    List<NetwOrFileImg> updated) async {
   //First: delete all images which occur in original,
   //but not in updated as network images
-  List<String> updatedNetw = updated.where((nf) => nf.isNetw).map((nf) => nf.url);
+  List<String> updatedNetw = updated.where((nf) => nf.isNetw).map((nf) =>
+  nf.url);
   for (String url in original) {
     if (!updatedNetw.contains(url)) {
       await deleteCloudImage(url);
