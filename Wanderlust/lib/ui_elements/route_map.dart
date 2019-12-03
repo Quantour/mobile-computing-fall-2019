@@ -87,6 +87,12 @@ class RouteMap extends StatelessWidget {
                 );
                 if (initialCameraPositionBuilder!=null) 
                   initCamPos = initialCameraPositionBuilder(mapSize);
+
+                if (initCamPos==null)
+                  initCamPos = CameraPosition(
+                    target: LatLng(37.523641, 126.984045),
+                    zoom: 14
+                  );
                 
                 return GoogleMap(
                   myLocationEnabled: myLocationEnabled,
