@@ -45,16 +45,9 @@ class User {
     return ret;
   }
   //mockup needed for UI until implemented
-  static User get currentUser {
-    Future<User> curUser() async {
-      FirebaseUser user = await FirebaseAuth.instance.currentUser();
-      return User(user.displayName,user.uid);
-    }
-    User ret;
-    curUser().then((value){
-      ret = User(value.name, value.ID);
-    });
-    return ret;
+  static Future<User> get currentUser async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    return User(user.displayName,user.uid);
   }
 
   //This function is neccessary, so that the User can be loaded and shown

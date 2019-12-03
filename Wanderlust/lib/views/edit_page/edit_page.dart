@@ -136,7 +136,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
     }
 
     if (widget.isNew) {
-      String userID = User.currentUser.getID;
+      String userID = (await User.currentUser).getID;
       String title = titleController.text;
       int timestamp = DateTime.now().millisecondsSinceEpoch;
       HikingRoute r = await HikingRoute.uploadRoute(userID, title, routeList, timestamp, description, tips, imageUrls);
