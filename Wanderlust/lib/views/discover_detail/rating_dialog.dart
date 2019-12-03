@@ -53,7 +53,7 @@ class __RatingDialogState extends State<_RatingDialog> {
           difficultyRating: difficultyRating,
           experienceRating: experienceRating,
           routeID: widget.routeID,
-          userID: User.currentUser.getID
+          userID: (await User.currentUser).getID
         );
         setState(() {
           _forceShowLoading = true;
@@ -86,7 +86,7 @@ class __RatingDialogState extends State<_RatingDialog> {
           difficultyRating: difficultyRating,
           experienceRating: experienceRating,
           routeID: widget.routeID,
-          userID: User.currentUser.getID
+          userID: (await User.currentUser).getID
         );
         setState(() {
           _forceShowLoading = true;
@@ -228,27 +228,36 @@ class __RatingDialogState extends State<_RatingDialog> {
               ),
             ],
           ),
-          child: FutureBuilder(
-            future: Rating.existRating(widget.routeID, User.currentUser.getID),
+          child: FutureBuilder<User>(
+            future: User.currentUser,
             builder: (context, snapshot) {
-              if (_forceShowLoading)
-                return loadContent(context);
-              
               if (!snapshot.hasData)
                 return loadContent(context);
-              bool existRat = snapshot.data;
-              if (!existRat)
-                return dialogContent(context, null);
+              User currentUser = snapshot.data;
+
               return FutureBuilder(
-                future: Rating.getRating(widget.routeID, User.currentUser.getID),
+                future: Rating.existRating(widget.routeID, currentUser.getID),
                 builder: (context, snapshot) {
+                  if (_forceShowLoading)
+                    return loadContent(context);
+                  
                   if (!snapshot.hasData)
                     return loadContent(context);
-                  Rating rating = snapshot.data;
-                  return dialogContent(context, rating);
+                  bool existRat = snapshot.data;
+                  if (!existRat)
+                    return dialogContent(context, null);
+                  return FutureBuilder(
+                    future: Rating.getRating(widget.routeID, currentUser.getID),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData)
+                        return loadContent(context);
+                      Rating rating = snapshot.data;
+                      return dialogContent(context, rating);
+                    },
+                  );
                 },
               );
-            },
+            }
           )
         ),
         Positioned(

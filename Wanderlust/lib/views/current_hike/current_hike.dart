@@ -76,12 +76,12 @@ class CurrentHike extends StatefulWidget {
     }
 
     //stop time keeping of active hike
-    activeHike.future.timeout(Duration(milliseconds: 500)).then((ah) {
+    activeHike.future.timeout(Duration(milliseconds: 500)).then((ah) async {
       ah.isPaused = true;
       updatePosTickerStream = null;
 
       //save Stuff
-      String userID = User.currentUser.getID;
+      String userID = (await User.currentUser).getID;
       String routeID = ah.route==null?null:ah.route.routeID;
       DateTime start = ah.timestampStart;
       DateTime stop = DateTime.now();
