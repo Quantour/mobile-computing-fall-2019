@@ -240,13 +240,19 @@ class HikingRoute {
           int avgTime = await _calculateAvgTime(route);
           int steepness = await _calculateSteepness(route);
 
+          Map<String,Map<String,double>> ratings ={};
+          var docRatings = ds["ratings"];
+          docRatings.forEach((k,v) => {
+            ratings[k] = {'experienceRating' : v['experienceRating'], 'difficultyRating' : v['difficultyRating']}
+          });
+
           return HikingRoute._(
             avgDifficulty: ds['avgDifficulty'],
             avgRating: ds['avgRating'],
             avgTime: avgTime,
             description: ds['description'],
             images: images,
-            ratings: ds['ratings'],
+            ratings: ratings,
             route: route,
             routeID: ds['routeID'],
             timestamp: ds['timestamp'],

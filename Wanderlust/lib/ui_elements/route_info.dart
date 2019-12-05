@@ -44,7 +44,11 @@ class RouteInfo extends StatelessWidget {
                         else
                           return Row(children: <Widget>[
                             Container(
-                              child: ProfilePictureWidget(url:snapshot.data.profilePicture),
+                              child: FutureBuilder(
+                                future: snapshot.data.profilePicture,
+                                builder: (context, snapshot) {
+                                  return ProfilePictureWidget(url:snapshot.data);
+                                }),
                               height: 30,
                               margin: EdgeInsets.only(right: 10),
                             ),
