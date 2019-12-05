@@ -21,6 +21,8 @@ class _SignInPageState extends State<SignInPage> {
   String _password1;
   String _password2;
   String _email;
+  String _firstName = "";
+  String _lastName = "";
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +58,7 @@ class _SignInPageState extends State<SignInPage> {
                   height: MediaQuery.of(context).size.width * 0.15,
                 ),
 
-                //Username
+                //email
                 Container(
                   padding: EdgeInsets.only(bottom: 10),
                   child: Text("Email", style: TextStyle(color: Colors.white,fontSize: 24)),
@@ -78,6 +80,63 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                 ),
+
+
+
+
+                //first name
+                Container(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: Text("First Name", style: TextStyle(color: Colors.white,fontSize: 24)),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width*0.83,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    color: Colors.white
+                  ),
+                  child: TextFormField(
+                    onSaved: (value) => _firstName = value,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 22,
+                      color: Colors.black
+                    ),
+                  ),
+                ),
+
+
+
+
+                //last name
+                Container(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: Text("Last Name", style: TextStyle(color: Colors.white,fontSize: 24)),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width*0.83,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    color: Colors.white
+                  ),
+                  child: TextFormField(
+                    onSaved: (value) => _lastName = value,
+                    keyboardType: TextInputType.text,
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 22,
+                      color: Colors.black
+                    ),
+                  ),
+                ),
+
+
+
+
+
 
 
                 //Password
@@ -167,7 +226,7 @@ class _SignInPageState extends State<SignInPage> {
                                 try {
                                   FirebaseUser result =
                                   await Provider.of<AuthService>(context).createUser(
-                                      firstName: "abc", lastName: "def", email: _email, password: _password1); //Look into providing name or no? and pw1 == pw2 to register
+                                      firstName: _firstName, lastName: _lastName, email: _email, password: _password1); //Look into providing name or no? and pw1 == pw2 to register
                                   print(result);
                                   Navigator.pop(context);
                                   FirebaseUser user = await FirebaseAuth.instance.currentUser();

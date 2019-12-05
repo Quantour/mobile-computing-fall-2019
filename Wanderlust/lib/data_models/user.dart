@@ -53,13 +53,12 @@ class User {
   //This function is neccessary, so that the User can be loaded and shown
   //for route information widget(creator of the route)
   //Just let it be with mockup data for this time until you implemented it
-  static Future<User> fromID(String i) {
-    Firestore.instance.collection("user").document(i).get().then((DocumentSnapshot ds) async {
-        if(!ds.exists) return Future.value(null);
-        else {
-          return Future.value(User(ds["userID"],ds["username"]));
-        }
-    });
+  static Future<User> fromID(String i) async {
+    DocumentSnapshot ds = await Firestore.instance.collection("user").document(i).get();
+    if(!ds.exists) return null;
+    else {
+      return User(ds["username"],ds["userID"]);
+    }
   }
 
   /*

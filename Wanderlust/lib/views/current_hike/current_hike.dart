@@ -3,6 +3,7 @@ import 'package:Wanderlust/data_models/pin.dart';
 import 'package:Wanderlust/data_models/user.dart';
 import 'package:Wanderlust/views/current_hike/pin_info_overlay.dart';
 import 'package:Wanderlust/views/edit_pin/edit_pin.dart';
+import 'package:Wanderlust/views/master/master.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,6 +21,7 @@ const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 60);
 
 
 class CurrentHike extends StatefulWidget {
+
   CurrentHike({Key key}) : super(key: key);
 
   static _CurrentHikeState _state;
@@ -105,6 +107,7 @@ class CurrentHike extends StatefulWidget {
 
       //reset all
       activeHike = Completer<ActiveHike>();
+      MasterView.resetCurrentHikeWidget();
     });
   }
 
@@ -261,8 +264,26 @@ class _CurrentHikeState extends State<CurrentHike> {
             ),
             Center(
               child: RaisedButton(
-                onPressed: () => CurrentHike.setActiveWithoutRoute(),
-                color: Theme.of(context).accentColor,
+                onPressed: () {
+                  if (!User.isLoggedIn) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content: Text("Please log in in order to start a hike!"),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text("Ok"),
+                              onPressed: () => Navigator.pop(context),
+                            )
+                          ],
+                        );
+                      }
+                    );
+                  } else 
+                    CurrentHike.setActiveWithoutRoute();
+                },
+                color: User.isLoggedIn?Theme.of(context).accentColor:Colors.grey,
                 child: Text("Start hike without route", style: TextStyle(color: Colors.white,)),
               ),
             )

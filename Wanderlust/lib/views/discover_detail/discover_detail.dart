@@ -1,4 +1,5 @@
 
+import 'package:Wanderlust/data_models/user.dart';
 import 'package:Wanderlust/views/discover_detail/rating_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -77,9 +78,9 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                           CustomButton(
                             padding: const EdgeInsets.all(8),
                             margin: const EdgeInsets.all(8),
-                            color: CurrentHike.isActive?Colors.grey:null,
+                            color: (CurrentHike.isActive||!User.isLoggedIn)?Colors.grey:Theme.of(context).accentColor,
                             text: "Start",
-                            child: Icon(Icons.play_arrow, color: CurrentHike.isActive?Colors.grey:Theme.of(context).accentColor, size: 18,),
+                            child: Icon(Icons.play_arrow, color:(CurrentHike.isActive||!User.isLoggedIn)?Colors.grey:Theme.of(context).accentColor, size: 18,),
                             onPressed: () {
                               if (CurrentHike.isActive) {
                                 showDialog(
@@ -96,6 +97,21 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                                     ],
                                   )
                                 );
+                              } else if (!User.isLoggedIn) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text("Ok"),
+                                          onPressed: ()=>Navigator.pop(context),
+                                        )
+                                      ],
+                                      content: Text("You must be logged in, in order to start a route!"),
+                                    );
+                                  }
+                                );
                               } else {
                                 Navigator.pop(context);
                                 CurrentHike.setActiveWithRoute(snapshot.data);
@@ -106,9 +122,27 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                           CustomButton(
                             padding: const EdgeInsets.all(8),
                             margin: const EdgeInsets.all(8),
+                            color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey,
                             text: "Rate",
-                            child: Icon(Icons.rate_review, color: Theme.of(context).accentColor, size: 18,),
+                            child: Icon(Icons.rate_review, color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey, size: 18,),
                             onPressed: () async {
+                              if (!User.isLoggedIn) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text("Ok"),
+                                          onPressed: ()=>Navigator.pop(context),
+                                        )
+                                      ],
+                                      content: Text("You must be logged in, in order to rate a route!"),
+                                    );
+                                  }
+                                );
+                                return;
+                              }
                               await showRatingDialog(snapshot.data.routeID, context);
                               //update sum of rating when finished
                               setState(() {});
@@ -117,9 +151,27 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                           CustomButton(
                             padding: const EdgeInsets.all(8),
                             margin: const EdgeInsets.all(8),
+                            color:  User.isLoggedIn? Theme.of(context).accentColor: Colors.grey,
                             text: "Edit",
-                            child: Icon(Icons.edit, color: Theme.of(context).accentColor, size: 18,),
+                            child: Icon(Icons.edit, color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey, size: 18,),
                             onPressed: () async {
+                              if (!User.isLoggedIn) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text("Ok"),
+                                          onPressed: ()=>Navigator.pop(context),
+                                        )
+                                      ],
+                                      content: Text("You must be logged in, in order to edit a route!"),
+                                    );
+                                  }
+                                );
+                                return;
+                              }
                               HikingRoute route = await widget.route;
                               await Navigator.push(
                                   context,

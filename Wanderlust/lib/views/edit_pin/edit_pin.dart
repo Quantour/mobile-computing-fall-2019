@@ -89,13 +89,20 @@ class _PinEditPageState extends State<PinEditPage> {
         urls = await updateCloudImages(widget.oldPin.images, images);
       }
 
+      print("sg1");
+
       //update pin/upload pin
       Pin editResult;
       if (widget.isNew){
+        print("sg1a" + (pinLocation==null).toString());
         editResult = await Pin.uploadPin(pinLocation, typeset, description, urls);
+        print("sg1b");
       } else {
+        print("sg2a");
         await Pin.updatePin(widget.oldPin.pinID, typeset, description, urls);
+        print("sg2b");
         editResult = Pin(widget.oldPin.pinID, pinLocation, urls, Pin.typenoFromSet(typeset), description);
+        print("sg2c");
       }
 
       Navigator.pop(context, editResult);
@@ -114,7 +121,7 @@ class _PinEditPageState extends State<PinEditPage> {
                 },
               )
             ],
-            content: Text("There was an error while uploading/updating the pin!"),
+            content: Text("There was an error while uploading/updating the pin!\n"+e.toString()),
           );
         }
       );
@@ -367,10 +374,10 @@ class _PinEditPageState extends State<PinEditPage> {
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => EditPinLocInfoPage(this.pinLocation)
-                        )).then((data) {
-                          this.pinLocation=data[0];
-                        });
+                          builder: (context) => EditPinLocInfoPage(this.pinLocation,(l) {
+                            this.pinLocation = l;
+                          })
+                        ));
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width*0.7,
