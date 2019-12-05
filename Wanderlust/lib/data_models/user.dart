@@ -30,20 +30,22 @@ class User {
 
   //neccessary to let it in the code, so the UI displays the data right,
   //just let it be with mockup data until ou have implemented it
-//  String get   profilePicture => "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
-  String get profilePicture {
+    String get   profilePicture => "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80";
+  /*String get profilePicture {
+    
     Future<User> curUser() async {
       FirebaseUser user = await FirebaseAuth.instance.currentUser();
       return User(user.displayName,user.uid);
     }
-    String ret = "";
+    
+    }String ret = "";
     curUser().then((value){
       Firestore.instance.collection("user").document(value.ID).get().then((DocumentSnapshot ds) async {
         if(ds.exists) ret = ds['profileURL']; 
       });
     });
     return ret;
-  }
+  } */
   //mockup needed for UI until implemented
   static Future<User> get currentUser async {
     FirebaseUser user = await FirebaseAuth.instance.currentUser();

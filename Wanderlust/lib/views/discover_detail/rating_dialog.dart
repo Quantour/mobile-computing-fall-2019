@@ -44,7 +44,7 @@ class __RatingDialogState extends State<_RatingDialog> {
     void Function() onCancel;
     void Function() onOk;
     const timeoutDur = const Duration(seconds: 3);
-
+    
     if (isNew) {
       cancelText = "Cancel";
       okText = "Ok";
@@ -234,8 +234,8 @@ class __RatingDialogState extends State<_RatingDialog> {
               if (!snapshot.hasData)
                 return loadContent(context);
               User currentUser = snapshot.data;
-
-              return FutureBuilder(
+              print(currentUser.getID);
+              return FutureBuilder<bool>(
                 future: Rating.existRating(widget.routeID, currentUser.getID),
                 builder: (context, snapshot) {
                   if (_forceShowLoading)
@@ -310,7 +310,6 @@ Future<void> showRatingDialog(String routeID, BuildContext context) async {
   void Function() closeDialog = () {
     Navigator.pop(context);
   };
-
   await showDialog(
     context: context,
     builder: (context) {
