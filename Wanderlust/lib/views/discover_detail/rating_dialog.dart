@@ -305,7 +305,7 @@ class __RatingDialogState extends State<_RatingDialog> {
 
 
 Future<void> showRatingDialog(String routeID, BuildContext context) async {
-  assert(User.isLoggedIn);
+  assert(await User.isLoggedIn);
 
   void Function() closeDialog = () {
     Navigator.pop(context);

@@ -266,7 +266,7 @@ class LoadingCircle extends StatelessWidget {
 
 
 void onProfilePictureTap(BuildContext context) {
-  assert(User.isLoggedIn);
+  User.isLoggedIn.then((status) {assert(status);});
 
   showDialog(
     context: context,
