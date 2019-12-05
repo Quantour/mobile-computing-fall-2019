@@ -81,6 +81,7 @@ class _HikeCardState extends State<HikeCard> {
                     GestureDetector(
                       onTap: () {
                         Hike.deleteHike(widget.hike.hikeID);
+                        print("delet");
                       },
                       child: Icon(Icons.delete, color: Theme.of(context).accentColor,),
                     )

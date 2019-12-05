@@ -23,7 +23,7 @@ class Hike {
 
   Duration get duration => stop.difference(start);
 
-  Hike({this.routeID, @required this.start, @required this.stop, @required this.actualRoute});
+  Hike({this.routeID, this.hikeID, @required this.start, @required this.stop, @required this.actualRoute});
 
   static Future<Stream<List<Hike>>> getCurrentUserHistory() async {
     if (!User.isLoggedIn)
@@ -38,8 +38,9 @@ class Hike {
             locInfo.add(Location(loc[j]['latitude'],loc[j]['longitude']));
           }
           curUserHistory.add(Hike(
-            start: doc["start"],
-            stop: doc["stop"],
+            start: doc["start"].toDate(),
+            stop: doc["stop"].toDate(),
+            hikeID: doc["hikeID"],
             routeID: doc["routeID"],
             actualRoute: locInfo,
           ));
@@ -84,7 +85,7 @@ class Hike {
   */
   static Future<Hike> uploadHike(
       String userID,
-      String routeID, 
+      String routeID,
       DateTime start, 
       DateTime stop, 
       List<Location> actualRoute) async {

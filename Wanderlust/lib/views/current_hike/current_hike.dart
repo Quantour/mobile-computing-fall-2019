@@ -17,7 +17,7 @@ import 'package:Wanderlust/util.dart';
 import 'package:Wanderlust/views/current_hike/active_hike.dart';
 
 //TODO set this to 40 seconds or so when deug o this section is finished
-const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 60);
+const RECORD_INTERVAL_ACTUAL_ROUTE = const Duration(seconds: 10);
 
 
 class CurrentHike extends StatefulWidget {
