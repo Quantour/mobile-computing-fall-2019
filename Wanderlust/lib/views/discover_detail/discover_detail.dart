@@ -1,4 +1,5 @@
 
+import 'package:Wanderlust/data_models/user.dart';
 import 'package:Wanderlust/views/discover_detail/rating_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -117,9 +118,26 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                           CustomButton(
                             padding: const EdgeInsets.all(8),
                             margin: const EdgeInsets.all(8),
+                            color:  User.isLoggedIn? Theme.of(context).accentColor: Colors.grey,
                             text: "Edit",
-                            child: Icon(Icons.edit, color: Theme.of(context).accentColor, size: 18,),
+                            child: Icon(Icons.edit, color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey, size: 18,),
                             onPressed: () {
+                              if (!User.isLoggedIn) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      actions: <Widget>[
+                                        FlatButton(
+                                          child: Text("Ok"),
+                                          onPressed: ()=>Navigator.pop(context),
+                                        )
+                                      ],
+                                      content: Text("You must be logged in, in order to edit a route!"),
+                                    );
+                                  }
+                                );
+                              }
                               widget.route.then((route){
                                 Navigator.push(
                                   context,

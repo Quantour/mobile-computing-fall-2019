@@ -54,7 +54,6 @@ class User {
   //for route information widget(creator of the route)
   //Just let it be with mockup data for this time until you implemented it
   static Future<User> fromID(String i) async {
-    print("/////////////////////USER ID: $i");
     DocumentSnapshot ds = await Firestore.instance.collection("user").document(i).get();
     if(!ds.exists) return null;
     else {
