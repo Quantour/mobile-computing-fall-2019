@@ -10,7 +10,7 @@ import '../../data_models/location.dart';
 import '../../data_models/route.dart';
 import '../../data_models/user.dart';
 
-class HikeEditPage extends StatefulWidget {
+class   HikeEditPage extends StatefulWidget {
   final bool isNew;
   final HikingRoute oldroute;
   final List<Location> routeSuggestion;
@@ -337,7 +337,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    FutureBuilder<bool>(
+    return FutureBuilder<bool>(
       future: User.isLoggedIn,
       builder: (context,snapshot) {
         bool logInStatus = false;
