@@ -92,7 +92,7 @@ class RouteInfo extends StatelessWidget {
                       Builder(
                         builder: (context) {
                           int hours = (route.avgTime/(60*60)).floor();
-                          int minutes = (route.avgTime%(60*60)).floor();
+                          int minutes = (route.avgTime%(60*60)/60).floor();
                           String timestr = "$hours h";
                           if (hours == 0) timestr = "$minutes min";
                           else if (minutes != 0) timestr += " $minutes min";

@@ -194,8 +194,10 @@ class HikingRoute {
     int totalDistance = 0;
     for (Location loc in route) {
       totalDistance = totalDistance + Location.distance(loc, prevLoc);
+      prevLoc = loc;
     }
-    return totalDistance; // Assumed the walking speed of 1m/s
+    int avgseconds =(60.0*60.0/5000.0*totalDistance.toDouble()).floor();
+    return avgseconds; // Assumed 5km per hour 
   }
 
   //######################################
