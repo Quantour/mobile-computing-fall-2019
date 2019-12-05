@@ -71,7 +71,7 @@ class RouteInfo extends StatelessWidget {
                     children: <Widget>[
                       route.length<1000
                         ?Text("${route.length} meter", style: TextStyle(fontSize: 12))
-                        :Text("${route.length.toDouble().toStringAsFixed(1)} km", style: TextStyle(fontSize: 12)),
+                        :Text("${(route.length.toDouble()/1000).toStringAsFixed(1)} km", style: TextStyle(fontSize: 12)),
                       Icon(Icons.gesture, size: 19)
                     ],
                   ),
