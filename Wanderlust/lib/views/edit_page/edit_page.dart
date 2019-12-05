@@ -106,7 +106,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
     }
     
     //shouldnt occur
-    if (!User.isLoggedIn) {
+    if (!(await User.isLoggedIn)) {
       showDialog(
         context: context,
         builder: (context) {
@@ -337,136 +337,150 @@ class _HikeEditPageState extends State<HikeEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!User.isLoggedIn) return buildWhenUserNotLoggedIn(context);
+    FutureBuilder<bool>(
+      future: User.isLoggedIn,
+      builder: (context,snapshot) {
+        bool logInStatus = false;
+        if (snapshot.hasData)
+          logInStatus = snapshot.data;
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            //----->Title<-----
-            Container(height: 30,),
-            Text("Title", style: TextStyle(fontSize: 20)),
-            Container(height: 7,),
-            TextField(
-              enabled: widget.isNew,
-              controller: titleController,
-              decoration: InputDecoration(fillColor: widget.isNew?Theme.of(context).accentColor.withAlpha(30):Colors.grey.withAlpha(30), filled: true),
-            ),
-            //----->Description<-----
-            Container(height: 30,),
-            Text("Description", style: TextStyle(fontSize: 20)),
-            Container(height: 7,),
-            TextField(
-              controller: descriptionController,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
-            ),
-            //----->Tips&Tricks<-----
-            Container(height: 30,),
-            Text("Tips & Tricks", style: TextStyle(fontSize: 20)),
-            Container(height: 7,),
-            TextField(
-              controller: tipsController,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
-            ),
-            //----->Images<-----
-            Container(height: 30,),
-            Text("Images", style: TextStyle(fontSize: 20)),
-            Container(height: 10,),
-            ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              child: Container(
-                color: Color.fromRGBO(200, 200, 200, 1),
-                child: _buildImagePicker()
-              ),
-            ),
 
-            //----->put in route information<-----
-            if (widget.isNew)
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Center(
-                  child: ClipRRect(
-                    clipBehavior: Clip.hardEdge,
-                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => EditLocInfoPage(this.routeList, this.cameraPosition)
-                        )).then((data) {
-                          this.routeList=data[0];
-                          this.cameraPosition=data[1];
-                        });
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width*0.7,
-                        height: 50,
-                        color: Theme.of(context).accentColor.withAlpha(150),
-                        child: Center(
-                          child: Text("Edit route information", style: TextStyle(fontSize: 20),),
+        if (!logInStatus) return buildWhenUserNotLoggedIn(context);
+
+        return Scaffold(
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                //----->Title<-----
+                Container(height: 30,),
+                Text("Title", style: TextStyle(fontSize: 20)),
+                Container(height: 7,),
+                TextField(
+                  enabled: widget.isNew,
+                  controller: titleController,
+                  decoration: InputDecoration(fillColor: widget.isNew?Theme.of(context).accentColor.withAlpha(30):Colors.grey.withAlpha(30), filled: true),
+                ),
+                //----->Description<-----
+                Container(height: 30,),
+                Text("Description", style: TextStyle(fontSize: 20)),
+                Container(height: 7,),
+                TextField(
+                  controller: descriptionController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
+                ),
+                //----->Tips&Tricks<-----
+                Container(height: 30,),
+                Text("Tips & Tricks", style: TextStyle(fontSize: 20)),
+                Container(height: 7,),
+                TextField(
+                  controller: tipsController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
+                ),
+                //----->Images<-----
+                Container(height: 30,),
+                Text("Images", style: TextStyle(fontSize: 20)),
+                Container(height: 10,),
+                ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  child: Container(
+                    color: Color.fromRGBO(200, 200, 200, 1),
+                    child: _buildImagePicker()
+                  ),
+                ),
+
+                //----->put in route information<-----
+                if (widget.isNew)
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Center(
+                      child: ClipRRect(
+                        clipBehavior: Clip.hardEdge,
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => EditLocInfoPage(this.routeList, this.cameraPosition)
+                            )).then((data) {
+                              this.routeList=data[0];
+                              this.cameraPosition=data[1];
+                            });
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width*0.7,
+                            height: 50,
+                            color: Theme.of(context).accentColor.withAlpha(150),
+                            child: Center(
+                              child: Text("Edit route information", style: TextStyle(fontSize: 20),),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
 
-            //------>show map when is old  route<-----
-            if (!widget.isNew)
-              Container(
-                margin: EdgeInsets.only(top: 25),
-                height: 300,
-                child: RouteMap(route: Future.value(widget.oldroute),),
-              ),
-              
-            
-            //----->Save/Cancel<-----
-            Container(height: 50,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  child: GestureDetector(
-                    onTap: ()=>_onSave(context),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width*0.3,
-                      height: 50,
-                      color: Colors.green,
-                      child: Center(
-                        child: Text("Save", style: TextStyle(fontSize: 20),),
+                //------>show map when is old  route<-----
+                if (!widget.isNew)
+                  Container(
+                    margin: EdgeInsets.only(top: 25),
+                    height: 300,
+                    child: RouteMap(route: Future.value(widget.oldroute),),
+                  ),
+                  
+                
+                //----->Save/Cancel<-----
+                Container(height: 50,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ClipRRect(
+                      clipBehavior: Clip.hardEdge,
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: GestureDetector(
+                        onTap: ()=>_onSave(context),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width*0.3,
+                          height: 50,
+                          color: Colors.green,
+                          child: Center(
+                            child: Text("Save", style: TextStyle(fontSize: 20),),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
 
-                ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  child: GestureDetector(
-                    onTap: ()=>Navigator.pop(context),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width*0.3,
-                      height: 50,
-                      color: Colors.red,
-                      child: Center(
-                        child: Text("Cancel", style: TextStyle(fontSize: 20),),
+                    ClipRRect(
+                      clipBehavior: Clip.hardEdge,
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: GestureDetector(
+                        onTap: ()=>Navigator.pop(context),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width*0.3,
+                          height: 50,
+                          color: Colors.red,
+                          child: Center(
+                            child: Text("Cancel", style: TextStyle(fontSize: 20),),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
 
-              ]
-            )
-          ],
-        ),
-      ),
+                  ]
+                )
+              ],
+            ),
+          ),
+        );
+
+        
+      },
     );
+
+
   }
 }
