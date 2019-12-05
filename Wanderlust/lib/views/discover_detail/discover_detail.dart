@@ -154,7 +154,7 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                             color:  User.isLoggedIn? Theme.of(context).accentColor: Colors.grey,
                             text: "Edit",
                             child: Icon(Icons.edit, color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey, size: 18,),
-                            onPressed: () {
+                            onPressed: () async {
                               if (!User.isLoggedIn) {
                                 showDialog(
                                   context: context,
@@ -172,12 +172,12 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                                 );
                                 return;
                               }
-                              widget.route.then((route){
-                                Navigator.push(
+                              HikingRoute route = await widget.route;
+                              await Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => HikeEditPage(oldroute: route)),
-                                );
-                              });
+                              );
+                              Navigator.pop(context);
                             },
                           )
                         ],

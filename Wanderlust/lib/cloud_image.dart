@@ -2,14 +2,16 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-
+import 'package:firebase_storage/firebase_storage.dart';
 
 /*
 * This Method deletes a cloud image from the cloud
 * and is given its URL
 */
 Future<void> deleteCloudImage(String url) {
-  //TODO: implement here 
+  var desertRef = FirebaseStorage().ref().child(url);
+  desertRef.delete();
+  print('deleted');
   return Future.value();
 }
 
@@ -18,12 +20,18 @@ Future<void> deleteCloudImage(String url) {
 * to the cloud and returns the url
 * of the image in a future
 */
-Future<String> uploadCloudImage(File file) {
-  //TODO: implement here
-  return Future.value("http:cloud.com/my_image");
+
+Future<String> uploadCloudImage(File file) async {
+  String _uploadedFileURL;
+  final StorageReference storageReference = FirebaseStorage().ref().child("/Hike_Pictures/${file.path}");
+  final StorageUploadTask uploadTask = storageReference.putFile(file);
+  await uploadTask.onComplete;
+  print('File Uploaded');
+  final String url = await storageReference.getDownloadURL();
+  _uploadedFileURL = url;
+  print('File Downloaded');
+  return Future.value(_uploadedFileURL);
 }
-
-
 
 /*
  * Represents a Image which is either loaded from the network or choosen locally as a file
