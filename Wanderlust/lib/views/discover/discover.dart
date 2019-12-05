@@ -149,13 +149,19 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
         );
 */
         List<HikingRoute> routes = [];
+
+        double minDiffRating = searchParameter.minDifficultyRating;
+        double minExpRating = searchParameter.minExperienceRating;
+        //if there is no rating its set to zero
+        if (minDiffRating <= 1.0) minDiffRating = 0.0;
+        if (minExpRating <= 1.0) minExpRating = 0.0;
        
         int numDocuments = snapshot.data.documents.length;
         for(int i = 0; i < numDocuments;i++){
             var doc = snapshot.data.documents[i];
             if(doc.data["avgTime"] <= searchParameter.maxMeter && doc.data["avgTime"] >= searchParameter.minMeter &&
-              doc.data["avgDifficulty"] >= searchParameter.minDifficultyRating &&
-              doc.data["avgRating"] >= searchParameter.minExperienceRating &&
+              doc.data["avgDifficulty"] >= minDiffRating &&
+              doc.data["avgRating"] >= minExpRating &&
               doc.data["title"].contains(searchParameter.searchTerm)){
 
                 List<Location> route = [];
