@@ -9,7 +9,7 @@ import 'package:transparent_image/transparent_image.dart';
 * and is given its URL
 */
 Future<void> deleteCloudImage(String url) {
-  //TODO: implement here
+  //TODO: implement here 
   return Future.value();
 }
 
@@ -59,7 +59,7 @@ class NetwOrFileImg {
 Future<List<String>> updateCloudImages(List<String> original, List<NetwOrFileImg> updated) async {
   //First: delete all images which occur in original,
   //but not in updated as network images
-  List<String> updatedNetw = updated.where((nf) => nf.isNetw).map((nf) => nf.url);
+  List<String> updatedNetw = updated.where((nf) => nf.isNetw).map((nf) => nf.url).toList();
   for (String url in original) {
     if (!updatedNetw.contains(url)) {
       await deleteCloudImage(url);

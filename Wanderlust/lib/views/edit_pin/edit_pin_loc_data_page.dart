@@ -9,7 +9,8 @@ import 'package:geolocator/geolocator.dart';
 
 class EditPinLocInfoPage extends StatefulWidget {
   final Dat.Location prevLoc;
-  EditPinLocInfoPage(this.prevLoc, {Key key}) : super(key: key);
+  final void Function(Dat.Location) setLoc;
+  EditPinLocInfoPage(this.prevLoc, this.setLoc, {Key key}) : super(key: key);
 
   @override
   _EditPinLocInfoPageState createState() => _EditPinLocInfoPageState(prevLoc);
@@ -79,7 +80,9 @@ class _EditPinLocInfoPageState extends State<EditPinLocInfoPage> {
           children: <Widget>[
             GestureDetector(
               onTap: () {
-                Navigator.pop(context, [pos]); //pass new route back
+                pos = Dat.Location(currentCameraPosition.target.latitude,currentCameraPosition.target.longitude);
+                widget.setLoc(pos);
+                Navigator.pop(context); //pass new route back
               },
               child: Container(
                 height: 50,
@@ -92,7 +95,8 @@ class _EditPinLocInfoPageState extends State<EditPinLocInfoPage> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.pop(context, [widget.prevLoc]); //pass old route back
+                widget.setLoc(widget.prevLoc);
+                Navigator.pop(context); //pass old route back
               },
               child: Container(
                 color: Colors.red,

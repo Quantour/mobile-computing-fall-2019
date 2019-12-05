@@ -99,7 +99,22 @@ class Pin {
    */
   static Future<Map<int, BitmapDescriptor>> loadPinBitmapDescriptor(BuildContext context) async {
     Map<int, BitmapDescriptor> descriptors = Map();
-    
+
+    const bool _USE_DEFAULT_PINS = true;
+
+    if (_USE_DEFAULT_PINS) {
+
+      descriptors[PinType.fountain.index] = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+      descriptors[PinType.picturePoint.index] = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
+      descriptors[PinType.restaurant.index] = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+      descriptors[PinType.restingPlace.index] = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
+      descriptors[PinType.restroom.index] = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+      descriptors[(-1)] = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta);
+
+      return descriptors;
+
+    }
+
     //This loads the pins from assets
     //we dont use BitmapDescriptor.fromAssetImage because this 
     //throws no error if it cannot load the asset file which leads
