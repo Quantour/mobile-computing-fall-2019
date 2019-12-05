@@ -264,8 +264,26 @@ class _CurrentHikeState extends State<CurrentHike> {
             ),
             Center(
               child: RaisedButton(
-                onPressed: () => CurrentHike.setActiveWithoutRoute(),
-                color: Theme.of(context).accentColor,
+                onPressed: () {
+                  if (!User.isLoggedIn) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          content: Text("Please log in in order to start a hike!"),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text("Ok"),
+                              onPressed: () => Navigator.pop(context),
+                            )
+                          ],
+                        );
+                      }
+                    );
+                  } else 
+                    CurrentHike.setActiveWithoutRoute();
+                },
+                color: User.isLoggedIn?Theme.of(context).accentColor:Colors.grey,
                 child: Text("Start hike without route", style: TextStyle(color: Colors.white,)),
               ),
             )
