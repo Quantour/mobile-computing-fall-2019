@@ -39,8 +39,8 @@ class RouteInfo extends StatelessWidget {
                     future: User.fromID(route.userID),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
-                        if (snapshot.hasError)
-                          return Container();
+                        if (snapshot.hasError || snapshot.data == null)
+                          return Container(child: Text("Couldnt load User", style: TextStyle(color: Colors.red),),);
                         else
                           return Row(children: <Widget>[
                             Container(
@@ -51,7 +51,7 @@ class RouteInfo extends StatelessWidget {
                             Text(snapshot.data.name)
                           ]);
                       } else {
-                        return Container(height: 30);
+                        return Container(height: 30,width: 100,child: Container(width: 20, height: 20, child: Center(child: CircularProgressIndicator(),)),);
                       }
                     },
                   ),
