@@ -46,7 +46,7 @@ class HikingRoute {
   final String          description;
   final String          tipsAndTricks;
   final List<String>    images;
-  final Map<String,Map> ratings;
+  final Map<String,Map<String,double>> ratings;
 
 
   //derived Informartion
@@ -72,7 +72,7 @@ class HikingRoute {
     String nearestCity,
     String country,
     int steepness,
-    Map<String,Map> ratings){
+    Map<String,Map<String,double>> ratings){
       return HikingRoute._(
       routeID: routeID,
       userID: userID,

@@ -169,13 +169,17 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                 for(int j = 0; j < docImages.length; j++){
                   images.add(docImages[j]);
                 }
+                Map<String,Map<String,double>> ratings ={};
+                var docRatings = doc.data["ratings"];
+                docRatings.forEach((k,v) => {
+                  ratings[k] = {'experienceRating' : v['experienceRating'], 'difficultyRating' : v['difficultyRating']}
+                });
 
                 routes.add(HikingRoute.packInfoToObject(doc.data["routeID"], doc.data["userID"], doc.data["title"], route,
                  doc.data["timestamp"] as int, doc.data["description"], doc.data["tipsAndTricks"], images, doc.data["avgRating"],
-                 doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"], doc.data['ratings']));
+                 doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"], ratings));
             }
         }
-        HikingRoute.deleteRoute("1cTz5KBBFhxL0tBh88kg");
         //if list is empty "no results found!" is shown, otherwise an CircularProgressIndicator
         return _buildWithRoutes(context, routes);
     }
