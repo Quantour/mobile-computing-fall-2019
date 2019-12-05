@@ -172,7 +172,7 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
 
                 routes.add(HikingRoute.packInfoToObject(doc.data["routeID"], doc.data["userID"], doc.data["title"], route,
                  doc.data["timestamp"] as int, doc.data["description"], doc.data["tipsAndTricks"], images, doc.data["avgRating"],
-                 doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"]));
+                 doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"], doc.data['ratings']));
             }
         }
         HikingRoute.deleteRoute("1cTz5KBBFhxL0tBh88kg");
