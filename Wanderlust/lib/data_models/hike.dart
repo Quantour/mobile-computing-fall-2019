@@ -3,6 +3,7 @@
 import 'package:Wanderlust/data_models/location.dart';
 import 'package:Wanderlust/data_models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
 /*
@@ -24,10 +25,30 @@ class Hike {
 
   Hike({this.routeID, @required this.start, @required this.stop, @required this.actualRoute});
 
-  static Stream<List<Hike>> DEBUGgetCurrentUserHistory() {
+  static Future<Stream<List<Hike>>> getCurrentUserHistory() async {
     if (!User.isLoggedIn)
       return Stream.error("User must be logged in to view his history");
-    return Future.value([
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    List<Hike> curUserHistory = [];
+    Firestore.instance.collection("hike").where("userID", isEqualTo: user.uid).snapshots().listen((data) =>
+        data.documents.forEach((doc) {
+          List<Location> locInfo = [];
+          var loc = doc["location"];
+          for(int j = 0; j < loc.length; j++){
+            locInfo.add(Location(loc[j]['latitude'],loc[j]['longitude']));
+          }
+          curUserHistory.add(Hike(
+            start: doc["start"],
+            stop: doc["stop"],
+            routeID: doc["routeID"],
+            actualRoute: locInfo,
+          ));
+        })
+    );
+    
+    return Future.value(Future.value(curUserHistory).asStream());
+  /*
+    return Future.value(Future.value([
       Hike(
         start: DateTime.utc(2019,02,20,12),
         stop: DateTime.utc(2019,02,20,13, 34, 12),
@@ -50,7 +71,8 @@ class Hike {
           Location(50.03+0.01, 6.005+0.01)
         ]
       )
-    ]).asStream();
+    ]).asStream());
+  */
   }
 
 

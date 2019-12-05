@@ -55,48 +55,54 @@ class _HikeHistoryState extends State<HikeHistory> {
           //##
           //##
           //########################################################
-          return StreamBuilder<List<Hike>>(
-            stream: Hike.DEBUGgetCurrentUserHistory(),
-            builder: (context, snapshot) {
-              //<------- no data yet ----->
-              if (!snapshot.hasData && !snapshot.hasError)
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              
-              //<------- error  ----->
-              if (snapshot.hasError)
-                return Center(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.3,
-                      ),
-                      Center(
-                        child: Icon(
-                          Icons.error,
-                          size: 40,
-                          color: Theme.of(context).accentColor,
+          return FutureBuilder(
+            future: Hike.getCurrentUserHistory(),
+            builder: (context,snapshot){
+              Stream<List<Hike>> curUserHistory = snapshot.data;
+                return StreamBuilder<List<Hike>>(
+                  stream: curUserHistory,
+                  builder: (context, snapshot) {
+                    //<------- no data yet ----->
+                    if (!snapshot.hasData && !snapshot.hasError)
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    
+                    //<------- error  ----->
+                    if (snapshot.hasError)
+                      return Center(
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.3,
+                            ),
+                            Center(
+                              child: Icon(
+                                Icons.error,
+                                size: 40,
+                                color: Theme.of(context).accentColor,
+                              ),
+                            ),
+                            Container(
+                              height: 20,
+                            ),
+                            Center(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width*0.7,
+                                child: Text("Please log in or register to view your hike history!", textAlign: TextAlign.center,)
+                              ),
+                            )
+                          ],
                         ),
-                      ),
-                      Container(
-                        height: 20,
-                      ),
-                      Center(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width*0.7,
-                          child: Text("Please log in or register to view your hike history!", textAlign: TextAlign.center,)
-                        ),
-                      )
-                    ],
-                  ),
+                      );
+
+                    //<------- We have User history at this point ----->
+                    return ListView(
+                      children: snapshot.data.map((hike) => HikeCard(hike: hike)).toList(),
+                    );
+
+                  },
                 );
-
-              //<------- We have User history at this point ----->
-              return ListView(
-                children: snapshot.data.map((hike) => HikeCard(hike: hike)).toList(),
-              );
-
             },
           );
         },
