@@ -111,7 +111,13 @@ class HikingRoute {
     String nearestCity = "n/a"; //"n/a" stands for not applicable, if there is no city/country to find
     String country     = "n/a";
 
-    Geocoding geocoding = Geocoder.local; //Geocoder.google(kGoogleMapsApiKey); 
+    Geocoding geocoding;
+    try {
+      //try internet first,better accuracy
+      geocoding = Geocoder.google(kGoogleMapsApiKey); 
+    } catch (e) {
+      geocoding = Geocoder.local; 
+    }
     Coordinates coordinates = loc.toCoordinates();
     List<Address> addresses = await geocoding.findAddressesFromCoordinates(coordinates);
     if (addresses.length>0) {
@@ -304,8 +310,8 @@ class HikingRoute {
     }
       
     a.setData({
-      'avgDifficulty' : null,
-      'avgRating' : null,
+      'avgDifficulty' : 2.5,
+      'avgRating' : 2.5,
       'avgTime' : avgTime,
       'routeID' : docID,
       'userID' : userID,
