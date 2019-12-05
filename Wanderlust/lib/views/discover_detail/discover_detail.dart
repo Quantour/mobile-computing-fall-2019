@@ -59,133 +59,142 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                 );
 
               //future is completed with data!
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.35,
-                      child: ImageScrollerWidget(
-                        imageBuilder: () => snapshot.data.images,
-                        heroTag: widget.heroTag==null?UUID():widget.heroTag,
-                      )
-                    ),
-                    SingleChildScrollView(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          CustomButton(
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.all(8),
-                            color: (CurrentHike.isActive||!User.isLoggedIn)?Colors.grey:Theme.of(context).accentColor,
-                            text: "Start",
-                            child: Icon(Icons.play_arrow, color:(CurrentHike.isActive||!User.isLoggedIn)?Colors.grey:Theme.of(context).accentColor, size: 18,),
-                            onPressed: () {
-                              if (CurrentHike.isActive) {
-                                showDialog(
-                                  context: context,
-                                  child: AlertDialog(
-                                    content: Text("Please stop current active hike before starting a new one!"),
-                                    actions: <Widget>[
-                                      FlatButton(
-                                        child: Text("Ok"),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                      )
-                                    ],
-                                  )
-                                );
-                              } else if (!User.isLoggedIn) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          child: Text("Ok"),
-                                          onPressed: ()=>Navigator.pop(context),
-                                        )
-                                      ],
-                                      content: Text("You must be logged in, in order to start a route!"),
-                                    );
-                                  }
-                                );
-                              } else {
-                                Navigator.pop(context);
-                                CurrentHike.setActiveWithRoute(snapshot.data);
-                                MasterView.navigate(MasterView.CURRENT_HIKE);
-                              }
-                            },
-                          ),
-                          CustomButton(
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.all(8),
-                            color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey,
-                            text: "Rate",
-                            child: Icon(Icons.rate_review, color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey, size: 18,),
-                            onPressed: () async {
-                              if (!User.isLoggedIn) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          child: Text("Ok"),
-                                          onPressed: ()=>Navigator.pop(context),
-                                        )
-                                      ],
-                                      content: Text("You must be logged in, in order to rate a route!"),
-                                    );
-                                  }
-                                );
-                                return;
-                              }
-                              await showRatingDialog(snapshot.data.routeID, context);
-                              //update sum of rating when finished
-                              setState(() {});
-                            },
-                          ),
-                          CustomButton(
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.all(8),
-                            color:  User.isLoggedIn? Theme.of(context).accentColor: Colors.grey,
-                            text: "Edit",
-                            child: Icon(Icons.edit, color: User.isLoggedIn? Theme.of(context).accentColor: Colors.grey, size: 18,),
-                            onPressed: () async {
-                              if (!User.isLoggedIn) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          child: Text("Ok"),
-                                          onPressed: ()=>Navigator.pop(context),
-                                        )
-                                      ],
-                                      content: Text("You must be logged in, in order to edit a route!"),
-                                    );
-                                  }
-                                );
-                                return;
-                              }
-                              HikingRoute route = await widget.route;
-                              await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => HikeEditPage(oldroute: route)),
-                              );
-                              Navigator.pop(context);
-                            },
+              return FutureBuilder<bool>(
+                future: User.isLoggedIn,
+                builder: (context, loginSnapshot) {
+                  bool loginstatus = false;
+                  if (loginSnapshot.hasData)
+                    loginstatus = loginSnapshot.data;
+                  
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Container(
+                          height: MediaQuery.of(context).size.height * 0.35,
+                          child: ImageScrollerWidget(
+                            imageBuilder: () => snapshot.data.images,
+                            heroTag: widget.heroTag==null?UUID():widget.heroTag,
                           )
-                        ],
-                      ),
+                        ),
+                        SingleChildScrollView(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              CustomButton(
+                                padding: const EdgeInsets.all(8),
+                                margin: const EdgeInsets.all(8),
+                                color: (CurrentHike.isActive||!loginstatus)?Colors.grey:Theme.of(context).accentColor,
+                                text: "Start",
+                                child: Icon(Icons.play_arrow, color:(CurrentHike.isActive||!loginstatus)?Colors.grey:Theme.of(context).accentColor, size: 18,),
+                                onPressed: () {
+                                  if (CurrentHike.isActive) {
+                                    showDialog(
+                                      context: context,
+                                      child: AlertDialog(
+                                        content: Text("Please stop current active hike before starting a new one!"),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            child: Text("Ok"),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          )
+                                        ],
+                                      )
+                                    );
+                                  } else if (!loginstatus) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              child: Text("Ok"),
+                                              onPressed: ()=>Navigator.pop(context),
+                                            )
+                                          ],
+                                          content: Text("You must be logged in, in order to start a route!"),
+                                        );
+                                      }
+                                    );
+                                  } else {
+                                    Navigator.pop(context);
+                                    CurrentHike.setActiveWithRoute(snapshot.data);
+                                    MasterView.navigate(MasterView.CURRENT_HIKE);
+                                  }
+                                },
+                              ),
+                              CustomButton(
+                                padding: const EdgeInsets.all(8),
+                                margin: const EdgeInsets.all(8),
+                                color: loginstatus? Theme.of(context).accentColor: Colors.grey,
+                                text: "Rate",
+                                child: Icon(Icons.rate_review, color: loginstatus? Theme.of(context).accentColor: Colors.grey, size: 18,),
+                                onPressed: () async {
+                                  if (!loginstatus) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              child: Text("Ok"),
+                                              onPressed: ()=>Navigator.pop(context),
+                                            )
+                                          ],
+                                          content: Text("You must be logged in, in order to rate a route!"),
+                                        );
+                                      }
+                                    );
+                                    return;
+                                  }
+                                  await showRatingDialog(snapshot.data.routeID, context);
+                                  //update sum of rating when finished
+                                  setState(() {});
+                                },
+                              ),
+                              CustomButton(
+                                padding: const EdgeInsets.all(8),
+                                margin: const EdgeInsets.all(8),
+                                color:  loginstatus? Theme.of(context).accentColor: Colors.grey,
+                                text: "Edit",
+                                child: Icon(Icons.edit, color: loginstatus? Theme.of(context).accentColor: Colors.grey, size: 18,),
+                                onPressed: () async {
+                                  if (!loginstatus) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              child: Text("Ok"),
+                                              onPressed: ()=>Navigator.pop(context),
+                                            )
+                                          ],
+                                          content: Text("You must be logged in, in order to edit a route!"),
+                                        );
+                                      }
+                                    );
+                                    return;
+                                  }
+                                  HikingRoute route = await widget.route;
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => HikeEditPage(oldroute: route)),
+                                  );
+                                  Navigator.pop(context);
+                                },
+                              )
+                            ],
+                          ),
+                        ),
+                        RouteInfo(route: widget.route, extended: true,)
+                      ],
                     ),
-                    RouteInfo(route: widget.route, extended: true,)
-                  ],
-                ),
+                  );
+                }
               );
             }
           )          

@@ -53,7 +53,7 @@ class CurrentHike extends StatefulWidget {
   static Future<void> stopActiveRoute(BuildContext context) async {
     assert(isActive);
 
-    if (!User.isLoggedIn) {
+    if (!(await User.isLoggedIn)) {
       bool answer = await showDialog(
         context: context,
         builder: (context) {
@@ -237,58 +237,67 @@ class _CurrentHikeState extends State<CurrentHike> {
 
   Widget buildInactive(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height*0.25,
-            ),
-            Center(
-              child: Icon(Icons.directions_walk, size: 40, color: Theme.of(context).accentColor,),
-            ),
-            Container(
-              height: 10,
-            ),
-            Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width*0.7,
-                child: Text("Please start a hike in order to see it here.",textAlign: TextAlign.center,)
-              ),
-            ),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.only(top: 20),
-                width: MediaQuery.of(context).size.width*0.7,
-                child: Text("You can start a route from the discover page or",textAlign: TextAlign.center,)
-              ),
-            ),
-            Center(
-              child: RaisedButton(
-                onPressed: () {
-                  if (!User.isLoggedIn) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text("Please log in in order to start a hike!"),
-                          actions: <Widget>[
-                            FlatButton(
-                              child: Text("Ok"),
-                              onPressed: () => Navigator.pop(context),
-                            )
-                          ],
+      body: FutureBuilder<bool>(
+        future: User.isLoggedIn,
+        builder: (context, snapshot) {
+          bool logInStatus = false;
+          if (snapshot.hasData)
+            logInStatus=snapshot.data;
+          
+          return Center(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.height*0.25,
+                ),
+                Center(
+                  child: Icon(Icons.directions_walk, size: 40, color: Theme.of(context).accentColor,),
+                ),
+                Container(
+                  height: 10,
+                ),
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width*0.7,
+                    child: Text("Please start a hike in order to see it here.",textAlign: TextAlign.center,)
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 20),
+                    width: MediaQuery.of(context).size.width*0.7,
+                    child: Text("You can start a route from the discover page or",textAlign: TextAlign.center,)
+                  ),
+                ),
+                Center(
+                  child: RaisedButton(
+                    onPressed: () {
+                      if (!logInStatus) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              content: Text("Please log in in order to start a hike!"),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text("Ok"),
+                                  onPressed: () => Navigator.pop(context),
+                                )
+                              ],
+                            );
+                          }
                         );
-                      }
-                    );
-                  } else 
-                    CurrentHike.setActiveWithoutRoute();
-                },
-                color: User.isLoggedIn?Theme.of(context).accentColor:Colors.grey,
-                child: Text("Start hike without route", style: TextStyle(color: Colors.white,)),
-              ),
-            )
-          ],
-        ),
+                      } else 
+                        CurrentHike.setActiveWithoutRoute();
+                    },
+                    color: logInStatus?Theme.of(context).accentColor:Colors.grey,
+                    child: Text("Start hike without route", style: TextStyle(color: Colors.white,)),
+                  ),
+                )
+              ],
+            ),
+          );
+        }
       ),
     );
   }

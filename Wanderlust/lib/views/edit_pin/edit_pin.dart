@@ -317,143 +317,154 @@ class _PinEditPageState extends State<PinEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!User.isLoggedIn) return buildWhenUserNotLoggedIn(context);
+    FutureBuilder(
+      future: User.isLoggedIn,
+      builder: (context, loginSnapshot) {
+        bool loginstatus = false;
+        if (loginSnapshot.hasData)
+          loginSnapshot = loginSnapshot.data;
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            //----->Types<-----
-            Container(height: 30,),
-            Text("Type(s)", style: TextStyle(fontSize: 20)),
-            for (Pair<String, bool> t in this.types.values) 
-              Column(
-                children: <Widget>[
-                  Container(height: 7,),
-                  CheckboxListTile(
-                    title:Text(t.first),
-                    value: t.second,
-                    onChanged: (bool value) {
-                      setState(() {t.second=value;});
-                    },
+        if (!loginstatus) return buildWhenUserNotLoggedIn(context);
+
+        return Scaffold(
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                //----->Types<-----
+                Container(height: 30,),
+                Text("Type(s)", style: TextStyle(fontSize: 20)),
+                for (Pair<String, bool> t in this.types.values) 
+                  Column(
+                    children: <Widget>[
+                      Container(height: 7,),
+                      CheckboxListTile(
+                        title:Text(t.first),
+                        value: t.second,
+                        onChanged: (bool value) {
+                          setState(() {t.second=value;});
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            //----->Description<-----
-            Container(height: 30,),
-            Text("Description", style: TextStyle(fontSize: 20)),
-            Container(height: 7,),
-            TextField(
-              controller: descriptionController,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
-            ),
-            //----->Images<-----
-            Container(height: 30,),
-            Text("Images", style: TextStyle(fontSize: 20)),
-            Container(height: 10,),
-            ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              child: Container(
-                color: Color.fromRGBO(200, 200, 200, 1),
-                child: _buildImagePicker()
-              ),
-            ),
+                //----->Description<-----
+                Container(height: 30,),
+                Text("Description", style: TextStyle(fontSize: 20)),
+                Container(height: 7,),
+                TextField(
+                  controller: descriptionController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  decoration: InputDecoration(fillColor: Theme.of(context).accentColor.withAlpha(30), filled: true),
+                ),
+                //----->Images<-----
+                Container(height: 30,),
+                Text("Images", style: TextStyle(fontSize: 20)),
+                Container(height: 10,),
+                ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  child: Container(
+                    color: Color.fromRGBO(200, 200, 200, 1),
+                    child: _buildImagePicker()
+                  ),
+                ),
 
-            //----->put in route information<-----
-            if (widget.isNew)
-              Container(
-                padding: EdgeInsets.all(20),
-                child: Center(
-                  child: ClipRRect(
-                    clipBehavior: Clip.hardEdge,
-                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) => EditPinLocInfoPage(this.pinLocation,(l) {
-                            this.pinLocation = l;
-                          })
-                        ));
-                      },
-                      child: Container(
-                        width: MediaQuery.of(context).size.width*0.7,
-                        height: 50,
-                        color: Theme.of(context).accentColor.withAlpha(150),
-                        child: Center(
-                          child: Text("set pin location", style: TextStyle(fontSize: 20),),
+                //----->put in route information<-----
+                if (widget.isNew)
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: Center(
+                      child: ClipRRect(
+                        clipBehavior: Clip.hardEdge,
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => EditPinLocInfoPage(this.pinLocation,(l) {
+                                this.pinLocation = l;
+                              })
+                            ));
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width*0.7,
+                            height: 50,
+                            color: Theme.of(context).accentColor.withAlpha(150),
+                            child: Center(
+                              child: Text("set pin location", style: TextStyle(fontSize: 20),),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
 
-            //------>show map when is old pin<-----
-            if (!widget.isNew)
-              Container(
-                margin: EdgeInsets.only(top: 25),
-                height: 300,
-                child: GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: pinLocation.toLatLng(),
-                    zoom: 13
-                  ),
-                  markers: Set<Marker>.from(<Marker>[
-                    Marker(
-                      markerId: MarkerId("markerOfPinLocation"),
-                      position: pinLocation.toLatLng()
-                    )
-                  ]),
-                ),
-              ),
-              
-            
-            //----->Save/Cancel<-----
-            Container(height: 50,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  child: GestureDetector(
-                    onTap: ()=>_onSave(context),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width*0.3,
-                      height: 50,
-                      color: Colors.green,
-                      child: Center(
-                        child: Text("Save", style: TextStyle(fontSize: 20),),
+                //------>show map when is old pin<-----
+                if (!widget.isNew)
+                  Container(
+                    margin: EdgeInsets.only(top: 25),
+                    height: 300,
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: pinLocation.toLatLng(),
+                        zoom: 13
                       ),
+                      markers: Set<Marker>.from(<Marker>[
+                        Marker(
+                          markerId: MarkerId("markerOfPinLocation"),
+                          position: pinLocation.toLatLng()
+                        )
+                      ]),
                     ),
                   ),
-                ),
-
-                ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                  child: GestureDetector(
-                    onTap: ()=>Navigator.pop(context),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width*0.3,
-                      height: 50,
-                      color: Colors.red,
-                      child: Center(
-                        child: Text("Cancel", style: TextStyle(fontSize: 20),),
+                  
+                
+                //----->Save/Cancel<-----
+                Container(height: 50,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ClipRRect(
+                      clipBehavior: Clip.hardEdge,
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: GestureDetector(
+                        onTap: ()=>_onSave(context),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width*0.3,
+                          height: 50,
+                          color: Colors.green,
+                          child: Center(
+                            child: Text("Save", style: TextStyle(fontSize: 20),),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
 
-              ]
-            )
-          ],
-        ),
-      ),
+                    ClipRRect(
+                      clipBehavior: Clip.hardEdge,
+                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                      child: GestureDetector(
+                        onTap: ()=>Navigator.pop(context),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width*0.3,
+                          height: 50,
+                          color: Colors.red,
+                          child: Center(
+                            child: Text("Cancel", style: TextStyle(fontSize: 20),),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  ]
+                )
+              ],
+            ),
+          ),
+        );
+
+      },
     );
+
   }
 }

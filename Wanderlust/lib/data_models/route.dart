@@ -25,6 +25,7 @@ class HikingRoute {
     @required this.description,
     @required this.tipsAndTricks,
     @required this.images,
+    @required this.ratings,
     @required this.avgRating,
     @required this.avgDifficulty,
     @required this.avgTime,
@@ -39,12 +40,13 @@ class HikingRoute {
   final String          title;
   final List<Location>  route;
   final int             timestamp; //Unix style timestamp, in milliseconds since 1970/1/1, 0:00 o'clock 
-
+  
 
   //optional, changeable, editable by everyone
   final String          description;
   final String          tipsAndTricks;
   final List<String>    images;
+  final Map<String,Map<String,double>> ratings;
 
 
   //derived Informartion
@@ -69,7 +71,8 @@ class HikingRoute {
     int avgTime,
     String nearestCity,
     String country,
-    int steepness){
+    int steepness,
+    Map<String,Map<String,double>> ratings){
       return HikingRoute._(
       routeID: routeID,
       userID: userID,
@@ -79,6 +82,7 @@ class HikingRoute {
       description: description,
       tipsAndTricks: tipsAndTricks,
       images: images,
+      ratings: ratings,
       avgRating: avgRating,
       avgDifficulty: avgDifficulty,
       avgTime: avgTime,
@@ -242,6 +246,7 @@ class HikingRoute {
             avgTime: avgTime,
             description: ds['description'],
             images: images,
+            ratings: ds['ratings'],
             route: route,
             routeID: ds['routeID'],
             timestamp: ds['timestamp'],
@@ -317,6 +322,7 @@ class HikingRoute {
       'userID' : userID,
       'title' : title,
       'route' : modifiedRoute,
+      'ratings' : {},
       'timestamp' : timestamp,
       'tipsAndTricks' : tipsAndTricks,
       'description' : description,

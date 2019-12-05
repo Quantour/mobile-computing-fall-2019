@@ -19,10 +19,15 @@ class _HikeHistoryState extends State<HikeHistory> {
         )
       ),
 
-      body: Builder(
-        builder: (context) {
+      body: FutureBuilder<bool>(
+        future: User.isLoggedIn,
+        builder: (context, loginSnapshot) {
+          bool loginStatus = false;
+          if (loginSnapshot.hasData)
+            loginStatus = loginSnapshot.data;
+
           //<------- Build this when User is not logged in and no history data can be shown ----->
-          if (!User.isLoggedIn)
+          if (!loginStatus)
             return Center(
               child: Column(
                 children: <Widget>[

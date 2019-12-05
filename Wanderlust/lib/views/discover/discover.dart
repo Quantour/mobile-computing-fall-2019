@@ -149,13 +149,19 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
         );
 */
         List<HikingRoute> routes = [];
+
+        double minDiffRating = searchParameter.minDifficultyRating;
+        double minExpRating = searchParameter.minExperienceRating;
+        //if there is no rating its set to zero
+        if (minDiffRating <= 1.0) minDiffRating = 0.0;
+        if (minExpRating <= 1.0) minExpRating = 0.0;
        
         int numDocuments = snapshot.data.documents.length;
         for(int i = 0; i < numDocuments;i++){
             var doc = snapshot.data.documents[i];
             if(doc.data["avgTime"] <= searchParameter.maxMeter && doc.data["avgTime"] >= searchParameter.minMeter &&
-              doc.data["avgDifficulty"] >= searchParameter.minDifficultyRating &&
-              doc.data["avgRating"] >= searchParameter.minExperienceRating &&
+              doc.data["avgDifficulty"] >= minDiffRating &&
+              doc.data["avgRating"] >= minExpRating &&
               doc.data["title"].contains(searchParameter.searchTerm)){
 
                 List<Location> route = [];
@@ -169,13 +175,17 @@ class _SearchScreenWidgetState extends State<SearchScreenWidget> {
                 for(int j = 0; j < docImages.length; j++){
                   images.add(docImages[j]);
                 }
+                Map<String,Map<String,double>> ratings ={};
+                var docRatings = doc.data["ratings"];
+                docRatings.forEach((k,v) => {
+                  ratings[k] = {'experienceRating' : v['experienceRating'], 'difficultyRating' : v['difficultyRating']}
+                });
 
                 routes.add(HikingRoute.packInfoToObject(doc.data["routeID"], doc.data["userID"], doc.data["title"], route,
                  doc.data["timestamp"] as int, doc.data["description"], doc.data["tipsAndTricks"], images, doc.data["avgRating"],
-                 doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"]));
+                 doc.data["avgDifficulty"], doc.data["avgTime"], doc.data["nearestCity"], doc.data["country"], doc.data["steepness"], ratings));
             }
         }
-        HikingRoute.deleteRoute("1cTz5KBBFhxL0tBh88kg");
         //if list is empty "no results found!" is shown, otherwise an CircularProgressIndicator
         return _buildWithRoutes(context, routes);
     }

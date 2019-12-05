@@ -102,11 +102,6 @@ class _FilterDrawerState extends State<FilterDrawer> {
                             color: Color.fromRGBO(244,81,30,1),
                             onPressed: () {
                               Provider.of<AuthService>(context).logout();
-
-                              //Needed anymore?
-                              setState(() {
-                               User.isLoggedIn = false;
-                              });
                             }
                           )
                         )
@@ -139,11 +134,6 @@ class _FilterDrawerState extends State<FilterDrawer> {
                             text: "  Login  ",
                             color: Color.fromRGBO(244,81,30,1),
                             onPressed: () {
-                              //TODO log in
-                              //For UI debug purposes: Needed anymore?
-                              setState(() {
-                               User.isLoggedIn = true;
-                              });
                               Navigator.push(context, MaterialPageRoute(
                                 builder: (context) => LoginPage()
                               ));

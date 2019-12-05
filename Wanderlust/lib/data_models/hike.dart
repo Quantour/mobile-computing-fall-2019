@@ -26,7 +26,7 @@ class Hike {
   Hike({this.routeID, this.hikeID, @required this.start, @required this.stop, @required this.actualRoute});
 
   static Future<Stream<List<Hike>>> getCurrentUserHistory() async {
-    if (!User.isLoggedIn)
+    if (!(await User.isLoggedIn))
       return Stream.error("User must be logged in to view his history");
     FirebaseUser user = await FirebaseAuth.instance.currentUser();
     List<Hike> curUserHistory = [];
