@@ -23,7 +23,7 @@ class Hike {
 
   Duration get duration => stop.difference(start);
 
-  Hike({this.routeID, @required this.start, @required this.stop, @required this.actualRoute});
+  Hike({this.hikeID, this.routeID, @required this.start, @required this.stop, @required this.actualRoute});
 
   static Future<Stream<List<Hike>>> getCurrentUserHistory() async {
     if (!(await User.isLoggedIn))
@@ -40,6 +40,7 @@ class Hike {
           curUserHistory.add(Hike(
             start: doc["start"].toDate(),
             stop: doc["stop"].toDate(),
+            hikeID: doc["hikeID"],
             routeID: doc["routeID"],
             actualRoute: locInfo,
           ));
