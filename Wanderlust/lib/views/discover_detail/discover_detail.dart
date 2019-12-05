@@ -119,13 +119,13 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                             margin: const EdgeInsets.all(8),
                             text: "Edit",
                             child: Icon(Icons.edit, color: Theme.of(context).accentColor, size: 18,),
-                            onPressed: () {
-                              widget.route.then((route){
-                                Navigator.push(
+                            onPressed: () async {
+                              HikingRoute route = await widget.route;
+                              await Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => HikeEditPage(oldroute: route)),
-                                );
-                              });
+                              );
+                              Navigator.pop(context);
                             },
                           )
                         ],

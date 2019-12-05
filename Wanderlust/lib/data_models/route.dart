@@ -304,8 +304,8 @@ class HikingRoute {
     }
       
     a.setData({
-      'avgDifficulty' : null,
-      'avgRating' : null,
+      'avgDifficulty' : 2.5,
+      'avgRating' : 2.5,
       'avgTime' : avgTime,
       'routeID' : docID,
       'userID' : userID,
@@ -324,10 +324,10 @@ class HikingRoute {
   }
 
 
-  /*This function updates a Route with new informarion
+  /*This function updates a Route with new information
     It returns a future of the new route
     if the route was uploaded,
-    otherwise it finished the furure with an error
+    otherwise it finished the future with an error
     */
     static Future<HikingRoute> updateRoute(
       String routeID,

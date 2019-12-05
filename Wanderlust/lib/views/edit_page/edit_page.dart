@@ -87,7 +87,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
       );
       return;
     }
-    if (this.routeList == null||this.routeList.length<2) {
+    if (widget.isNew && (this.routeList == null||this.routeList.length<2)) {
       showDialog(
         context: context,
         builder: (context) {
