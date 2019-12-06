@@ -32,15 +32,15 @@ class CurrentHike extends StatefulWidget {
     return _state;
   }
 
-  static Completer<ActiveHike> activeHike = Completer();
+  static ValueNotifier<ActiveHike> activeHike = ValueNotifier(null);
   static Stream updatePosTickerStream;
 
-  static bool get isActive => activeHike.isCompleted;
+  static bool get isActive => activeHike.value!=null;
 
   static void setActiveWithRoute(HikingRoute route) {
     assert(!isActive);
     ActiveHike ah = ActiveHike(route, DateTime.now());
-    activeHike.complete(ah);
+    activeHike.value = ah;
     //Start recording actual route
 
     updatePosTickerStream = Stream.periodic(RECORD_INTERVAL_ACTUAL_ROUTE)..listen((event) {
@@ -78,37 +78,35 @@ class CurrentHike extends StatefulWidget {
     }
 
     //stop time keeping of active hike
-    activeHike.future.timeout(Duration(milliseconds: 500)).then((ah) async {
-      ah.isPaused = true;
-      updatePosTickerStream = null;
+    activeHike.value.isPaused = true;
+    updatePosTickerStream = null;
 
-      //save Stuff
-      String userID = (await User.currentUser).getID;
-      String routeID = ah.route==null?null:ah.route.routeID;
-      DateTime start = ah.timestampStart;
-      DateTime stop = DateTime.now();
-      List<Location> actualRoute = ah.actualRoute;
-      Hike.uploadHike(userID, routeID, start, stop, actualRoute);
+    //save Stuff
+    String userID = (await User.currentUser).getID;
+    String routeID = activeHike.value.route==null?null:activeHike.value.route.routeID;
+    DateTime start = activeHike.value.timestampStart;
+    DateTime stop = DateTime.now();
+    List<Location> actualRoute = activeHike.value.actualRoute;
+    Hike.uploadHike(userID, routeID, start, stop, actualRoute);
 
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text("This hike was saved in your hike history!"),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: ()=>Navigator.pop(context),
-                child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
-              )
-            ],
-          );
-        }
-      );
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text("This hike was saved in your hike history!"),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: ()=>Navigator.pop(context),
+              child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
+            )
+          ],
+        );
+      }
+    );
 
-      //reset all
-      activeHike = Completer<ActiveHike>();
-      MasterView.resetCurrentHikeWidget();
-    });
+    //reset all
+    activeHike.value = null;
+    MasterView.resetCurrentHikeWidget();
   }
 
 }
@@ -161,7 +159,7 @@ class _CurrentHikeState extends State<CurrentHike> {
   void addActualRoutePoint() async {
     Position pos = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     if (!CurrentHike.isActive) return;
-    ActiveHike ah = await CurrentHike.activeHike.future;
+    ActiveHike ah = CurrentHike.activeHike.value;
     if (ah.isPaused) return;
     setState(() {
       ah.actualRoute.add(Location(pos.latitude, pos.longitude));
@@ -482,7 +480,15 @@ class _CurrentHikeState extends State<CurrentHike> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: FutureBuilder(
+      child: Builder(
+        builder: (context) {
+          if (!CurrentHike.isActive)
+            return buildInactive(context);
+          assert(CurrentHike.activeHike.value!=null);
+          return buildActive(context, CurrentHike.activeHike.value);
+        },
+      )
+      /*FutureBuilder(
         future: CurrentHike.activeHike.future,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done)
@@ -493,7 +499,7 @@ class _CurrentHikeState extends State<CurrentHike> {
 
           return buildActive(context, snapshot.data);
         }
-      ),
+      ),*/
     );
   }
 
