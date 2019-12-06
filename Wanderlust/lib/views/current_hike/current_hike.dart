@@ -50,7 +50,7 @@ class CurrentHike extends StatefulWidget {
 
   static void setActiveWithoutRoute() => setActiveWithRoute(null);
 
-  static Future<void> stopActiveRoute(BuildContext context) async {
+  static Future<void> stopActiveRoute(BuildContext context, void Function() callback) async {
     assert(isActive);
 
     if (!(await User.isLoggedIn)) {
@@ -104,9 +104,11 @@ class CurrentHike extends StatefulWidget {
       }
     );
 
+
+
     //reset all
     activeHike.value = null;
-    MasterView.resetCurrentHikeWidget();
+    callback();
   }
 
 }
@@ -203,6 +205,10 @@ class _CurrentHikeState extends State<CurrentHike> {
   }
 
   void _onStop(BuildContext context) {
+    setState(() {
+      showLoadingIndicatorWhenActiveHikeIsSet = false;
+    });
+    
     showDialog(
       context: context,
       builder: (context) {
@@ -219,7 +225,7 @@ class _CurrentHikeState extends State<CurrentHike> {
                   mapController = null;
                   camPos = null;
                   _discardPinInfo();
-                  CurrentHike.stopActiveRoute(context);
+                  CurrentHike.stopActiveRoute(context, () {setState((){});});
                 });
               },
             ),
@@ -233,6 +239,8 @@ class _CurrentHikeState extends State<CurrentHike> {
     );
   }
 
+
+  bool showLoadingIndicatorWhenActiveHikeIsSet = false;
   Widget buildInactive(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<bool>(
@@ -241,6 +249,11 @@ class _CurrentHikeState extends State<CurrentHike> {
           bool logInStatus = false;
           if (snapshot.hasData)
             logInStatus=snapshot.data;
+
+          if (showLoadingIndicatorWhenActiveHikeIsSet)
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           
           return Center(
             child: Column(
@@ -285,8 +298,12 @@ class _CurrentHikeState extends State<CurrentHike> {
                             );
                           }
                         );
-                      } else 
+                      } else {
+                        setState(() {
+                          showLoadingIndicatorWhenActiveHikeIsSet = true;  
+                        });
                         CurrentHike.setActiveWithoutRoute();
+                      }
                     },
                     color: logInStatus?Theme.of(context).accentColor:Colors.grey,
                     child: Text("Start hike without route", style: TextStyle(color: Colors.white,)),

@@ -33,12 +33,6 @@ class MasterView extends StatefulWidget {
     if (page < 0 || page > 2) throw ArgumentError("page must be in Range");
     _pageControllerStream.add(page);
   }
-
-   static CurrentHike currentHike;
-
-  static void resetCurrentHikeWidget() {
-    currentHike = CurrentHike();
-  }
 }
 
 
@@ -46,13 +40,6 @@ class MasterView extends StatefulWidget {
 
 class _MasterViewState extends State<MasterView> {
   int _index = 0;
-
-
-  @override
-  void initState() {
-    MasterView.resetCurrentHikeWidget();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +61,7 @@ class _MasterViewState extends State<MasterView> {
                 offstage: _index!=1,
               ),
               Offstage(
-                child: MasterView.currentHike,
+                child: CurrentHike(),
                 offstage: _index!=2,
               ),
             ],
