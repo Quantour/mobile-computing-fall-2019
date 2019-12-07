@@ -1,6 +1,7 @@
 
 import 'dart:ffi';
 
+import 'package:Wanderlust/data_models/hike.dart';
 import 'package:Wanderlust/google_maps_api.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -362,9 +363,13 @@ class HikingRoute {
   if successful it completed the future, otheriwse it
   completes the future with an error
   */
-  static Future<void> deleteRoute(String id) {
+  static Future<void> deleteRoute(String id) async {
     Firestore.instance.collection("route").document(id).delete();
-    return Future.value();
+    //Delete this Route from every Hike it is connected to
+    QuerySnapshot data = await Firestore.instance.collection("hike").where("routeID", isEqualTo: id).snapshots().first;
+    data.documents.forEach((doc) {
+      Hike.updateRoute(doc["hikeID"], null);
+    });
   }
 
 }
