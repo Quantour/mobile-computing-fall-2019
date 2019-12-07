@@ -4,36 +4,57 @@ import 'package:Wanderlust/data_models/pin.dart';
 import 'package:Wanderlust/ui_elements/image_scroller.dart';
 import 'package:flutter/material.dart';
 
-class PinInfoOverlay extends StatefulWidget {
-  PinInfoOverlay({Key key, this.onDelete, this.onEdit}) : super(key: key);
+class PinInfoOverlayController extends ChangeNotifier {
 
-  final void         Function(Pin pin) onDelete;
-  //return edited pin or error is this window should close
-  final Future<Pin> Function(Pin pin) onEdit;
-  final _PinInfoOverlayState _state = _PinInfoOverlayState();
+  Pin _currentPin;
 
-  Pin get currentPin => _state.pin;
-
-  @override
-  _PinInfoOverlayState createState() => _state;
+  Pin get currentPin => _currentPin;
 
   void show(Pin pin) {
-    _state.setPin(pin);
+    _currentPin = pin;
+    notifyListeners();
   }
 
   void discard() {
     show(null);
   }
+
+}
+
+class PinInfoOverlay extends StatefulWidget {
+  PinInfoOverlay({Key key, this.onDelete, this.onEdit, @required this.controller}) : super(key: key);
+
+  final void         Function(Pin pin) onDelete;
+  //return edited pin or error is this window should close
+  final Future<Pin> Function(Pin pin) onEdit;
+  final PinInfoOverlayController controller;
+
+  @override
+  _PinInfoOverlayState createState() => _PinInfoOverlayState();
 }
 
 class _PinInfoOverlayState extends State<PinInfoOverlay> {
   Pin pin;
   static const Duration animation_duration = const Duration(milliseconds: 500);
 
-  void setPin(Pin p) {
+  void _controllerListener() {
     setState(() {
-      pin = p;
+      pin = widget.controller.currentPin;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    assert(widget.controller!=null);
+    pin = widget.controller.currentPin;
+    widget.controller.addListener(_controllerListener);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_controllerListener);
+    super.dispose();
   }
 
   Future<bool> _onPop() async {
@@ -41,7 +62,7 @@ class _PinInfoOverlayState extends State<PinInfoOverlay> {
       return true;
     } else {
       Future.delayed(animation_duration).then((evt) {
-        setPin(null);
+        widget.controller.discard();
       });
       return false;
     }
@@ -99,7 +120,7 @@ class _PinInfoOverlayState extends State<PinInfoOverlay> {
                             if (pin == null)
                               _onPop();
                             else
-                              setPin(pin);
+                              widget.controller.show(pin);
                           })
                           .catchError((error) => _onPop());
                     }, 

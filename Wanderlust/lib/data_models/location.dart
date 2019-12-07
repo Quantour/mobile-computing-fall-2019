@@ -89,6 +89,7 @@ class Location {
     //in route list and border of the map?
     const double FACTOR = 0.85;
     const double GLOBE_WIDTH = 256;
+    const double MAX_ZOOM = 15;
 
     //<Calculate zoom level to fit longitude bounds!>
     List<double> longitudes = route.map((l)=>l.longitude).toList();
@@ -115,6 +116,7 @@ class Location {
     //"multiply" factor to zoom factor in *linear scale*
     //The following is this calculation simplified
     double adjustedZoom = (Math.log(FACTOR) / Math.ln2) + zoom;
+    adjustedZoom = Math.min(adjustedZoom, MAX_ZOOM);
     return adjustedZoom;
   }
 

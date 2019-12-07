@@ -102,8 +102,25 @@ class _HikeHistoryState extends State<HikeHistory> {
                       );
 
                     //<------- We have User history at this point ----->
+                    if (snapshot.data.length == 0) {
+
+                      return Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: Center(
+                          child: Text("Appears you went on no hike so far!"),
+                        ),
+                      );
+
+                    }
+
                     return ListView(
-                      children: snapshot.data.map((hike) => HikeCard(hike: hike)).toList(),
+                      children: snapshot.data.map((hike) 
+                        => HikeCard(
+                              hike: hike,
+                              onDelete: ()=>setState((){}),
+                           )
+                      ).toList(),
                     );
 
                   },
