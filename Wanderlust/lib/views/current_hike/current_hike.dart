@@ -3,7 +3,6 @@ import 'package:Wanderlust/data_models/pin.dart';
 import 'package:Wanderlust/data_models/user.dart';
 import 'package:Wanderlust/views/current_hike/pin_info_overlay.dart';
 import 'package:Wanderlust/views/edit_pin/edit_pin.dart';
-import 'package:Wanderlust/views/master/master.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
@@ -89,26 +88,27 @@ class CurrentHike extends StatefulWidget {
     List<Location> actualRoute = activeHike.value.actualRoute;
     Hike.uploadHike(userID, routeID, start, stop, actualRoute);
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Text("This hike was saved in your hike history!"),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: ()=>Navigator.pop(context),
-              child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
-            )
-          ],
-        );
-      }
-    );
-
-
-
     //reset all
     activeHike.value = null;
     callback();
+
+    try {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text("This hike was saved in your hike history!"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: ()=>Navigator.pop(context),
+                child: Text("Ok", style: TextStyle(color: Theme.of(context).accentColor),),
+              )
+            ],
+          );
+        }
+      );
+    } catch (e) {}
+
   }
 
 }
@@ -124,18 +124,23 @@ class _CurrentHikeState extends State<CurrentHike> {
   CameraPosition camPos;
   //if tappedPin==null then no info will be shown,
   //otherwise an overview for the pin Information will be shown
-  PinInfoOverlay pinInfo;
+  PinInfoOverlayController pinInfoController;
   
 
   @override
   void initState() {
     super.initState();
-    pinInfo = PinInfoOverlay(
+    pinInfoController = PinInfoOverlayController();
+  }
+
+  Widget buildPinInfoOverlay() {
+    return PinInfoOverlay(
+      controller: pinInfoController,
       onDelete: (pin) {
         Pin.deletePin(pin.pinID).then((evt) {
           setState(() {
-              pinInfo.discard();
-            });
+              pinInfoController.discard();
+          });
         });
       },
       onEdit: (pin) async {
@@ -341,20 +346,20 @@ class _CurrentHikeState extends State<CurrentHike> {
   }
 
   void _discardPinInfo() {
-    pinInfo.discard();
+    pinInfoController.discard();
   }
 
   Future<bool> _onWillPop() async {
-    if (pinInfo.currentPin==null) {
+    if (pinInfoController.currentPin==null) {
       return true; //you may pop the screen
     } else {
-      pinInfo.discard();
+      pinInfoController.discard();
       return false; //dont pop the screen
     }
   }
 
   void _onPinTap(Pin pin) {
-    pinInfo.show(pin);
+    pinInfoController.show(pin);
   }
 
   Widget buildActive(BuildContext context, ActiveHike activeHike) {
@@ -413,7 +418,7 @@ class _CurrentHikeState extends State<CurrentHike> {
             ],
           ),
           
-          pinInfo,
+          buildPinInfoOverlay(),
 
           if (activeHike.isPaused)
             Container(
