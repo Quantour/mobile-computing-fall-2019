@@ -138,15 +138,18 @@ class _HikeCardState extends State<HikeCard> {
                         );
 
                       } else {
-
                         //save thiis route and share with other people
-                        HikingRoute route =  await Navigator.push(
+                        await Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => HikeEditPage(routeSuggestion: widget.hike.actualRoute)),
+                          MaterialPageRoute(
+                            builder: (context) => HikeEditPage(
+                              routeSuggestion: widget.hike.actualRoute,
+                              onSaveCallback: (routeID) {
+                                Hike.updateRoute(widget.hike.hikeID, routeID);
+                              },
+                            )
+                          ),
                         );
-                        
-                        await Hike.updateRoute(widget.hike.hikeID, route.routeID);
-
                       }
                     },
                     child: Container(

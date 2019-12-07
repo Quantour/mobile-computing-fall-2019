@@ -14,8 +14,9 @@ class   HikeEditPage extends StatefulWidget {
   final bool isNew;
   final HikingRoute oldroute;
   final List<Location> routeSuggestion;
+  final void Function(String routeID) onSaveCallback;
 
-  HikeEditPage({this.oldroute, this.routeSuggestion}) : isNew = (oldroute == null) {
+  HikeEditPage({this.oldroute, this.routeSuggestion, this.onSaveCallback}) : isNew = (oldroute == null) {
     //Either it is a new or an old route
     assert(!(oldroute!=null && routeSuggestion!=null));
   }
@@ -139,12 +140,14 @@ class _HikeEditPageState extends State<HikeEditPage> {
       String userID = (await User.currentUser).getID;
       String title = titleController.text;
       int timestamp = DateTime.now().millisecondsSinceEpoch;
-      HikingRoute r = await HikingRoute.uploadRoute(userID, title, routeList, timestamp, description, tips, imageUrls);
-      Navigator.pop(context,r);
+      String rID = await HikingRoute.uploadRoute(userID, title, routeList, timestamp, description, tips, imageUrls);
+      if (widget.onSaveCallback!=null) widget.onSaveCallback(rID);
+      Navigator.pop(context,rID);
       return;
     } else {
-      HikingRoute r = await HikingRoute.updateRoute(widget.oldroute.routeID, description, tips, imageUrls);
-      Navigator.pop(context,r);
+      await HikingRoute.updateRoute(widget.oldroute.routeID, description, tips, imageUrls);
+      if (widget.onSaveCallback!=null) widget.onSaveCallback(widget.oldroute.routeID);
+      Navigator.pop(context,widget.oldroute.routeID);
       return;
     }
   }

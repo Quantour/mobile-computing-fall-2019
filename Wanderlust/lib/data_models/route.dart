@@ -216,57 +216,56 @@ class HikingRoute {
       Location(50.03, 6.005)
     ];
 */
+    DocumentSnapshot ds = await Firestore.instance.collection("route").document(id).get();
 
-    Firestore.instance.collection("route").document(id).get().then((DocumentSnapshot ds) async {
-        if(!ds.exists) return Future.value(null);
-        else {
+    if(!ds.exists) return Future.value(null);
+    else {
 
-          List<Location> route = [];
-          var docRoute = ds["route"];
-          for(int j = 0; j < docRoute.length; j++){
-            route.add(Location(docRoute[j]['latitude'],docRoute[j]['longitude']));
-          }
+      List<Location> route = [];
+      var docRoute = ds["route"];
+      for(int j = 0; j < docRoute.length; j++){
+        route.add(Location(docRoute[j]['latitude'],docRoute[j]['longitude']));
+      }
 
-          List<String> images = [];
-          var docImages = ds["images"];
-          for(int j = 0; j < docImages.length; j++){
-            images.add(docImages[j]);
-          }
+      List<String> images = [];
+      var docImages = ds["images"];
+      for(int j = 0; j < docImages.length; j++){
+        images.add(docImages[j]);
+      }
 
-          //Once you have downloaded the route from the database,
-          //you can calculate nearestCity and country properties
-          //and the steepness of the route like this:
-          List<String> locationName = await _calculateLocationName(Location.average(route));
-          String nearestCity = locationName[0];
-          String country = locationName[1];
-          int avgTime = await _calculateAvgTime(route);
-          int steepness = await _calculateSteepness(route);
+      //Once you have downloaded the route from the database,
+      //you can calculate nearestCity and country properties
+      //and the steepness of the route like this:
+      List<String> locationName = await _calculateLocationName(Location.average(route));
+      String nearestCity = locationName[0];
+      String country = locationName[1];
+      int avgTime = await _calculateAvgTime(route);
+      int steepness = await _calculateSteepness(route);
 
-          Map<String,Map<String,double>> ratings ={};
-          var docRatings = ds["ratings"];
-          docRatings.forEach((k,v) => {
-            ratings[k] = {'experienceRating' : v['experienceRating'], 'difficultyRating' : v['difficultyRating']}
-          });
+      Map<String,Map<String,double>> ratings ={};
+      var docRatings = ds["ratings"];
+      docRatings.forEach((k,v) => {
+        ratings[k] = {'experienceRating' : v['experienceRating'], 'difficultyRating' : v['difficultyRating']}
+      });
 
-          return HikingRoute._(
-            avgDifficulty: ds['avgDifficulty'],
-            avgRating: ds['avgRating'],
-            avgTime: avgTime,
-            description: ds['description'],
-            images: images,
-            ratings: ratings,
-            route: route,
-            routeID: ds['routeID'],
-            timestamp: ds['timestamp'],
-            tipsAndTricks: ds['tipsAndTricks'],
-            title: ds['title'],
-            userID: ds['userID'],
-            nearestCity: nearestCity,
-            country: country,
-            steepness: steepness
-          );
-        }
-    });
+      return HikingRoute._(
+        avgDifficulty: ds['avgDifficulty'],
+        avgRating: ds['avgRating'],
+        avgTime: avgTime,
+        description: ds['description'],
+        images: images,
+        ratings: ratings,
+        route: route,
+        routeID: ds['routeID'],
+        timestamp: ds['timestamp'],
+        tipsAndTricks: ds['tipsAndTricks'],
+        title: ds['title'],
+        userID: ds['userID'],
+        nearestCity: nearestCity,
+        country: country,
+        steepness: steepness
+      );
+    }
 
     
 /*
@@ -301,7 +300,8 @@ class HikingRoute {
   if the route was uploaded,
   otherwise it finished the furure with an error
   */
-  static Future<HikingRoute> uploadRoute (
+  //RETURN ID OF ROUTE!!!!!
+  static Future<String> uploadRoute (
     String userID,
     String title, 
     List<Location> route,
@@ -321,7 +321,7 @@ class HikingRoute {
     for(Location loc in route){
       modifiedRoute.add({'latitude' : loc.latitude, 'longitude' : loc.longitude});
     }
-      
+
     a.setData({
       'avgDifficulty' : 2.5,
       'avgRating' : 2.5,
@@ -340,7 +340,7 @@ class HikingRoute {
       'steepness' : steepness
       });
 
-    return Future.value(null);
+    return Future.value(docID);
   }
 
 
@@ -349,14 +349,13 @@ class HikingRoute {
     if the route was uploaded,
     otherwise it finished the future with an error
     */
-    static Future<HikingRoute> updateRoute(
+    static Future<void> updateRoute(
       String routeID,
       String description,
       String tipsAndTricks,
-      List<String> images) {
+      List<String> images) async {
       var a = Firestore.instance.collection("route").document(routeID); 
       a.updateData({'description' : description, 'tipsAndTricks' : tipsAndTricks, 'images' : images });
-      return Future.value(null);
   }
 
   /*This function deletes a route from the cloude
