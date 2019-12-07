@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HikeCard extends StatefulWidget {
-  HikeCard({Key key,@required this.hike}) : super(key: key);
+  final void Function() onDelete; 
+  HikeCard({Key key,@required this.hike, this.onDelete}) : super(key: key);
 
   final Hike hike;
 
@@ -81,8 +82,9 @@ class _HikeCardState extends State<HikeCard> {
                     GestureDetector(
                       onTap: () {
                         Hike.deleteHike(widget.hike.hikeID);
-                        // TODO get Hike ID
-                        print("delet");
+                        print("delete Hike");
+                        if (widget.onDelete!=null)
+                          widget.onDelete();
                       },
                       child: Icon(Icons.delete, color: Theme.of(context).accentColor,),
                     )

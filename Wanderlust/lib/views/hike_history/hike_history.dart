@@ -103,7 +103,12 @@ class _HikeHistoryState extends State<HikeHistory> {
 
                     //<------- We have User history at this point ----->
                     return ListView(
-                      children: snapshot.data.map((hike) => HikeCard(hike: hike)).toList(),
+                      children: snapshot.data.map((hike) 
+                        => HikeCard(
+                              hike: hike,
+                              onDelete: ()=>setState((){}),
+                           )
+                      ).toList(),
                     );
 
                   },
