@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:transparent_image/transparent_image.dart';
 import '../../data_models/location.dart';
 import '../../data_models/user.dart';
 
@@ -176,11 +177,17 @@ class _PinEditPageState extends State<PinEditPage> {
         body: Container(
           color: Colors.black.withAlpha(200),
           padding: EdgeInsets.all(15),
-          child: Center(
-            child: Image(
-              image: img.image,
-              fit: BoxFit.contain,
-            ),
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              Center(child: CircularProgressIndicator(),),
+              Center(
+                child: Image(
+                  image: img.image,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ],
           ),
         ),
         bottomNavigationBar: Row(
@@ -230,9 +237,17 @@ class _PinEditPageState extends State<PinEditPage> {
               child: Container(
                 width: widthOfGridElement,
                 height: widthOfGridElement,
-                decoration: BoxDecoration(
-                    image:
-                        DecorationImage(fit: BoxFit.cover, image: img.image)),
+                child: Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    Center(child: CircularProgressIndicator()),
+                    FadeInImage(
+                      fit: BoxFit.cover,
+                      image: img.image,
+                      placeholder: MemoryImage(kTransparentImage),
+                    )
+                  ],
+                ),
               ),
             ),
           InkWell(
@@ -265,6 +280,8 @@ class _PinEditPageState extends State<PinEditPage> {
             rowCount = 0;
           }
         }
+        if (rowCount > 0)
+          grid.add(gridRow);
         /*int row = 0; int col = 0;
         for (int i = 0; i < gridItems.length; i++) {
           if (grid.length <= row) grid.add([]);

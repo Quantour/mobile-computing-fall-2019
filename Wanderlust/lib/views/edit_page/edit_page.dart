@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:Wanderlust/ui_elements/route_map.dart';
 import 'package:Wanderlust/views/edit_page/edit_loc_data_page.dart';
+import 'package:transparent_image/transparent_image.dart';
 import '../../data_models/location.dart';
 import '../../data_models/route.dart';
 import '../../data_models/user.dart';
@@ -199,11 +200,17 @@ class _HikeEditPageState extends State<HikeEditPage> {
         body: Container(
           color: Colors.black.withAlpha(200),
           padding: EdgeInsets.all(15),
-          child: Center(
-            child: Image(
-              image: img.image,
-              fit: BoxFit.contain,
-            ),
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: <Widget>[
+              Center(child: CircularProgressIndicator(),),
+              Center(
+                child: Image(
+                  image: img.image,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ],
           ),
         ),
         bottomNavigationBar: Row(
@@ -253,9 +260,17 @@ class _HikeEditPageState extends State<HikeEditPage> {
               child: Container(
                 width: widthOfGridElement,
                 height: widthOfGridElement,
-                decoration: BoxDecoration(
-                    image:
-                        DecorationImage(fit: BoxFit.cover, image: img.image)),
+                child: Stack(
+                  fit: StackFit.passthrough,
+                  children: <Widget>[
+                    Center(child: CircularProgressIndicator()),
+                    FadeInImage(
+                      fit: BoxFit.cover,
+                      image: img.image,
+                      placeholder: MemoryImage(kTransparentImage),
+                    )
+                  ],
+                ),
               ),
             ),
           InkWell(
@@ -288,6 +303,8 @@ class _HikeEditPageState extends State<HikeEditPage> {
             rowCount = 0;
           }
         }
+        if (rowCount > 0)
+          grid.add(gridRow);
         /*int row = 0; int col = 0;
         for (int i = 0; i < gridItems.length; i++) {
           if (grid.length <= row) grid.add([]);
