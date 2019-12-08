@@ -86,54 +86,6 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                               CustomButton(
                                 padding: const EdgeInsets.all(8),
                                 margin: const EdgeInsets.all(8),
-                                color: (!loginstatus)?Colors.grey:Theme.of(context).accentColor,
-                                text: "Delete",
-                                child: Icon(Icons.delete, color:(!loginstatus)?Colors.grey:Theme.of(context).accentColor, size: 18,),
-                                onPressed: () {
-                                  if (!loginstatus)
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          actions: <Widget>[
-                                            FlatButton(
-                                              child: Text("Ok"),
-                                              onPressed: ()=>Navigator.pop(context),
-                                            )
-                                          ],
-                                          content: Text("You must be logged in, in order to delete a route!"),
-                                        );
-                                      }
-                                    );
-                                  else {
-                                    showDialog(
-                                      context: context,
-                                      builder: (con) {
-                                        return AlertDialog(
-                                          actions: <Widget>[
-                                            FlatButton(
-                                              child: Text("Yes"),
-                                              onPressed: () {
-                                                HikingRoute.deleteRoute(snapshot.data.routeID);
-                                                Navigator.pop(con);
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                            FlatButton(
-                                              child: Text("Cancel"),
-                                              onPressed: ()=>Navigator.pop(con),
-                                            )
-                                          ],
-                                          content: Text("Are you sure you want to delete the route?"),
-                                        );
-                                      }
-                                    );
-                                  }
-                                },
-                              ),
-                              CustomButton(
-                                padding: const EdgeInsets.all(8),
-                                margin: const EdgeInsets.all(8),
                                 color: (CurrentHike.isActive||!loginstatus)?Colors.grey:Theme.of(context).accentColor,
                                 text: "Start",
                                 child: Icon(Icons.play_arrow, color:(CurrentHike.isActive||!loginstatus)?Colors.grey:Theme.of(context).accentColor, size: 18,),
@@ -234,6 +186,54 @@ class _DiscoverDetailState extends State<DiscoverDetail> {
                                       MaterialPageRoute(builder: (context) => HikeEditPage(oldroute: route)),
                                   );
                                   Navigator.pop(context);
+                                },
+                              ),
+                              CustomButton(
+                                padding: const EdgeInsets.all(8),
+                                margin: const EdgeInsets.all(8),
+                                color: (!loginstatus)?Colors.grey:Theme.of(context).accentColor,
+                                text: "Delete",
+                                child: Icon(Icons.delete, color:(!loginstatus)?Colors.grey:Theme.of(context).accentColor, size: 18,),
+                                onPressed: () {
+                                  if (!loginstatus)
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                child: Text("Ok"),
+                                                onPressed: ()=>Navigator.pop(context),
+                                              )
+                                            ],
+                                            content: Text("You must be logged in, in order to delete a route!"),
+                                          );
+                                        }
+                                    );
+                                  else {
+                                    showDialog(
+                                        context: context,
+                                        builder: (con) {
+                                          return AlertDialog(
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                child: Text("Yes"),
+                                                onPressed: () {
+                                                  HikingRoute.deleteRoute(snapshot.data.routeID);
+                                                  Navigator.pop(con);
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                              FlatButton(
+                                                child: Text("Cancel"),
+                                                onPressed: ()=>Navigator.pop(con),
+                                              )
+                                            ],
+                                            content: Text("Are you sure you want to delete the route?"),
+                                          );
+                                        }
+                                    );
+                                  }
                                 },
                               )
                             ],

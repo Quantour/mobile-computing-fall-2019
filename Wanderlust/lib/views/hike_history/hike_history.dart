@@ -51,15 +51,6 @@ class _HikeHistoryState extends State<HikeHistory> {
                 ],
               ),
             );
-
-          //<------- Build this when User IS logged in ----->
-          //########################################################
-          //##
-          //##
-          //TODO: use stream of firebase instead...
-          //##
-          //##
-          //########################################################
           return FutureBuilder(
             future: Hike.getCurrentUserHistory(),
             builder: (context,snapshot){

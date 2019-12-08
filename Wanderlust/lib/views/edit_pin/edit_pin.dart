@@ -317,7 +317,7 @@ class _PinEditPageState extends State<PinEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    FutureBuilder(
+    return FutureBuilder(
       future: User.isLoggedIn,
       builder: (context, loginSnapshot) {
         bool loginstatus = false;
