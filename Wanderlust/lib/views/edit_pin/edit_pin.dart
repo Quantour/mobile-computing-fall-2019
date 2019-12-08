@@ -317,14 +317,14 @@ class _PinEditPageState extends State<PinEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<bool>(
       future: User.isLoggedIn,
-      builder: (context, loginSnapshot) {
-        bool loginstatus = false;
-        if (loginSnapshot.hasData)
-          loginSnapshot = loginSnapshot.data;
+      builder: (context, snapshot) {
+        bool logInStatus = false;
+        if (snapshot.hasData)
+          logInStatus = snapshot.data;
 
-        if (!loginstatus) return buildWhenUserNotLoggedIn(context);
+        if (!logInStatus) return buildWhenUserNotLoggedIn(context);
 
         return Scaffold(
           body: SingleChildScrollView(
