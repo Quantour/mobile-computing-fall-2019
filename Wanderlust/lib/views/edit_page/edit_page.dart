@@ -240,11 +240,11 @@ class _HikeEditPageState extends State<HikeEditPage> {
   }
 
   Widget _buildImagePicker() {
-    return Builder(
-      builder: (context) {
-        const int number_of_colums = 5;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const int number_of_colums = 4;
         double widthOfGridElement =
-            MediaQuery.of(context).size.width / number_of_colums;
+            constraints.maxWidth / number_of_colums;
         //build list of widgets which are going to be displayed in a grid view
         List<Widget> gridItems = [
           for (NetwOrFileImg img in images)
@@ -277,7 +277,18 @@ class _HikeEditPageState extends State<HikeEditPage> {
 
         //put gridItems in matrix
         List<List<Widget>> grid = [];
-        int row = 0; int col = 0;
+        List<Widget> gridRow = [];
+        int rowCount = 0;
+        for (Widget w in gridItems) {
+          rowCount+=1;
+          gridRow.add(w);
+          if (rowCount==number_of_colums) {
+            grid.add(gridRow);
+            gridRow = [];
+            rowCount = 0;
+          }
+        }
+        /*int row = 0; int col = 0;
         for (int i = 0; i < gridItems.length; i++) {
           if (grid.length <= row) grid.add([]);
           grid[row] = grid[row]..add(gridItems[i]);
@@ -286,7 +297,7 @@ class _HikeEditPageState extends State<HikeEditPage> {
             col = 0;
             row++;
           }
-        }
+        }*/
 
         //display matrix
         return Column(
